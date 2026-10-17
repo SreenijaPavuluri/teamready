@@ -1,0 +1,5 @@
+uagents>=0.26.1
+uagents-core>=0.4.12
+anthropic>=0.49.0
+python-dotenv>=1.0.0
+pytest>=8.0.0

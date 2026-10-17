@@ -1,0 +1,117 @@
+{
+  "stop_categories": [
+    {
+      "category": "performance",
+      "terms": [
+        "promotion",
+        "promoted",
+        "performance review",
+        "performance rating",
+        "deserve a raise",
+        "pip ",
+        "performance plan"
+      ],
+      "human_id": "p06",
+      "channel": "HR Business Partner or your manager",
+      "reason": "Performance and promotion decisions need accountable human review."
+    },
+    {
+      "category": "compensation",
+      "terms": [
+        "salary",
+        "compensation",
+        "a raise",
+        "pay raise",
+        "pay increase",
+        "bonus",
+        "equity",
+        "stock options",
+        "paycheck"
+      ],
+      "human_id": "p06",
+      "channel": "HR Business Partner",
+      "reason": "Pay and compensation questions are handled by HR, not an assistant."
+    },
+    {
+      "category": "benefits eligibility",
+      "terms": [
+        "eligible for benefits",
+        "benefits eligibility",
+        "eligible for insurance",
+        "insurance coverage",
+        "covered by insurance",
+        "eligible for health"
+      ],
+      "human_id": "p06",
+      "channel": "HR Business Partner",
+      "reason": "Benefits eligibility is decided by HR. Unblock can only point you to the right place."
+    },
+    {
+      "category": "employment status",
+      "terms": [
+        "fired",
+        "termination",
+        "terminate",
+        "layoff",
+        "laid off",
+        "quit",
+        "resign",
+        "visa",
+        "immigration"
+      ],
+      "human_id": "p06",
+      "channel": "HR Business Partner",
+      "reason": "Employment status questions need a confidential conversation with a person."
+    },
+    {
+      "category": "harassment or wellbeing",
+      "terms": [
+        "harass",
+        "discriminat",
+        "unsafe",
+        "bullied",
+        "bullying",
+        "hostile",
+        "mental health",
+        "overwhelmed",
+        "burnout"
+      ],
+      "human_id": "p06",
+      "channel": "HR Business Partner, or the confidential Employee Assistance line",
+      "reason": "This deserves a confidential conversation with a person who can help."
+    }
+  ],
+  "approval_categories": [
+    {
+      "category": "production access",
+      "terms": [
+        "production access",
+        "prod access",
+        "access to prod",
+        "prod db",
+        "production database",
+        "admin access",
+        "root access",
+        "sudo",
+        "break-glass"
+      ],
+      "approver": "manager",
+      "reason": "Elevated access always needs your manager's approval. Unblock prepares the request but never files it on its own."
+    },
+    {
+      "category": "analytics access",
+      "terms": [
+        "analytics workspace access",
+        "dashboard access",
+        "access to the analytics",
+        "access to the dashboard",
+        "looker access"
+      ],
+      "approver": "manager",
+      "reason": "Analytics Workspace access needs your manager's approval before Data Platform processes it."
+    }
+  ],
+  "message_actions_need_user_approval": true,
+  "min_cohort_size": 5,
+  "default_helper": "p05"
+}
