@@ -20,7 +20,7 @@ from fastapi import FastAPI, Header, HTTPException, Request  # noqa: E402
 from fastapi.responses import FileResponse, JSONResponse  # noqa: E402
 from pydantic import BaseModel, Field  # noqa: E402
 
-from unblock import semantic, timeseries, workday  # noqa: E402
+from unblock import creao, semantic, timeseries, workday  # noqa: E402
 from unblock.config import env  # noqa: E402
 from unblock.data import load_people, load_user  # noqa: E402
 from unblock.friction import build_map  # noqa: E402
@@ -134,4 +134,5 @@ def health():
     return JSONResponse({"ok": True, "llm": llm.mode, "model": getattr(llm, "model", ""),
                          "retrieval": "hybrid (Gemini)" if semantic.enabled() else "keyword (BM25)",
                          "friction_store": "Tiger Data" if timeseries.enabled() else "JSON files",
-                         "new_hire_profile": (load_user(), workday.status())[1]})
+                         "new_hire_profile": (load_user(), workday.status())[1],
+                         "doc_fixes": creao.status()})

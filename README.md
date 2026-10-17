@@ -4,7 +4,7 @@
 ![tag:hackathon](https://img.shields.io/badge/hackathon-5F43F1)
 
 **A "who do I ask?" agent network for new hires that can't make things up.**
-Built for LA Hacks AI Hackathon 2026: Workday "Build the Future of Work with AI" and the Fetch.ai ASI:One Agent Challenge.
+Built for LA Hacks AI Hackathon 2026: Workday "Build the Future of Work with AI", the Fetch.ai ASI:One Agent Challenge, and CREAO Best Team Empowerment.
 
 A new hire describes a blocker in ASI:One. Unblock answers only from approved company docs, verifies every claim word for word, finds the right person to ask when the docs fall short, drafts the message, and sends it only after the new hire approves. Access requests go to a human manager. Pay, performance and harassment questions go straight to a person. People Ops gets an anonymous Friction Map of what keeps blocking new hires, and pays for the full report through the Fetch.ai Payment Protocol.
 
@@ -47,6 +47,7 @@ Full checklist with what each sponsor asks for and the manual steps: [`docs/TRAC
 | --- | --- |
 | Workday | The product: a new-hire agent with visible responsible-AI controls and a People Ops Friction Map. Reads the new hire's profile from a Workday Build development tenant ([setup](docs/WORKDAY.md)) |
 | Fetch.ai | Six uAgents on Agentverse, Chat Protocol, ASI:One, Interactive Cards, Payment Protocol (FET) |
+| CREAO (Team Empowerment) | The Doc Steward agent on CREAO drafts every doc fix from the Friction Map (API Trigger, async), and a scheduled Weekly Digest agent tells doc owners on Slack ([setup](docs/CREAO.md)). Agent ID: `TODO` · Run: `TODO share link` |
 | Gemini | Hybrid retrieval with Gemini embeddings; Gemini as a drop-in reasoning model behind the same verifier |
 | Snowflake | Cortex chat completions REST API as a third reasoning model |
 | Tiger Data | Friction events in a TimescaleDB hypertable, 30-day view from a continuous aggregate |

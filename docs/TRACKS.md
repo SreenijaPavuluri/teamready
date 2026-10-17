@@ -31,6 +31,16 @@ Status key: **Built and tested** means code plus automated tests in this repo. *
 | Bonus: Interactive Cards | Built; **check they render in ASI:One** |
 | Bonus: reliability | Built and tested: fallbacks, clear errors, payment cancels on failure |
 
+## CREAO: Best Team Empowerment
+
+| Requirement | Status |
+| --- | --- |
+| A CREAO agent does the core work | Built: the Doc Steward drafts every doc fix (`unblock/creao.py`, `agents/insights_agent.py`), tested with a stubbed API |
+| Agent built on agent.creao.ai | Needs you: paste the instructions from `docs/CREAO.md` |
+| README has the agent ID and a run share link | Needs you, after the first real run |
+| Agent shown running in the demo | Needs you |
+| Devpost: select the CREAO track | Needs you |
+
 ## MLH prizes
 
 ### Best use of Gemini

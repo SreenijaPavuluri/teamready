@@ -4,6 +4,11 @@ Free:  "friction map" -> top clusters (anonymous aggregates only).
 Paid:  "full report"  -> 0.1 FET via the Payment Protocol, then the full report
        plus an AI-drafted doc fix for the worst process gap. The doc owner, a
        human, approves the fix before anything changes.
+
+With CREAO_APP_ID set, the fix is drafted by the CREAO Doc Steward agent
+(unblock/creao.py): the run starts, the report goes out, and the proposal
+follows in the same chat when the run finishes. The exact-quote check applies
+either way, and a failed or slow run falls back to drafting here.
 """
 import asyncio
 import json
@@ -22,7 +27,7 @@ from uagents_core.contrib.protocols.payment import (
     payment_protocol_spec,
 )
 
-from unblock import render, solana_pay
+from unblock import creao, render, solana_pay
 from unblock.actions import send_email
 from unblock.chat import card_message, create_chat_protocol, parse_input, text_message
 from unblock.config import env
@@ -33,6 +38,8 @@ from unblock.models import FrictionEvent
 from unblock.text import normalize
 
 PRICE = env("INSIGHTS_PRICE_FET", "0.1")
+CREAO_CHECK_SECONDS = float(env("CREAO_CHECK_SECONDS", "20"))
+CREAO_TIMEOUT_SECONDS = float(env("CREAO_TIMEOUT_MINUTES", "12")) * 60
 
 agent = create_agent(
     "insights", "unblock-insights",
@@ -71,33 +78,42 @@ async def _request_payment(ctx: Context, sender: str) -> None:
     ))
 
 
-def _proposal() -> dict | None:
-    fmap = build_map()
+def _target():
+    """The biggest fixable cluster, with the doc to fix and the doc that has the missing detail."""
     docs = load_docs()
-    for cluster in fmap["clusters"]:
+    for cluster in build_map()["clusters"]:
         target = fix_target(cluster) if cluster["fixable"] else None
-        if not target:
-            continue
-        doc, source = docs[target[0]], docs[target[1]]
-        try:
-            fix = get_llm().propose_fix(cluster, doc.body, doc.title, source.body)
-        except LLMError as exc:
-            return {"cluster": cluster, "error": f"The model is unavailable ({exc}), so no fix was drafted."}
-        before, after = str(fix.get("before_quote") or ""), fix.get("after_text")
-        if len(normalize(before).split()) < 4 or normalize(before) not in normalize(doc.body):
-            return {"cluster": cluster, "error": "The drafted fix didn't quote the doc exactly, so I blocked it."}
-        if not isinstance(after, str) or not after.strip():
-            return {"cluster": cluster, "error": "The drafted fix was empty, so I blocked it."}
-        fix = {"before_quote": before, "after_text": after.strip(), "rationale": str(fix.get("rationale") or "")}
-        return {"cluster": cluster, "doc_id": doc.id, "doc_title": doc.title, "owner_id": doc.owner,
-                "before": fix["before_quote"], "after": fix["after_text"], "rationale": fix.get("rationale", "")}
+        if target:
+            return cluster, docs[target[0]], docs[target[1]]
     return None
 
 
-async def _send_report(ctx: Context, sender: str):
-    fmap = build_map()
-    proposal = await asyncio.to_thread(_proposal)
-    text = render.friction_text(fmap, full=True)
+def _check_fix(fix, cluster: dict, doc) -> dict:
+    """Same rules whoever drafted the fix (Sonnet, Gemini or the CREAO Doc Steward): exact quote, non-empty edit."""
+    if not isinstance(fix, dict):
+        return {"cluster": cluster, "error": "The drafted fix wasn't in the expected format, so I blocked it."}
+    before, after = str(fix.get("before_quote") or ""), fix.get("after_text")
+    if len(normalize(before).split()) < 4 or normalize(before) not in normalize(doc.body):
+        return {"cluster": cluster, "error": "The drafted fix didn't quote the doc exactly, so I blocked it."}
+    if not isinstance(after, str) or not after.strip():
+        return {"cluster": cluster, "error": "The drafted fix was empty, so I blocked it."}
+    return {"cluster": cluster, "doc_id": doc.id, "doc_title": doc.title, "owner_id": doc.owner,
+            "before": before, "after": after.strip(), "rationale": str(fix.get("rationale") or "")}
+
+
+def _proposal() -> dict | None:
+    found = _target()
+    if not found:
+        return None
+    cluster, doc, source = found
+    try:
+        fix = get_llm().propose_fix(cluster, doc.body, doc.title, source.body)
+    except LLMError as exc:
+        return {"cluster": cluster, "error": f"The model is unavailable ({exc}), so no fix was drafted."}
+    return _check_fix(fix, cluster, doc)
+
+
+def _proposal_message(ctx: Context, sender: str, text: str, proposal: dict | None):
     if not proposal:
         return text_message(text + "\n\nNo cluster has a clear doc fix right now.")
     if "error" in proposal:
@@ -117,6 +133,70 @@ async def _send_report(ctx: Context, sender: str):
         "approve_cta": {"label": "Send to doc owner", "primary": True, "selection": {"action": "ub_approve"}},
         "reject_cta": {"label": "Not now", "selection": {"action": "ub_reject"}},
     })
+
+
+def _start_creao(ctx: Context, sender: str) -> str:
+    """Hand the drafting to the CREAO Doc Steward. Returns a status line, or "" to draft locally instead."""
+    found = _target()
+    if not found:
+        return ""
+    cluster, doc, source = found
+    try:
+        run_id = creao.start_run(creao.fix_inputs(cluster, doc.title, doc.body, source.title, source.body))
+    except Exception as exc:
+        ctx.logger.warning(f"CREAO run failed to start, drafting locally: {exc}")
+        return ""
+    pending = json.loads(ctx.storage.get("creao:pending") or "{}")
+    pending[run_id] = {"sender": sender, "doc_id": doc.id, "topic": cluster["topic"], "started": time.time()}
+    ctx.storage.set("creao:pending", json.dumps(pending))
+    ctx.logger.info(f"CREAO Doc Steward run {run_id} started for {cluster['topic']}")
+    return (f"\n\n**The CREAO Doc Steward is drafting a fix for '{doc.title}'** (run `{run_id}`). "
+            "It takes a few minutes; I'll post the proposal in this chat when it's ready.")
+
+
+async def _send_report(ctx: Context, sender: str):
+    text = render.friction_text(build_map(), full=True)
+    if creao.enabled():
+        line = await asyncio.to_thread(_start_creao, ctx, sender)
+        if line:
+            return text_message(text + line)
+    proposal = await asyncio.to_thread(_proposal)
+    return _proposal_message(ctx, sender, text, proposal)
+
+
+@agent.on_interval(period=CREAO_CHECK_SECONDS)
+async def check_creao(ctx: Context):
+    pending = json.loads(ctx.storage.get("creao:pending") or "{}")
+    if not pending:
+        return
+    for run_id, job in list(pending.items()):
+        timed_out = time.time() - job["started"] > CREAO_TIMEOUT_SECONDS
+        try:
+            run = await asyncio.to_thread(creao.get_run, run_id)
+        except Exception as exc:
+            ctx.logger.warning(f"CREAO poll {run_id}: {exc}")
+            run = None
+        if run is not None and run.get("status") not in creao.DONE and not timed_out:
+            continue
+        if run is None and not timed_out:
+            continue
+        del pending[run_id]
+        ctx.storage.set("creao:pending", json.dumps(pending))
+        found = _target()
+        if not found:
+            await ctx.send(job["sender"], text_message("The Friction Map changed while the fix was drafted; no fix is needed now."))
+            continue
+        cluster, doc, _ = found
+        try:
+            if run is None:
+                raise LLMError("the run took too long")
+            proposal = _check_fix(creao.result_fix(run), cluster, doc)
+            head = f"**CREAO Doc Steward finished** (run `{run_id}`)."
+        except LLMError as exc:
+            ctx.logger.warning(f"CREAO run {run_id} unusable ({exc}); drafting locally")
+            proposal = await asyncio.to_thread(_proposal)
+            head = f"The CREAO run didn't return a usable fix ({exc}), so I drafted it here instead."
+        await ctx.send(job["sender"], _proposal_message(ctx, job["sender"], head, proposal))
 
 
 def _payment_problem(pending: dict | None, msg: CommitPayment) -> str:

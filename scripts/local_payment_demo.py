@@ -51,11 +51,13 @@ async def complete(ctx: Context, sender: str, msg: CompletePayment):
 @buyer.on_event("startup")
 async def go(ctx: Context):
     await asyncio.sleep(2)
-    for text, replies in (("friction map", 1), ("full report", 2), ("approve", 1)):
+    # With CREAO on, the drafted fix arrives as a third message when the Doc Steward's run finishes.
+    from unblock import creao
+    for text, replies in (("friction map", 1), ("full report", 3 if creao.enabled() else 2), ("approve", 1)):
         print(f"\n>>> people ops says: {text}")
         await ctx.send(address("insights"), text_message(text))
         for _ in range(replies):
-            await asyncio.wait_for(got.get(), timeout=90)
+            await asyncio.wait_for(got.get(), timeout=900)
     os._exit(0)
 
 
