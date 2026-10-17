@@ -1,4 +1,4 @@
-"""Run all six Unblock agents in one process.
+"""Run all seven Unblock agents in one process.
 
     python agents/main.py
 
@@ -14,12 +14,13 @@ from manager_agent import agent as manager
 from orchestrator import agent as orchestrator
 from routing_agent import agent as routing
 from tracker_agent import agent as tracker
+from canary_agent import agent as canary
 
 bureau = Bureau(port=8000, endpoint=["http://127.0.0.1:8000/submit"])
-for a in (orchestrator, knowledge, routing, manager, insights, tracker):
+for a in (orchestrator, knowledge, routing, manager, insights, tracker, canary):
     bureau.add(a)
 
 if __name__ == "__main__":
-    for a in (orchestrator, knowledge, routing, manager, insights, tracker):
+    for a in (orchestrator, knowledge, routing, manager, insights, tracker, canary):
         print(f"{a.name:24s} {a.address}")
     bureau.run()

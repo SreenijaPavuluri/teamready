@@ -23,6 +23,7 @@ AGENTS = {
     "manager": ("MANAGER_SEED", "unblock manager demo seed CHANGE ME", 8103),
     "insights": ("INSIGHTS_SEED", "unblock insights demo seed CHANGE ME", 8104),
     "tracker": ("TRACKER_SEED", "unblock tracker demo seed CHANGE ME", 8105),
+    "canary": ("CANARY_SEED", "unblock canary demo seed CHANGE ME", 8106),
 }
 
 

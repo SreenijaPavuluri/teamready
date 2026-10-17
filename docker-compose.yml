@@ -1,6 +1,6 @@
 # Run everything on one Vultr server:  docker compose up -d --build
 # - web:    landing page, live demo, Friction Map, ElevenLabs voice tool
-# - agents: the five uAgents (Agentverse mailbox mode when AGENTVERSE_API_KEY is set)
+# - agents: the seven uAgents (Agentverse mailbox mode when AGENTVERSE_API_KEY is set)
 # - caddy:  HTTPS for your domain (set DOMAIN in .env), needed for the ElevenLabs webhook
 services:
   web:
@@ -16,7 +16,7 @@ services:
     command: ["sh", "-c", "./scripts/run_all.sh && tail -F logs/*.log"]
     restart: unless-stopped
     # Local-only ports, for the Agent Inspector "Connect" fallback over an SSH tunnel
-    ports: ["127.0.0.1:8100-8105:8100-8105"]
+    ports: ["127.0.0.1:8100-8106:8100-8106"]
     volumes: [runtime:/app/data/runtime, outbox:/app/outbox]
 
   caddy:

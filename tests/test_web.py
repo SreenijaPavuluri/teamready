@@ -38,7 +38,7 @@ def test_voice_never_guesses():
 def test_friction_and_agents_endpoints():
     m = client.get("/api/friction").json()
     assert m["clusters"] and m["storage"] == "JSON files"
-    assert len(client.get("/api/agents").json()) == 6
+    assert len(client.get("/api/agents").json()) == 7
 
 
 def test_rate_limit(monkeypatch):
