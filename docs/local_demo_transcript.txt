@@ -1,6 +1,6 @@
 
 ==============================================================================
-USER says
+NEW HIRE -> UNBLOCK
 ------------------------------------------------------------------------------
 How do I set up my dev environment?
 
@@ -18,7 +18,7 @@ Confidence: High (100/100). Sources: Local Development Environment Setup (update
 _Mode: extractive (no AI model). Answers are direct quotes from the docs._
 
 ==============================================================================
-USER says
+NEW HIRE -> UNBLOCK
 ------------------------------------------------------------------------------
 How do I deploy to staging?
 
@@ -40,7 +40,7 @@ _Mode: extractive (no AI model). Answers are direct quotes from the docs._
 Want me to tell Wei Zhang (the owner) that the old doc is out of date? Reply **approve** to send the note I drafted, or **reject**.
 
 ==============================================================================
-USER says
+NEW HIRE -> UNBLOCK
 ------------------------------------------------------------------------------
 reject
 
@@ -50,7 +50,7 @@ UNBLOCK -> new hire
 Okay, I discarded the draft. Nothing was sent.
 
 ==============================================================================
-USER says
+NEW HIRE -> UNBLOCK
 ------------------------------------------------------------------------------
 How many vacation days do I get?
 
@@ -68,7 +68,7 @@ Confidence: High (93/100). Sources: Time Off Policy: United States (updated 2026
 _Mode: extractive (no AI model). Answers are direct quotes from the docs._
 
 ==============================================================================
-USER says
+NEW HIRE -> UNBLOCK
 ------------------------------------------------------------------------------
 wrong person
 
@@ -100,17 +100,50 @@ Maya
 Reply **approve**, **reject**, **edit: <your new message>**, or **wrong person**.
 
 ==============================================================================
-USER says
+NEW HIRE -> UNBLOCK
 ------------------------------------------------------------------------------
 approve
 
 ==============================================================================
 UNBLOCK -> new hire
 ------------------------------------------------------------------------------
-**Simulated (email not configured).** Email is not configured, so nothing was sent. Saved to outbox/20261017-122825-c5e676.eml. Reply **wrong person** if they can't help, and I'll find someone else.
+**Simulated (email not configured).** Email is not configured, so nothing was sent. Saved to outbox/20261017-141303-a7706f.eml. The Unblock Tracker will check back if there's no reply. Reply **wrong person** if they can't help, and I'll find someone else.
 
 ==============================================================================
-USER says
+(waiting)
+------------------------------------------------------------------------------
+the Tracker notices no reply and offers a follow-up
+
+==============================================================================
+TRACKER -> new hire  [card: review]
+------------------------------------------------------------------------------
+It's been 1 minute since your message to **Sofia Rossi** about "How many vacation days do I get?", and there's no answer yet.
+
+I drafted a friendly follow-up. Nothing is sent until you approve it.
+
+To: Sofia Rossi <sofia.rossi@lumen.example>
+Subject: Following up: How many vacation days do I get?
+
+Hi Sofia,
+
+Just following up on my earlier message about "How many vacation days do I get?". No rush, and thank you for your help!
+
+Maya
+
+Reply **approve**, **reject**, or **edit: <your new message>**.
+
+==============================================================================
+NEW HIRE -> TRACKER
+------------------------------------------------------------------------------
+approve
+
+==============================================================================
+TRACKER -> new hire
+------------------------------------------------------------------------------
+**Simulated (email not configured).** Email is not configured, so nothing was sent. Saved to outbox/20261017-141307-7c7667.eml.
+
+==============================================================================
+NEW HIRE -> UNBLOCK
 ------------------------------------------------------------------------------
 I need access to the analytics dashboard
 
@@ -140,25 +173,25 @@ Maya
 Reply **approve**, **reject**, **edit: <your new message>**, or **wrong person**.
 
 ==============================================================================
-USER says
+NEW HIRE -> UNBLOCK
 ------------------------------------------------------------------------------
 approve
 
 ==============================================================================
 UNBLOCK -> new hire
 ------------------------------------------------------------------------------
-Sent request **AR-B77058** to Jordan Lee's approval agent. Delivered.
+Sent request **AR-F0E49D** to Jordan Lee's approval agent. Delivered.
 Only your manager can approve it. I'll message you here as soon as they decide.
 
 ==============================================================================
-MANAGER says
+MANAGER -> MANAGER AGENT
 ------------------------------------------------------------------------------
 pending
 
 ==============================================================================
 MANAGER AGENT -> manager  [card: review]
 ------------------------------------------------------------------------------
-**Approval request AR-B77058**: analytics access
+**Approval request AR-F0E49D**: analytics access
 From: Maya Chen, Data Analyst (Growth Insights)
 Subject: New hire question: I need access to the analytics dashboard
 
@@ -176,22 +209,22 @@ Evidence Unblock verified in approved docs:
 - Standard access is read-only. Editor access to shared dashboards needs a second approval from the dashboard owner. [D01]
 - In the form, name the project or reporting task that needs access. Requests without a business reason are returned. [D01]
 
-Reply **approve AR-B77058** or **reject AR-B77058 <reason>**.
+Reply **approve AR-F0E49D** or **reject AR-F0E49D <reason>**.
 
 ==============================================================================
-MANAGER says
+MANAGER -> MANAGER AGENT
 ------------------------------------------------------------------------------
 approve
 
 ==============================================================================
 MANAGER AGENT -> manager
 ------------------------------------------------------------------------------
-Done: AR-B77058 approved. I've told the orchestrator, which will let Maya Chen know.
+Done: AR-F0E49D approved. I've told the orchestrator, which will let Maya Chen know.
 
 ==============================================================================
 UNBLOCK -> new hire
 ------------------------------------------------------------------------------
-**Jordan Lee approved request AR-B77058.**
+**Jordan Lee approved request AR-F0E49D.**
 
 What happens next, from the docs:
 - Access to the Analytics Workspace (dashboards, saved reports and the Looker explore views) is granted through the Analytics Workspace Access form at go/analytics-access.  [D01]
@@ -199,7 +232,7 @@ What happens next, from the docs:
 - In the form, name the project or reporting task that needs access. Requests without a business reason are returned.  [D01]
 
 ==============================================================================
-USER says
+NEW HIRE -> UNBLOCK
 ------------------------------------------------------------------------------
 Can the AI decide whether I deserve a promotion?
 

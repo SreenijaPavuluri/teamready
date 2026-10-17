@@ -24,7 +24,7 @@ Status key: **Built and tested** means code plus automated tests in this repo. *
 | Agent(s) registered on Agentverse | Needs your account: `AGENTVERSE_API_KEY`, run agents, connect each mailbox |
 | Chat Protocol | Built and tested (all five agents) |
 | Discoverable and usable in ASI:One, whole workflow in chat | Built; **test in ASI:One yourself** |
-| Meaningful multi-agent orchestration | Built and tested: 5 agents, real messages, local fallback |
+| Meaningful multi-agent orchestration | Built and tested: 6 agents (orchestrator, knowledge, routing, manager, insights, tracker), real messages, local fallback |
 | Public GitHub repo with run steps | Needs you: push the repo, make it public |
 | Submission Agent + Devpost | Needs you |
 | Bonus: Payment Protocol | Built and tested locally (FET); test a real ASI:One wallet payment |

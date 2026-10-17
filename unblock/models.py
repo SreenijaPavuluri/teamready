@@ -52,3 +52,17 @@ class FrictionEvent(Model):
     doc_id: str
     docs_read: list[str]
     resolved: bool
+
+
+class TrackItem(Model):
+    item_id: str
+    user: str          # the new hire's chat address, so the Tracker can follow up there
+    kind: str          # message_helper | book_1_1 | access_request
+    summary: str
+    to_name: str
+    to_email: str
+
+
+class TrackResolved(Model):
+    item_id: str
+    outcome: str       # approved | rejected | answered

@@ -12,7 +12,7 @@ from dataclasses import dataclass
 from . import render
 from .data import load_people, load_user
 from .llm import ExtractiveLLM, LLMError
-from .risk import assess
+from .risk import assess, check_draft
 
 
 @dataclass
@@ -94,12 +94,16 @@ class Orchestrator:
             return ExtractiveLLM().draft(ask or purpose, user, recipient, facts, question), f"\n(Template draft: the model is unavailable: {exc})"
 
     def _pending(self, kind: str, person: dict, draft: dict) -> dict:
-        return {"type": kind, "to_id": person["id"] if "id" in person else person.get("person_id", ""),
-                "to_name": person["name"], "to_role": person["role"], "to_email": person["email"],
-                "subject": str(draft.get("subject", "Question from a new hire"))[:120], "body": str(draft.get("body", ""))[:1500]}
+        p = {"type": kind, "to_id": person["id"] if "id" in person else person.get("person_id", ""),
+             "to_name": person["name"], "to_role": person["role"], "to_email": person["email"],
+             "subject": str(draft.get("subject", "Question from a new hire"))[:120], "body": str(draft.get("body", ""))[:1500]}
+        p["guardian"] = check_draft(p["subject"], p["body"])
+        return p
 
     def _review(self, state: dict, prefix: str = "") -> Reply:
         p = state["pending"]
+        if p.get("guardian"):
+            prefix = (prefix + "\n\n" if prefix else "") + render.guardian_text(p["guardian"])
         text = render.action_text(p, state.get("answer"), state.get("helper"), state.get("rotation_note", ""))
         return Reply((prefix + "\n\n" + text).strip(), "review", render.action_card(p, state.get("answer"), state.get("helper")))
 
@@ -140,6 +144,8 @@ class Orchestrator:
 
         pending = state.get("pending")
         if cmd == "approve" and pending:
+            if pending.get("guardian"):
+                return Reply(render.guardian_text(pending["guardian"]) + "\n\nNothing was sent. Reply **edit: <new message>** or **reject**.")
             return await self._execute(sender, state)
         if cmd == "reject" and pending:
             state.pop("pending", None)
@@ -149,8 +155,9 @@ class Orchestrator:
             new_body = re.sub(r"^\s*edit:\s*", "", text, flags=re.I).strip()
             if new_body:
                 pending["body"] = new_body
+                pending["guardian"] = check_draft(pending["subject"], new_body)
                 self.store.set(sender, state)
-            return self._review(state, "Updated your draft.")
+            return self._review(state, "Updated your draft." + ("" if pending.get("guardian") else " Guardian checked it: clear to send."))
         if cmd == "wrong_person" and state.get("helper"):
             helper = state["helper"]
             await self.s.wrong_person(helper["person_id"], state.get("topic_key", ""))
@@ -261,6 +268,7 @@ class Orchestrator:
             state["awaiting"] = {"request_id": request_id, "approver": p["to_name"]}
             self.store.set(sender, state)
             self.store.set(f"req:{request_id}", {"sender": sender})
+            await self.s.track(request_id, sender, "access_request", p["subject"], p["to_name"], p["to_email"])
             return Reply(f"Sent request **{request_id}** to {p['to_name']}'s approval agent. {status}\n"
                          "Only your manager can approve it. I'll message you here as soon as they decide.")
         ics = None
@@ -272,7 +280,12 @@ class Orchestrator:
         if p["type"] in ("message_helper", "book_1_1"):
             doc = (answer.get("retrieved_doc_ids") or [""])[0]
             await self.s.friction_event(doc, answer.get("retrieved_doc_ids", [])[:1], False)
+            if result["status"] in ("sent", "simulated"):
+                await self.s.track("MS-" + uuid.uuid4().hex[:6].upper(), sender, p["type"],
+                                   state.get("question") or p["subject"], p["to_name"], p["to_email"])
         label = {"sent": "Sent", "simulated": "Simulated (email not configured)", "failed": "Not sent"}[result["status"]]
+        if result["status"] != "failed":
+            result["detail"] += " The Unblock Tracker will check back if there's no reply."
         follow = " Reply **wrong person** if they can't help, and I'll find someone else." if p["type"] == "message_helper" else ""
         return Reply(f"**{label}.** {result['detail']}{follow}")
 
@@ -283,6 +296,7 @@ class Orchestrator:
             return None
         state = self.store.get(sender) or {}
         state.pop("awaiting", None)
+        await self.s.track_resolved(decision["request_id"], decision["decision"])
         if decision["decision"] == "approved":
             text = f"**{decision.get('approver', 'Your manager')} approved request {decision['request_id']}.**"
             claims = (state.get("answer") or {}).get("claims", [])

@@ -28,6 +28,8 @@ from unblock.models import (
     KnowledgeResponse,
     RoutingRequest,
     RoutingResponse,
+    TrackItem,
+    TrackResolved,
     WrongPersonFeedback,
 )
 
@@ -105,6 +107,13 @@ class Services:
         status = await self.ctx.send(address("insights"), FrictionEvent(doc_id=doc_id, docs_read=docs_read, resolved=resolved))
         if "fail" in str(getattr(status, "status", "")).lower():
             log_live_event(doc_id, docs_read, resolved)
+
+    async def track(self, item_id: str, user: str, kind: str, summary: str, to_name: str, to_email: str) -> None:
+        await self.ctx.send(address("tracker"), TrackItem(item_id=item_id, user=user, kind=kind, summary=summary,
+                                                          to_name=to_name, to_email=to_email))
+
+    async def track_resolved(self, item_id: str, outcome: str) -> None:
+        await self.ctx.send(address("tracker"), TrackResolved(item_id=item_id, outcome=outcome))
 
     async def friction_map(self) -> dict:
         return build_map()

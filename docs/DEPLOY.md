@@ -1,6 +1,8 @@
 # Deploy on Vultr with a GoDaddy domain
 
-One server runs the web app, the five agents, and HTTPS.
+The full step-by-step, including Agentverse and ASI:One testing, is in [`GO_LIVE.md`](GO_LIVE.md) (Phase 4). This page is the short version.
+
+One server runs the web app, the six agents, and HTTPS.
 
 ## 1. Domain (GoDaddy)
 Register a domain (for example `unblock-ai.xyz`). Keep the DNS page open; you'll add the server IP in step 3.
@@ -22,7 +24,7 @@ In GoDaddy DNS, add an **A record**: host `@`, value = the Vultr server's IPv4, 
 git clone https://github.com/<you>/unblock.git && cd unblock
 cp .env.example .env    # fill in keys, seeds, DOMAIN=your-domain.xyz
 docker compose up -d --build
-docker compose logs -f agents   # copy each Agent Inspector link and connect its mailbox once
+docker compose logs -f agents   # expect "Agentverse mailbox connected" six times
 ```
 Open `https://your-domain.xyz`. Caddy gets the HTTPS certificate on first visit.
 

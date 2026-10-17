@@ -14,7 +14,7 @@ New hires get stuck on questions nobody has answered for them. Ownership lives i
 
 ## Agents
 
-All five agents are registered on Agentverse, implement the Chat Protocol, and can be used on their own from ASI:One. Run `python scripts/addresses.py` to print the addresses for your seeds.
+Six agents, each registered on Agentverse with the Chat Protocol and usable on its own from ASI:One. Run `python scripts/addresses.py` to print the addresses for your seeds. **Go live:** [`docs/GO_LIVE.md`](docs/GO_LIVE.md).
 
 | Agent | What it does | Address |
 | --- | --- | --- |
@@ -23,6 +23,21 @@ All five agents are registered on Agentverse, implement the Chat Protocol, and c
 | `unblock-routing` | Who to ask: 50% skills, 30% team, 20% availability, fairness rotation, learns from "wrong person". | `agent1q...` |
 | `unblock-manager` | Human approval gate. Only the manager can approve access requests. | `agent1q...` |
 | `unblock-insights` | Friction Map from anonymous events (groups of 5+ only). Full report with an AI-drafted doc fix for 0.1 FET via the Payment Protocol. | `agent1q...` |
+| `unblock-tracker` | Follows up when a message or request gets no answer, with a reminder sent only after approval. | `agent1q...` |
+
+### What each agent may do (and nothing more)
+
+Every agent gets only the tools its job needs. The **Guardian** is not a separate agent: it is plain code that every draft passes through before it can be sent, and it can only raise risk, never lower it.
+
+| Agent | Tools it gets | Data it sees | Can it act? |
+| --- | --- | --- | --- |
+| Orchestrator | Risk gate, Guardian, calls to the other agents, email after approval | The question, the new hire's role, team and office | Only after the new hire approves |
+| Knowledge | Doc search, the model, the verifier | Approved company docs | Read only |
+| Routing | Helper ranking, feedback | Each person's skills, team, availability and question load | Read only (ranks people) |
+| Manager | Hold requests, send decisions | The request, its business reason and verified evidence | Only a human manager decides |
+| Insights | Friction Map, doc-fix drafts, payments | Topics and doc ids of past blockers, no names or messages | Drafts a fix; the doc owner publishes it |
+| Tracker | Its follow-up list, reminder drafts, email after approval | What was sent, to whom, and when | Only after the new hire approves |
+| Guardian (code) | Rules for pay, performance, benefits, harassment, health, personal data and secrets | Each outgoing draft | Can only stop a draft |
 
 ## Sponsor tracks
 
@@ -31,7 +46,7 @@ Full checklist with what each sponsor asks for and the manual steps: [`docs/TRAC
 | Track | How Unblock uses it |
 | --- | --- |
 | Workday | The product: a new-hire agent with visible responsible-AI controls and a People Ops Friction Map. Reads the new hire's profile from a Workday Build development tenant ([setup](docs/WORKDAY.md)) |
-| Fetch.ai | Five uAgents on Agentverse, Chat Protocol, ASI:One, Interactive Cards, Payment Protocol (FET) |
+| Fetch.ai | Six uAgents on Agentverse, Chat Protocol, ASI:One, Interactive Cards, Payment Protocol (FET) |
 | Gemini | Hybrid retrieval with Gemini embeddings; Gemini as a drop-in reasoning model behind the same verifier |
 | Snowflake | Cortex chat completions REST API as a third reasoning model |
 | Tiger Data | Friction events in a TimescaleDB hypertable, 30-day view from a continuous aggregate |
@@ -89,6 +104,8 @@ Computed in code from four visible factors, with no fixed base points: retrieval
 
 Every answer and every proposed action shows: what Unblock did, sources with dates and owners, confidence and its factors, claims blocked, why this person, the data used and not used, and Approve / Edit / Reject.
 
+**Guardian:** every draft (messages, 1:1 invites, access requests, follow-ups) is checked before it can be sent. Drafts that mention pay, performance, benefits or harassment, health details, an ID or card number, a password or an API key are stopped until edited.
+
 **Unblock will never:** send or file anything without approval · grant access or approve its own requests · read private DMs, performance reviews or pay data · present an answer as fact without a source.
 
 ## Responsible AI (Workday's five principles)
@@ -126,7 +143,7 @@ Baseline with no model (extractive): 34/40 behavior, 27/27 citations, 2/2 helper
 pip install -r requirements.txt
 cp .env.example .env          # fill in the keys and your own agent seeds
 python scripts/generate_events.py
-python -m pytest -q           # 62 tests, no network needed
+python -m pytest -q           # 70 tests, no network needed
 ./scripts/run_all.sh          # runs the five agents as separate processes (logs in logs/)
 # or: python agents/main.py   # all five in one process
 ```
@@ -170,7 +187,7 @@ eval/        40 labeled questions and the eval runner
 scripts/     local end-to-end demo, event generator, address printer
 web/         landing page, live demo, Friction Map dashboard, voice tool endpoint (FastAPI)
 docs/        track checklist, ElevenLabs and deploy guides, DEV article draft, local demo transcript
-tests/       62 tests: verifier, risk gate, retrieval, routing, friction map, payments (FET + Solana), providers, web, conversation flow
+tests/       70 tests: verifier, risk gate, retrieval, routing, friction map, payments (FET + Solana), providers, web, conversation flow
 Dockerfile, docker-compose.yml   one-server deploy with HTTPS
 ```
 

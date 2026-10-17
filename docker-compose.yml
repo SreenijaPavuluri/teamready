@@ -15,6 +15,8 @@ services:
     # Each agent as its own process (the setup Agentverse mailboxes are known to work with)
     command: ["sh", "-c", "./scripts/run_all.sh && tail -F logs/*.log"]
     restart: unless-stopped
+    # Local-only ports, for the Agent Inspector "Connect" fallback over an SSH tunnel
+    ports: ["127.0.0.1:8100-8105:8100-8105"]
     volumes: [runtime:/app/data/runtime, outbox:/app/outbox]
 
   caddy:

@@ -5,8 +5,8 @@ with the real agents over uAgents messages and print every reply.
     python scripts/local_demo.py                          # uses Sonnet
 
 Steps: a verified answer, a stale-doc flag, a question the docs can't answer
-(routed to a person, then "wrong person"), an access request approved by the
-manager agent, and the high-impact stop.
+(routed to a person, then "wrong person"), a Tracker follow-up when nobody
+answers, an access request approved by the manager agent, and the high-impact stop.
 """
 import asyncio
 import os
@@ -17,6 +17,8 @@ ROOT = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(ROOT / "agents"))
 os.environ.setdefault("UNBLOCK_TODAY", "2026-10-17")
 os.environ["AGENTVERSE_API_KEY"] = ""  # always local
+os.environ.setdefault("TRACKER_DUE_MINUTES", "0.05")   # 3 seconds, so the demo shows a follow-up
+os.environ.setdefault("TRACKER_CHECK_SECONDS", "2")
 
 from common import address  # noqa: E402
 from uagents import Agent, Bureau, Context  # noqa: E402
@@ -27,6 +29,7 @@ from knowledge_agent import agent as knowledge  # noqa: E402
 from manager_agent import agent as manager  # noqa: E402
 from orchestrator import agent as orchestrator  # noqa: E402
 from routing_agent import agent as routing  # noqa: E402
+from tracker_agent import agent as tracker  # noqa: E402
 from unblock.chat import message_text, text_message  # noqa: E402
 from unblock.routing import reset_feedback  # noqa: E402
 
@@ -37,6 +40,8 @@ SCRIPT = [
     ("user", "How many vacation days do I get?"),
     ("user", "wrong person"),
     ("user", "approve"),
+    ("wait", "the Tracker notices no reply and offers a follow-up"),
+    ("tracker", "approve"),
     ("user", "I need access to the analytics dashboard"),
     ("user", "approve"),
     ("manager", "pending"),
@@ -54,36 +59,56 @@ def show(who: str, text: str) -> None:
     print(f"\n{'=' * 78}\n{who}\n{'-' * 78}\n{text}")
 
 
-for a, label in ((user, "UNBLOCK -> new hire"), (boss, "MANAGER AGENT -> manager")):
+NAMES = {address("orchestrator"): "UNBLOCK", address("manager"): "MANAGER AGENT", address("tracker"): "TRACKER"}
+
+
+for a, to in ((user, "new hire"), (boss, "manager")):
     @a.on_message(ChatMessage)
-    async def got(ctx: Context, sender: str, msg: ChatMessage, label=label):
+    async def got(ctx: Context, sender: str, msg: ChatMessage, to=to):
         await ctx.send(sender, ChatAcknowledgement(timestamp=msg.timestamp, acknowledged_msg_id=msg.msg_id))
         cards = [c for c in msg.content if getattr(c, "type", "") == "metadata"]
-        show(label + (f"  [card: {cards[0].metadata.get('card_kind')}]" if cards else ""), message_text(msg))
-        await queue.put(label)
+        src = NAMES.get(sender, sender[:12])
+        show(f"{src} -> {to}" + (f"  [card: {cards[0].metadata.get('card_kind')}]" if cards else ""), message_text(msg))
+        await queue.put(src)
 
     @a.on_message(ChatAcknowledgement)
     async def ack(ctx: Context, sender: str, msg: ChatAcknowledgement):
         pass
 
 
+async def expect(src: str, timeout: float = 120) -> None:
+    """Wait for a reply from one agent; other agents' messages are shown but don't count."""
+    end = asyncio.get_event_loop().time() + timeout
+    while True:
+        left = end - asyncio.get_event_loop().time()
+        if left <= 0:
+            show("TIMEOUT", f"no reply from {src}")
+            return
+        try:
+            if await asyncio.wait_for(queue.get(), timeout=left) == src:
+                return
+        except asyncio.TimeoutError:
+            show("TIMEOUT", f"no reply from {src}")
+            return
+
+
 @user.on_event("startup")
 async def run_script(ctx: Context):
     reset_feedback()
     await asyncio.sleep(2)
+    targets = {"user": ("orchestrator", "UNBLOCK"), "tracker": ("tracker", "TRACKER"), "manager": ("manager", "MANAGER AGENT")}
     for who, text in SCRIPT:
-        show(f"{who.upper()} says", text)
-        if who == "user":
-            await ctx.send(address("orchestrator"), text_message(text))
-        else:
-            await boss_ctx.send(address("manager"), text_message(text))
-        try:
-            await asyncio.wait_for(queue.get(), timeout=120)
-        except asyncio.TimeoutError:
-            show("TIMEOUT", "no reply within 120s")
+        if who == "wait":
+            show("(waiting)", text)
+            await expect("TRACKER", 60)
+            continue
+        show(f"{'NEW HIRE' if who != 'manager' else 'MANAGER'} -> {targets[who][1]}", text)
+        agent_name, src = targets[who]
+        sender_ctx = boss_ctx if who == "manager" else ctx
+        await sender_ctx.send(address(agent_name), text_message(text))
+        await expect(src)
         if who == "manager" and text == "approve":
-            await asyncio.wait_for(queue.get(), timeout=60)  # the new hire gets the decision
-    done.set()
+            await expect("UNBLOCK", 60)  # the new hire gets the decision
     print("\nDemo finished.")
     os._exit(0)
 
@@ -98,7 +123,7 @@ async def keep(ctx: Context):
 
 
 bureau = Bureau(port=8010, endpoint=["http://127.0.0.1:8010/submit"])
-for a in (orchestrator, knowledge, routing, manager, insights, user, boss):
+for a in (orchestrator, knowledge, routing, manager, insights, tracker, user, boss):
     bureau.add(a)
 
 if __name__ == "__main__":

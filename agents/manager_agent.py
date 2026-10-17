@@ -81,6 +81,7 @@ async def on_request(ctx: Context, sender: str, msg: ApprovalRequest):
 
 
 async def chat(ctx: Context, sender: str, text: str):
+    ctx.logger.info(f"message from {sender} (add this address to MANAGER_ALLOWED_SENDERS to make it the only approver)")
     pending = _pending(ctx)
     sel = parse_input(text)
     action = str(sel.get("action", "")).lower().removeprefix("ub_")

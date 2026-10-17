@@ -4,7 +4,7 @@
 cd "$(dirname "$0")/.." || exit 1
 mkdir -p logs
 : > logs/pids
-for a in knowledge_agent routing_agent manager_agent insights_agent orchestrator; do
+for a in knowledge_agent routing_agent manager_agent insights_agent tracker_agent orchestrator; do
   python agents/$a.py > logs/$a.log 2>&1 &
   echo $! >> logs/pids
   echo "started $a (pid $!)"

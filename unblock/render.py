@@ -93,7 +93,9 @@ def action_card(pending: dict, answer: dict | None, helper: dict | None) -> dict
             {"label": "Subject", "value": pending["subject"]},
             {"label": "Message", "value": pending["body"][:600]},
             {"label": "What happens", "value": what_happens},
-            {"label": "Data shared", "value": "your name, role and this message only"}]
+            {"label": "Data shared", "value": "your name, role and this message only"},
+            {"label": "Guardian check", "value": ("Blocked: " + "; ".join(pending["guardian"])) if pending.get("guardian")
+             else "Clear: no pay, performance, health, personal data or secrets"}]
     if answer:
         rows += [r for r in trust_rows(answer, helper) if r["label"] in ("Sources", "Confidence", "Claims blocked", "Why this person")]
     return {"title": "Review before anything is sent", "summary_rows": rows,
@@ -128,3 +130,8 @@ def friction_text(fmap: dict, full: bool = False) -> str:
 def doc_title(doc_id: str) -> str:
     doc = load_docs().get(doc_id)
     return doc.title if doc else doc_id
+
+
+def guardian_text(issues: list[str]) -> str:
+    return ("**Guardian stopped this draft:** it " + "; it ".join(issues) +
+            ". Unblock won't send it. Remove that part with **edit: <new message>**, or **reject** it.")

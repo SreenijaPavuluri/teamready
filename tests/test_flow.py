@@ -19,6 +19,7 @@ class MemStore(dict):
 class FakeServices:
     def __init__(self):
         self.sent, self.approvals, self.feedback, self.events = [], [], [], []
+        self.tracked, self.resolved = [], []
 
     async def knowledge(self, q, user):
         return knowledge.answer(q, user, ExtractiveLLM()).to_dict()
@@ -46,6 +47,12 @@ class FakeServices:
 
     async def source_feedback(self, ids):
         pass
+
+    async def track(self, item_id, user, kind, summary, to_name, to_email):
+        self.tracked.append({"id": item_id, "kind": kind, "to": to_name})
+
+    async def track_resolved(self, item_id, outcome):
+        self.resolved.append((item_id, outcome))
 
 
 def run(coro):
@@ -162,3 +169,44 @@ def test_questions_containing_command_words_are_still_questions():
     reply = run(flow.handle("u", "How do I approve an expense report in Expense Hub?"))
     assert "Expense" in reply.text and not s.sent
     assert load_user()["name"] == "Maya Chen"
+
+
+# ---------- Guardian ----------
+from unblock.risk import check_draft  # noqa: E402
+
+
+def test_guardian_flags_sensitive_drafts():
+    assert check_draft("Hi", "Can we talk about my salary band?")
+    assert check_draft("Hi", "My password is hunter2")
+    assert check_draft("Hi", "My SSN is 123-45-6789")
+    assert check_draft("Hi", "Card 4111 1111 1111 1111 for the license")
+    assert check_draft("Hi", "I have a medical condition and need time")
+    assert check_draft("Hi", "token sk-abcdefghijklmnopqrstuvwx")
+    assert not check_draft("Quick question", "How do I deploy my branch to staging? Thanks!")
+    assert not check_draft("Ticket 1234-5678", "Order 1234 5678 9012 3456 is not a card")  # fails the Luhn check
+
+
+def test_guardian_blocks_send_until_draft_is_clean():
+    flow, s = make()
+    run(flow.handle("u", "Is there free lunch on Fridays?"))
+    reply = run(flow.handle("u", "edit: Also, my password is hunter2 if you need to check my account."))
+    assert "Guardian stopped this draft" in reply.text
+    blocked = run(flow.handle("u", "approve"))
+    assert "Nothing was sent" in blocked.text and not s.sent
+    clean = run(flow.handle("u", "edit: Hi Elena, is there free lunch on Fridays?"))
+    assert "clear to send" in clean.text
+    run(flow.handle("u", "approve"))
+    assert len(s.sent) == 1
+
+
+def test_sent_items_are_tracked_and_decisions_resolve_them():
+    flow, s = make()
+    run(flow.handle("u", "Is there free lunch on Fridays?"))
+    run(flow.handle("u", "approve"))
+    assert s.tracked and s.tracked[0]["kind"] == "message_helper"
+    run(flow.handle("u", "Give me prod DB access"))
+    run(flow.handle("u", "approve"))
+    req_id = s.approvals[0]["request_id"]
+    assert any(t["id"] == req_id for t in s.tracked)
+    run(flow.on_decision({"request_id": req_id, "decision": "approved", "approver": "Jordan Lee"}))
+    assert (req_id, "approved") in s.resolved
