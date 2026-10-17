@@ -124,6 +124,14 @@ def friction_text(fmap: dict, full: bool = False) -> str:
         if full and c["pattern"]:
             line += f". Pattern: {c['pattern']}"
         lines.append(line)
+    walls = fmap.get("canary_walls")
+    if walls is None:
+        from .canary import predicted_for_map
+        walls = predicted_for_map()
+    predicted = [w for w in walls if w["predicted"]]
+    if predicted:
+        lines += ["", "**Predicted by Canary New Hires** (no real new hire has hit these yet):"]
+        lines += [f"- {w['wall']}: {w['task'].rstrip('.')}" + (f" ('{w['doc']}')" if w["doc"] else "") for w in predicted]
     return "\n".join(lines)
 
 
