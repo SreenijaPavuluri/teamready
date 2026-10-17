@@ -49,6 +49,8 @@ def answer(question: str, user: dict, llm, verify: bool = True) -> AnswerResult:
     people = load_people()
     result = search(question, office=user.get("office", ""))
     trace = [f"Searched {result.searched_count} approved docs ({result.method})"]
+    if user.get("profile_source") == "Workday":
+        trace.insert(0, "Read your name, title and organization from Workday (nothing else)")
     if result.excluded_regional:
         names = ", ".join(f"{d.title}" for d in result.excluded_regional)
         trace.append(f"Set aside {names}: it applies to a different office than yours ({user.get('office')})")

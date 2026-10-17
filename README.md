@@ -30,7 +30,7 @@ Full checklist with what each sponsor asks for and the manual steps: [`docs/TRAC
 
 | Track | How Unblock uses it |
 | --- | --- |
-| Workday | The product: a new-hire agent with visible responsible-AI controls and a People Ops Friction Map |
+| Workday | The product: a new-hire agent with visible responsible-AI controls and a People Ops Friction Map. Reads the new hire's profile from a Workday Build development tenant ([setup](docs/WORKDAY.md)) |
 | Fetch.ai | Five uAgents on Agentverse, Chat Protocol, ASI:One, Interactive Cards, Payment Protocol (FET) |
 | Gemini | Hybrid retrieval with Gemini embeddings; Gemini as a drop-in reasoning model behind the same verifier |
 | Snowflake | Cortex chat completions REST API as a third reasoning model |
@@ -126,7 +126,7 @@ Baseline with no model (extractive): 34/40 behavior, 27/27 citations, 2/2 helper
 pip install -r requirements.txt
 cp .env.example .env          # fill in the keys and your own agent seeds
 python scripts/generate_events.py
-python -m pytest -q           # 59 tests, no network needed
+python -m pytest -q           # 62 tests, no network needed
 ./scripts/run_all.sh          # runs the five agents as separate processes (logs in logs/)
 # or: python agents/main.py   # all five in one process
 ```
@@ -170,7 +170,7 @@ eval/        40 labeled questions and the eval runner
 scripts/     local end-to-end demo, event generator, address printer
 web/         landing page, live demo, Friction Map dashboard, voice tool endpoint (FastAPI)
 docs/        track checklist, ElevenLabs and deploy guides, DEV article draft, local demo transcript
-tests/       59 tests: verifier, risk gate, retrieval, routing, friction map, payments (FET + Solana), providers, web, conversation flow
+tests/       62 tests: verifier, risk gate, retrieval, routing, friction map, payments (FET + Solana), providers, web, conversation flow
 Dockerfile, docker-compose.yml   one-server deploy with HTTPS
 ```
 

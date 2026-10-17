@@ -66,8 +66,23 @@ def load_people() -> dict[str, dict]:
 
 
 @lru_cache(maxsize=1)
-def load_user() -> dict:
+def _local_user() -> dict:
     return json.loads((DATA_DIR / "user.json").read_text())
+
+
+def load_user() -> dict:
+    """The new hire. With Workday configured, name, title, org and work email come
+    from the Workday development tenant; everything else stays local."""
+    from . import workday
+
+    user = dict(_local_user())
+    wd = workday.profile()
+    if wd:
+        user.update({k: v for k, v in wd.items() if v})
+        user["profile_source"] = "Workday"
+    else:
+        user["profile_source"] = "local"
+    return user
 
 
 @lru_cache(maxsize=1)

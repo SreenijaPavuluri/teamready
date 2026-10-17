@@ -14,7 +14,9 @@ Status key: **Built and tested** means code plus automated tests in this repo. *
 | UX and inclusivity (10%) | Plain-language onboarding-buddy tone, web demo, voice option, works without cards |
 | Pitch (5%) | 3-minute script in README |
 
-**You must:** present it; say exactly which parts each teammate built (their recruiters asked for this).
+**Built on Workday's own platform:** with a free Workday Build development tenant, Unblock reads the new hire's name, title, organization and work email from Workday (the system of record), and nothing else. Setup: [`docs/WORKDAY.md`](WORKDAY.md), about 15 minutes. Code: `unblock/workday.py`, tested against a fake tenant; **test it live**.
+
+**You must:** create the dev tenant and API client; present it; say exactly which parts each teammate built (their recruiters asked for this).
 
 ### Fetch.ai: ASI:One Agent Challenge
 | Requirement | Status |
@@ -69,6 +71,7 @@ Status key: **Built and tested** means code plus automated tests in this repo. *
 ## Order to do the manual steps (with about 22 hours left)
 1. Anthropic + Agentverse keys, connect mailboxes, test the full flow in ASI:One (Fetch is the hiring prize).
 2. Run the Sonnet eval; fix anything it shows.
+2b. Workday dev tenant + API client (`docs/WORKDAY.md`); log in daily so it doesn't expire.
 3. Gemini key + hybrid retrieval + Gemini eval (cheap and strong).
 4. Tiger Cloud + setup script.
 5. Vultr + GoDaddy + HTTPS.
