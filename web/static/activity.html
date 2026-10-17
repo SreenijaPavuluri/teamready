@@ -125,7 +125,7 @@ li.step .msg { color: var(--muted); }
   <div class="grid">
     <section class="panel" aria-label="Agent map">
       <h2>Who's talking to whom</h2>
-      <svg id="map" viewBox="0 0 980 440" role="img" aria-label="Map of the six Unblock agents, the people they work with, and CREAO"></svg>
+      <svg id="map" viewBox="0 0 980 440" role="img" aria-label="Map of the seven Unblock agents, the people they work with, and CREAO"></svg>
       <div class="strip" id="strip"></div>
       <div class="legend">
         <span><b style="background:var(--pine)"></b>Message or passed check</span>
@@ -166,10 +166,12 @@ li.step .msg { color: var(--muted); }
     people:         { x: 640, y: 285, label: "Email", sub: "only after approval", person: true },
     insights:       { x: 640, y: 405, label: "Insights", sub: "Friction Map · FET" },
     creao:          { x: 880, y: 405, label: "CREAO", sub: "Doc Steward agent", creao: true },
+    canary:         { x: 880, y: 50,  label: "Canary", sub: "synthetic new hires" },
   };
   const EDGES = [["user","orchestrator"],["orchestrator","knowledge"],["orchestrator","routing"],["orchestrator","tracker"],
     ["orchestrator","manager"],["orchestrator","insights"],["orchestrator","people"],["tracker","user"],["tracker","people"],
-    ["manager_person","manager"],["people_ops","insights"],["insights","creao"],["insights","people"]];
+    ["manager_person","manager"],["people_ops","insights"],["insights","creao"],["insights","people"],
+    ["canary","knowledge"],["canary","creao"],["canary","people"]];
   const NAME = Object.fromEntries(Object.entries(NODES).map(([k, v]) => [k, v.label]));
   const W = 176, H = 56;
   const svg = document.getElementById("map"), ns = "http://www.w3.org/2000/svg";

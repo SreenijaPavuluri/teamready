@@ -47,3 +47,24 @@ def test_rate_limit(monkeypatch):
     codes = [client.post("/api/ask", json={"question": "How do I reset my password?"}).status_code for _ in range(3)]
     assert codes == [200, 200, 429]
     webapp._hits.clear()
+
+
+def test_canary_page_run_and_approval_gate(monkeypatch):
+    import time as _time
+    assert "Canary New Hires" in client.get("/canary").text
+    assert client.get("/api/canary/latest").json() == {"status": "none"}
+    webapp._canary.update(thread=None, last=0.0)
+    r = client.post("/api/canary/run").json()
+    assert r["status"] == "running" and r["run_id"].startswith("CR-")
+    for _ in range(100):
+        latest = client.get("/api/canary/latest").json()
+        if latest["status"] == "done":
+            break
+        _time.sleep(0.1)
+    assert latest["status"] == "done" and latest["walls"]
+    assert client.get("/api/friction").json()["canary_walls"]
+    monkeypatch.setenv("PORTAL_MANAGER_KEY", "k3y")
+    fix = {"run_id": latest["run_id"], "fix_id": latest["fixes"][0]["id"]}
+    assert client.post("/api/canary/approve", json=fix).status_code == 403
+    assert client.post("/api/canary/approve", json=fix, headers={"X-Manager-Key": "k3y"}).json()["ok"]
+    webapp._hits.clear()

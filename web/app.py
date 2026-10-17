@@ -9,6 +9,7 @@ access requests) happens in ASI:One, where the new hire approves it first.
 import asyncio
 import json
 import sys
+import threading
 import time
 from collections import defaultdict, deque
 from pathlib import Path
@@ -21,7 +22,7 @@ from fastapi import FastAPI, Header, HTTPException, Request  # noqa: E402
 from fastapi.responses import FileResponse, JSONResponse  # noqa: E402
 from pydantic import BaseModel, Field  # noqa: E402
 
-from unblock import activity, creao, portal, semantic, timeseries, workday  # noqa: E402
+from unblock import activity, canary, creao, portal, semantic, timeseries, workday  # noqa: E402
 from unblock.config import env  # noqa: E402
 from unblock.data import load_people, load_user  # noqa: E402
 from unblock.friction import build_map  # noqa: E402
@@ -139,7 +140,8 @@ async def voice_ask(body: Ask, request: Request, x_unblock_secret: str = Header(
 
 @app.get("/api/friction")
 def api_friction():
-    return build_map()
+    # Walls the Canary New Hires found: topics and doc titles only. "predicted" means no real new hire has hit it yet.
+    return {**build_map(), "canary_walls": canary.predicted_for_map()}
 
 
 @app.get("/api/agents")
@@ -214,6 +216,56 @@ def portal_manager(x_manager_key: str = Header(default="")):
 async def portal_decide(body: Decide, x_manager_key: str = Header(default="")):
     _manager_ok(x_manager_key)
     return await portal.decide(body.request_id, body.decision, body.note)
+
+
+# ---------- Canary New Hires ----------
+
+class CanaryFix(BaseModel):
+    run_id: str = Field(max_length=20, pattern=r"^CR-[A-Z0-9]+$")
+    fix_id: str = Field(max_length=6, pattern=r"^F\d+$")
+
+
+_canary = {"thread": None, "last": 0.0}
+
+
+async def _canary_ask(question: str, user: dict) -> dict:
+    activity.log("canary", f"{user['name']}: {question[:80]}", to="knowledge", kind="message")
+    return (await asyncio.to_thread(answer, question, user, get_llm_or_unavailable())).to_dict()
+
+
+@app.get("/canary")
+def canary_page():
+    return FileResponse(STATIC / "canary.html")
+
+
+@app.post("/api/canary/run")
+def canary_run(request: Request):
+    """Start a run in the background (one at a time) and return it; poll /api/canary/latest for progress."""
+    _limit(request)
+    t = _canary["thread"]
+    if t and t.is_alive():
+        return canary.latest()
+    if time.time() - _canary["last"] < 15:
+        raise HTTPException(429, "A run just finished. Wait a few seconds.")
+    rec = canary.new_run("web")
+    canary.save(rec)
+    _canary["last"] = time.time()
+    _canary["thread"] = threading.Thread(target=lambda: asyncio.run(canary.run(_canary_ask, "web", rec)), daemon=True)
+    _canary["thread"].start()
+    return rec
+
+
+@app.get("/api/canary/latest")
+def canary_latest():
+    return canary.latest() or {"status": "none"}
+
+
+@app.post("/api/canary/approve")
+def canary_approve(body: CanaryFix, request: Request, x_manager_key: str = Header(default="")):
+    """People Ops sends one fix to its doc owner. Uses the portal's manager key when one is set."""
+    _manager_ok(x_manager_key)
+    _limit(request)
+    return canary.approve(body.run_id, body.fix_id)
 
 
 @app.get("/activity")
