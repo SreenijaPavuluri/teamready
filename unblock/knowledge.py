@@ -48,7 +48,7 @@ def answer(question: str, user: dict, llm, verify: bool = True) -> AnswerResult:
     docs = load_docs()
     people = load_people()
     result = search(question, office=user.get("office", ""))
-    trace = [f"Searched {result.searched_count} approved docs"]
+    trace = [f"Searched {result.searched_count} approved docs ({result.method})"]
     if result.excluded_regional:
         names = ", ".join(f"{d.title}" for d in result.excluded_regional)
         trace.append(f"Set aside {names}: it applies to a different office than yours ({user.get('office')})")

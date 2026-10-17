@@ -59,31 +59,14 @@ def _parse_json(text: str) -> dict:
         raise LLMError(f"model returned invalid JSON: {exc}") from exc
 
 
-class AnthropicLLM:
-    mode = "anthropic"
+class PromptLLM:
+    """Shared prompts. Each provider only implements _json(system, prompt, max_tokens)."""
 
-    def __init__(self, model: str | None = None):
-        key = env("ANTHROPIC_API_KEY")
-        if not key:
-            raise LLMError("ANTHROPIC_API_KEY is not set")
-        import anthropic
-
-        self.client = anthropic.Anthropic(api_key=key)
-        self.model = model or env("LLM_MODEL", "sonnet-5-5")
+    mode = "base"
+    model = ""
 
     def _json(self, system: str, prompt: str, max_tokens: int = 1500) -> dict:
-        try:
-            response = self.client.messages.create(
-                model=self.model,
-                max_tokens=max_tokens,
-                temperature=0,
-                system=system,
-                messages=[{"role": "user", "content": prompt}],
-            )
-        except Exception as exc:  # network, auth, rate limit
-            raise LLMError(f"Sonnet request failed: {exc}") from exc
-        text = "".join(block.text for block in response.content if getattr(block, "type", "") == "text")
-        return _parse_json(text)
+        raise NotImplementedError
 
     def answer(self, question: str, user: dict, passages: list[dict]) -> dict:
         lines = []
@@ -111,6 +94,33 @@ class AnthropicLLM:
             f"Related doc that has the missing detail:\n{related}"
         )
         return self._json(FIX_SYSTEM, prompt, max_tokens=500)
+
+
+class AnthropicLLM(PromptLLM):
+    mode = "anthropic"
+
+    def __init__(self, model: str | None = None):
+        key = env("ANTHROPIC_API_KEY")
+        if not key:
+            raise LLMError("ANTHROPIC_API_KEY is not set")
+        import anthropic
+
+        self.client = anthropic.Anthropic(api_key=key)
+        self.model = model or env("LLM_MODEL", "sonnet-5-5")
+
+    def _json(self, system: str, prompt: str, max_tokens: int = 1500) -> dict:
+        try:
+            response = self.client.messages.create(
+                model=self.model,
+                max_tokens=max_tokens,
+                temperature=0,
+                system=system,
+                messages=[{"role": "user", "content": prompt}],
+            )
+        except Exception as exc:  # network, auth, rate limit
+            raise LLMError(f"Sonnet request failed: {exc}") from exc
+        text = "".join(block.text for block in response.content if getattr(block, "type", "") == "text")
+        return _parse_json(text)
 
 
 class ExtractiveLLM:
@@ -168,7 +178,14 @@ def get_llm_or_unavailable(mode: str | None = None):
 
 
 def get_llm(mode: str | None = None):
+    """anthropic (default) | gemini | snowflake | extractive"""
     mode = (mode or env("UNBLOCK_LLM", "anthropic")).lower()
     if mode == "extractive":
         return ExtractiveLLM()
+    if mode == "gemini":
+        from .providers import GeminiLLM
+        return GeminiLLM()
+    if mode == "snowflake":
+        from .providers import SnowflakeLLM
+        return SnowflakeLLM()
     return AnthropicLLM()

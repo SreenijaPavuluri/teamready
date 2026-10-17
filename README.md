@@ -24,6 +24,26 @@ All five agents are registered on Agentverse, implement the Chat Protocol, and c
 | `unblock-manager` | Human approval gate. Only the manager can approve access requests. | `agent1q...` |
 | `unblock-insights` | Friction Map from anonymous events (groups of 5+ only). Full report with an AI-drafted doc fix for 0.1 FET via the Payment Protocol. | `agent1q...` |
 
+## Sponsor tracks
+
+Full checklist with what each sponsor asks for and the manual steps: [`docs/TRACKS.md`](docs/TRACKS.md).
+
+| Track | How Unblock uses it |
+| --- | --- |
+| Workday | The product: a new-hire agent with visible responsible-AI controls and a People Ops Friction Map |
+| Fetch.ai | Five uAgents on Agentverse, Chat Protocol, ASI:One, Interactive Cards, Payment Protocol (FET) |
+| Gemini | Hybrid retrieval with Gemini embeddings; Gemini as a drop-in reasoning model behind the same verifier |
+| Snowflake | Cortex chat completions REST API as a third reasoning model |
+| Tiger Data | Friction events in a TimescaleDB hypertable, 30-day view from a continuous aggregate |
+| ElevenLabs | Voice onboarding buddy: an ElevenLabs agent calls our verified-answer endpoint ([setup](docs/ELEVENLABS.md)) |
+| Vultr + GoDaddy | Docker deploy of the web app, agents and HTTPS on one Vultr server, on your domain ([steps](docs/DEPLOY.md)) |
+| Solana | People Ops can pay for the report in USDC with Solana Pay, confirmed on-chain |
+| DEV | Article draft in `docs/dev_post.md` |
+
+## Web app
+
+`uvicorn web.app:app --port 8080` serves a landing page where anyone can ask a question and see verified claims, blocked claims, sources and confidence; the live Friction Map; the agent addresses; and `POST /api/voice/ask` for the voice agent. It is read-only: actions only happen in ASI:One after approval.
+
 ## How it works
 
 ```
@@ -88,6 +108,8 @@ Every answer and every proposed action shows: what Unblock did, sources with dat
 ```
 python eval/run_eval.py                    # Sonnet
 python eval/run_eval.py --llm extractive   # no-model baseline
+python eval/run_eval.py --llm gemini --embeddings gemini   # Gemini + hybrid retrieval
+python eval/run_eval.py --llm snowflake    # Snowflake Cortex
 ```
 
 It reports behavior accuracy, citation accuracy, helper accuracy, unsupported claims blocked, and how many adversarial questions were answered instead of routed. Results are written to `eval/RESULTS_<mode>.md`.
@@ -104,7 +126,7 @@ Baseline with no model (extractive): 34/40 behavior, 27/27 citations, 2/2 helper
 pip install -r requirements.txt
 cp .env.example .env          # fill in the keys and your own agent seeds
 python scripts/generate_events.py
-python -m pytest -q           # 42 tests, no network needed
+python -m pytest -q           # 59 tests, no network needed
 ./scripts/run_all.sh          # runs the five agents as separate processes (logs in logs/)
 # or: python agents/main.py   # all five in one process
 ```
@@ -146,7 +168,10 @@ unblock/     shared library: retrieval, verifier, confidence, risk gate, routing
 data/        synthetic company: 30 docs, 15 people, the new hire, policies, events
 eval/        40 labeled questions and the eval runner
 scripts/     local end-to-end demo, event generator, address printer
-tests/       42 tests: verifier, risk gate, retrieval, routing, friction map, payments, conversation flow, Sonnet parsing
+web/         landing page, live demo, Friction Map dashboard, voice tool endpoint (FastAPI)
+docs/        track checklist, ElevenLabs and deploy guides, DEV article draft, local demo transcript
+tests/       59 tests: verifier, risk gate, retrieval, routing, friction map, payments (FET + Solana), providers, web, conversation flow
+Dockerfile, docker-compose.yml   one-server deploy with HTTPS
 ```
 
 All company data is fictional (Lumen Labs). No real or confidential employee data is used.

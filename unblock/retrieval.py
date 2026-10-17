@@ -11,6 +11,7 @@ from functools import lru_cache
 
 from .config import STALE_AFTER_DAYS, today
 from .data import Doc, Passage, load_docs
+from . import semantic
 from .text import tokens
 
 K1 = 1.4
@@ -39,6 +40,7 @@ class SearchResult:
     docs: list[DocHit]
     excluded_regional: list[Doc] = field(default_factory=list)
     searched_count: int = 0
+    method: str = "keyword (BM25)"
 
     @property
     def top_score(self) -> float:
@@ -82,7 +84,15 @@ def search(query: str, office: str = "", max_docs: int = 4, per_doc: int = 3) ->
     docs = load_docs()
     index = _index()
     q = tokens(query)
-    hits = [Hit(index.passages[i], index.score(q, i)) for i in range(index.n)]
+    bonus: dict[str, float] = {}
+    method = "keyword (BM25)"
+    if semantic.enabled():
+        try:
+            bonus = semantic.scores(query)
+            method = "hybrid: keyword (BM25) + Gemini embeddings"
+        except Exception as exc:  # Gemini down: keep working on keywords
+            method = f"keyword (BM25); Gemini embeddings unavailable ({type(exc).__name__})"
+    hits = [Hit(p, index.score(q, i) + bonus.get(p.ref, 0.0)) for i, p in enumerate(index.passages)]
     hits = [h for h in hits if h.score > 0]
 
     by_doc: dict[str, list[Hit]] = {}
@@ -109,4 +119,4 @@ def search(query: str, office: str = "", max_docs: int = 4, per_doc: int = 3) ->
     kept = [d for d in ranked if d.score >= 0.35 * best][:max_docs]
     kept_ids = {d.doc.id for d in kept}
     excluded = [d for d in excluded if by_doc[d.id][0].score >= 0.35 * best and d.id not in kept_ids]
-    return SearchResult(query=query, docs=kept, excluded_regional=excluded, searched_count=len(docs))
+    return SearchResult(query=query, docs=kept, excluded_regional=excluded, searched_count=len(docs), method=method)

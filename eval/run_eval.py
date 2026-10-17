@@ -32,8 +32,11 @@ from unblock.routing import rank  # noqa: E402
 
 def main() -> None:
     parser = argparse.ArgumentParser()
-    parser.add_argument("--llm", default=None, help="anthropic (default) or extractive")
+    parser.add_argument("--llm", default=None, help="anthropic (default) | gemini | snowflake | extractive")
+    parser.add_argument("--embeddings", default="", help="gemini to use hybrid retrieval")
     args = parser.parse_args()
+    if args.embeddings:
+        os.environ["UNBLOCK_EMBEDDINGS"] = args.embeddings
     llm = get_llm(args.llm)
     user = load_user()
     questions = json.loads((ROOT / "eval" / "questions.json").read_text())
@@ -82,14 +85,16 @@ def main() -> None:
         "adversarial_answered_instead_of_routed": f"{invented}/{len(adversarial)}",
         "unsupported_claims_shown_to_user": 0,
     }
+    summary["retrieval"] = "hybrid (Gemini embeddings)" if args.embeddings else "keyword (BM25)"
     out = {"summary": summary, "rows": rows}
-    (ROOT / "eval" / f"results_{llm.mode}.json").write_text(json.dumps(out, indent=1))
+    tag = llm.mode + ("_hybrid" if args.embeddings else "")
+    (ROOT / "eval" / f"results_{tag}.json").write_text(json.dumps(out, indent=1))
     md = ["# Unblock eval results", "", f"Mode: **{llm.mode}** {summary['model']}", "",
           "| Metric | Result |", "| --- | --- |"]
     md += [f"| {k.replace('_', ' ')} | {v} |" for k, v in summary.items() if k not in ("llm", "model")]
     md += ["", "Unsupported claims shown to the user is 0 by construction: the verifier removes any claim it can't find word for word.",
            "Without the verifier, every blocked claim above would have been shown as fact."]
-    (ROOT / "eval" / f"RESULTS_{llm.mode}.md").write_text("\n".join(md) + "\n")
+    (ROOT / "eval" / f"RESULTS_{tag}.md").write_text("\n".join(md) + "\n")
     print("\n" + json.dumps(summary, indent=1))
 
 

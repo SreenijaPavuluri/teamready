@@ -22,7 +22,7 @@ from uagents_core.contrib.protocols.payment import (
     payment_protocol_spec,
 )
 
-from unblock import render
+from unblock import render, solana_pay
 from unblock.actions import send_email
 from unblock.chat import card_message, create_chat_protocol, parse_input, text_message
 from unblock.config import env
@@ -191,10 +191,30 @@ async def chat(ctx: Context, sender: str, text: str):
                 f"Before: {p['before']}\nAfter: {p['after']}\n\nYou decide whether to publish it.\n\nPeople Ops, via Unblock")
         result = await asyncio.to_thread(send_email, owner["email"], f"Suggested fix for '{p['doc_title']}'", body, "people-ops@lumen.example")
         return f"**{result['status'].capitalize()}.** {result['detail']} {owner['name']} decides whether to publish it."
+    if action in ("pay with solana", "solana", "pay with usdc", "usdc", "solana pay"):
+        if not solana_pay.enabled():
+            return "Solana Pay isn't set up on this agent yet. Say **full report** to pay in FET instead."
+        reference = solana_pay.new_reference()
+        ctx.storage.set(f"sol:{sender}", reference)
+        price = solana_pay.settings()["price"]
+        return (f"Pay {price} USDC with any Solana wallet using this Solana Pay link:\n\n{solana_pay.payment_url(reference)}\n\n"
+                "When your wallet confirms, say **check payment** and I'll verify it on-chain before sending the report.")
+    if action in ("check payment", "check", "i paid", "paid", "done"):
+        reference = ctx.storage.get(f"sol:{sender}")
+        if not reference:
+            return "There's no Solana payment waiting. Say **pay with solana** to start one."
+        paid, detail = await asyncio.to_thread(solana_pay.check_payment, reference)
+        if not paid:
+            return detail
+        ctx.storage.remove(f"sol:{sender}")
+        report = await _send_report(ctx, sender)
+        report.content[0].text = f"**{detail}**\n\n" + report.content[0].text
+        return report
     if action in ("full report", "buy", "buy the report", "buy full report", "purchase", "get the full report", "buy report"):
         await _request_payment(ctx, sender)
         return f"The full report with a drafted doc fix costs {PRICE} FET. I've sent a payment request in this chat."
-    return render.friction_text(build_map()) + f"\n\nSay **full report** to get patterns and a drafted fix ({PRICE} FET)."
+    extra = f" or **pay with solana** ({solana_pay.settings()['price']} USDC)" if solana_pay.enabled() else ""
+    return render.friction_text(build_map()) + f"\n\nSay **full report** to get patterns and a drafted fix ({PRICE} FET){extra}."
 
 
 agent.include(create_chat_protocol("unblock-insights", chat), publish_manifest=PUBLISH)
