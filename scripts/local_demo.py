@@ -111,7 +111,7 @@ async def run_script(ctx: Context):
         await expect(src)
         if who == "manager" and text == "approve":
             await expect("UNBLOCK", 60)  # the new hire gets the decision
-    print("\nDemo finished.")
+    print("\nDemo finished.", flush=True)
     os._exit(0)
 
 

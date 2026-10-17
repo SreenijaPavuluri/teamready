@@ -58,6 +58,7 @@ async def go(ctx: Context):
         await ctx.send(address("insights"), text_message(text))
         for _ in range(replies):
             await asyncio.wait_for(got.get(), timeout=900)
+    sys.stdout.flush()
     os._exit(0)
 
 
