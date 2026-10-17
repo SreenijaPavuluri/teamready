@@ -60,6 +60,11 @@ Full checklist with what each sponsor asks for and the manual steps: [`docs/TRAC
 
 `uvicorn web.app:app --port 8080` serves a landing page where anyone can ask a question and see verified claims, blocked claims, sources and confidence; the live Friction Map; the agent addresses; and `POST /api/voice/ask` for the voice agent. It is read-only: actions only happen in ASI:One after approval.
 
+**New Hire Portal (`/app`)** is the web version of the Unblock chat: ask, see verified answers with sources,
+approve/edit/reject every draft (Guardian checks each version), "wrong person", access requests the manager approves on
+the Manager tab, Tracker reminders, a first-two-weeks checklist from the approved docs, and the profile from Workday
+when connected. Details: [`docs/PORTAL.md`](docs/PORTAL.md).
+
 **Agent Activity (`/activity`)** shows the agents working, live: a map of who's messaging whom, and a feed of every
 step, check and stop (risk gate, verifier, Guardian, routing, manager approval, Tracker, payment, the CREAO run). All
 six agents and the web app append to `data/runtime/activity.jsonl` (`unblock/activity.py`); the page polls

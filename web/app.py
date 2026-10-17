@@ -21,7 +21,7 @@ from fastapi import FastAPI, Header, HTTPException, Request  # noqa: E402
 from fastapi.responses import FileResponse, JSONResponse  # noqa: E402
 from pydantic import BaseModel, Field  # noqa: E402
 
-from unblock import activity, creao, semantic, timeseries, workday  # noqa: E402
+from unblock import activity, creao, portal, semantic, timeseries, workday  # noqa: E402
 from unblock.config import env  # noqa: E402
 from unblock.data import load_people, load_user  # noqa: E402
 from unblock.friction import build_map  # noqa: E402
@@ -147,6 +147,73 @@ def api_agents():
     from common import AGENTS, address
 
     return [{"name": f"unblock-{n}", "address": address(n)} for n in AGENTS]
+
+
+# ---------- New Hire Portal ----------
+
+class PortalChat(BaseModel):
+    session: str = Field(min_length=8, max_length=40, pattern=r"^web-[a-z0-9]+$")
+    text: str = Field(default="", max_length=1500)
+    selection: dict | None = None
+
+
+class Remind(BaseModel):
+    session: str = Field(min_length=8, max_length=40, pattern=r"^web-[a-z0-9]+$")
+    item_id: str = Field(max_length=20)
+    send: bool = False
+
+
+class Decide(BaseModel):
+    request_id: str = Field(max_length=20)
+    decision: str = Field(pattern=r"^(approved|rejected)$")
+    note: str = Field(default="", max_length=300)
+
+
+def _manager_ok(key: str) -> None:
+    if env("PORTAL_MANAGER_KEY") and key != env("PORTAL_MANAGER_KEY"):
+        raise HTTPException(403, "Only the manager can do this.")
+
+
+@app.get("/app")
+def portal_page():
+    return FileResponse(STATIC / "portal.html")
+
+
+@app.get("/api/portal/session")
+def portal_session():
+    return {"session": portal.new_session()}
+
+
+@app.post("/api/portal/chat")
+async def portal_chat(body: PortalChat, request: Request):
+    _limit(request)
+    if not body.text.strip() and not body.selection:
+        raise HTTPException(400, "Say something first.")
+    return await portal.chat(body.session, body.text.strip(), body.selection)
+
+
+@app.get("/api/portal/state")
+def portal_state(session: str, after: int = 0):
+    if not session.startswith("web-") or len(session) > 40:
+        raise HTTPException(400, "bad session")
+    return portal.state(session, after)
+
+
+@app.post("/api/portal/remind")
+def portal_remind(body: Remind):
+    return portal.reminder(body.session, body.item_id, body.send)
+
+
+@app.get("/api/portal/manager")
+def portal_manager(x_manager_key: str = Header(default="")):
+    _manager_ok(x_manager_key)
+    return portal.pending_approvals()
+
+
+@app.post("/api/portal/decide")
+async def portal_decide(body: Decide, x_manager_key: str = Header(default="")):
+    _manager_ok(x_manager_key)
+    return await portal.decide(body.request_id, body.decision, body.note)
 
 
 @app.get("/activity")

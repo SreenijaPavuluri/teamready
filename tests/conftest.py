@@ -20,4 +20,7 @@ def isolated_runtime(tmp_path, monkeypatch):
     monkeypatch.setattr(friction, "LIVE_EVENTS_PATH", tmp_path / "live.json")
     import unblock.actions as actions
     monkeypatch.setattr(actions, "OUTBOX_DIR", tmp_path / "outbox")
+    from unblock import activity, portal
+    monkeypatch.setattr(activity, "PATH", tmp_path / "activity.jsonl")
+    monkeypatch.setattr(portal, "PATH", tmp_path / "portal.json")
     yield
