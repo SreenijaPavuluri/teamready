@@ -46,7 +46,7 @@ def test_model_answer_goes_through_the_verifier():
     assert [c["source_id"] for c in r.claims] == ["D04"] and len(r.steps) == 1
     assert len(r.blocked) == 1 and "Alcohol" in r.blocked[0]["text"]
     sent = llm.client.messages.calls[0]
-    assert sent["temperature"] == 0 and "[D04]" in sent["messages"][0]["content"]
+    assert "temperature" not in sent and "[D04]" in sent["messages"][0]["content"]  # current models reject sampling params
 
 
 def test_model_saying_it_cannot_answer_routes_to_a_person():

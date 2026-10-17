@@ -113,7 +113,6 @@ class AnthropicLLM(PromptLLM):
             response = self.client.messages.create(
                 model=self.model,
                 max_tokens=max_tokens,
-                temperature=0,
                 system=system,
                 messages=[{"role": "user", "content": prompt}],
             )

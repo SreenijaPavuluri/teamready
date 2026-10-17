@@ -182,7 +182,19 @@ It reports behavior accuracy, citation accuracy, helper accuracy, unsupported cl
 
 Baseline with no model (extractive): 34/40 behavior, 27/27 citations, 2/2 helpers, but it "answers" **5 of 5** adversarial questions with irrelevant quotes. Recognizing when the docs don't actually answer the question is exactly the judgment Sonnet adds, and the verifier makes sure that judgment can't turn into an invented fact.
 
-<!-- Paste your Sonnet results here after running the eval. -->
+**With Sonnet (sonnet-5-5), Oct 17:**
+
+| Metric | Sonnet | No model (extractive) |
+| --- | --- | --- |
+| Behavior accuracy | **40/40** | 34/40 |
+| Citation accuracy | **27/27** | 27/27 |
+| Adversarial questions answered instead of routed | **0/5** | 5/5 |
+| Unsupported claims blocked by the verifier | 2 | 0 |
+| Unsupported claims shown to the user | **0** | 0 |
+| Helper accuracy | 7/8 | 2/2 |
+
+Sonnet refused to guess on all five trick questions, and the verifier still caught two claims it couldn't find word for
+word in the docs. Full table: [`eval/RESULTS_anthropic.md`](eval/RESULTS_anthropic.md).
 
 ## Run it
 
