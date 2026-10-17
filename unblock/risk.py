@@ -24,12 +24,11 @@ class Risk:
 
 
 def _matches(text: str, term: str) -> bool:
-    term = term.lower()
-    # Prefix terms such as "harass" or "discriminat" match word starts;
-    # everything else must match on word boundaries.
-    if term.endswith(" ") or len(term.split()) > 1:
-        return term.strip() in text
-    return re.search(rf"\b{re.escape(term)}", text) is not None
+    """Whole words or phrases by default; a trailing * marks a prefix (harass* matches harassment)."""
+    term = term.lower().strip()
+    if term.endswith("*"):
+        return re.search(rf"(?<![a-z0-9]){re.escape(term[:-1])}", text) is not None
+    return re.search(rf"(?<![a-z0-9]){re.escape(term)}(?![a-z0-9])", text) is not None
 
 
 def assess(query: str) -> Risk:

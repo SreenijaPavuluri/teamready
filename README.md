@@ -55,7 +55,9 @@ Sonnet must return every fact as a claim with a supporting quote and a doc id. P
 1. it cites a doc that was actually retrieved for this question,
 2. the quote appears word for word in that doc (case, quotes, dashes and spacing normalized),
 3. the quote is at least 4 words long, and
-4. every number in the claim also appears in the quote ("100 USD" can't hide behind a quote that says "75 USD").
+4. the quote isn't cut out of a negated sentence, and the claim keeps any "not" the quote has,
+5. most of the claim's words appear in the quote, so the claim can't say more than its source, and
+6. every number in the claim also appears in the quote ("100 USD" can't hide behind a quote that says "75 USD").
 
 Only verified claims are shown. The model's free text never is. If nothing verifies, Unblock routes the question to a person instead of guessing.
 
@@ -102,7 +104,7 @@ Baseline with no model (extractive): 34/40 behavior, 27/27 citations, 2/2 helper
 pip install -r requirements.txt
 cp .env.example .env          # fill in the keys and your own agent seeds
 python scripts/generate_events.py
-python -m pytest -q           # 33 tests, no network needed
+python -m pytest -q           # 42 tests, no network needed
 ./scripts/run_all.sh          # runs the five agents as separate processes (logs in logs/)
 # or: python agents/main.py   # all five in one process
 ```
@@ -118,6 +120,10 @@ UNBLOCK_LLM=extractive python scripts/local_demo.py
 This runs the five real agents plus a test new hire and a test manager, and prints the whole conversation: verified answer, stale-doc flag, routing to a person, "wrong person", an access request approved by the manager agent, and the high-impact stop.
 
 **Real email (optional):** set the SMTP values in `.env` (a Gmail app password works) and `DEMO_RECIPIENT_OVERRIDE` to an inbox you control. Without SMTP, approved emails are saved to `outbox/` and the reply says "Simulated". Unblock never claims a send that didn't happen.
+
+**Payments:** the insights agent checks that each `CommitPayment` matches its open request (reference, FET, amount, its own wallet, not expired) and cancels on any mismatch or if the report fails. Confirming the transaction hash on the Fetch ledger is left to the ASI:One wallet in this build.
+
+**Safety between agents:** the orchestrator only accepts approval decisions from the manager agent's address, and the manager agent only accepts requests from the orchestrator.
 
 **Lock the manager gate:** set `MANAGER_ALLOWED_SENDERS` to the manager's ASI:One address. Otherwise the manager agent says it's in demo mode.
 
@@ -140,7 +146,7 @@ unblock/     shared library: retrieval, verifier, confidence, risk gate, routing
 data/        synthetic company: 30 docs, 15 people, the new hire, policies, events
 eval/        40 labeled questions and the eval runner
 scripts/     local end-to-end demo, event generator, address printer
-tests/       33 tests: verifier, risk gate, retrieval, routing, friction map, conversation flow, Sonnet parsing
+tests/       42 tests: verifier, risk gate, retrieval, routing, friction map, payments, conversation flow, Sonnet parsing
 ```
 
 All company data is fictional (Lumen Labs). No real or confidential employee data is used.

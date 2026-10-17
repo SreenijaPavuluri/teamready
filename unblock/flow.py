@@ -36,8 +36,21 @@ INTRO = (
 )
 
 
+# Card buttons carry distinctive ids ("ub_approve") so a typed sentence can never
+# be mistaken for a click. Typed commands must match a whole short phrase.
+ACTIONS = ("approve", "reject", "wrong_person", "wrong_answer", "ask_helper", "book_1_1")
+PHRASES = {
+    "wrong_person": {"wrong person", "not the right person", "wrong person, try someone else", "someone else please"},
+    "wrong_answer": {"this looks wrong", "that looks wrong", "looks wrong", "that's wrong", "thats wrong", "this is wrong", "that's outdated"},
+    "ask_helper": {"ask someone", "ask a person", "i'm still stuck", "still stuck"},
+    "book_1_1": {"book a 1:1", "schedule a 1:1", "book a meeting"},
+    "friction_map": {"friction map", "show the friction map"},
+    "status": {"status", "any update", "any updates"},
+}
+
+
 def _command(text: str, selection: dict, has_pending: bool = False) -> str:
-    action = str(selection.get("action", "")).lower()
+    action = str(selection.get("action", "")).lower().removeprefix("ub_")
     if action:
         return action
     t = text.lower().strip().rstrip(".!")
@@ -49,23 +62,13 @@ def _command(text: str, selection: dict, has_pending: bool = False) -> str:
         return "edit"
     if t in GREETINGS:
         return "intro"
-    short = len(t.split()) <= 6
-    for key, phrases in {
-        "wrong_person": ["wrong person", "not the right person", "someone else"],
-        "wrong_answer": ["looks wrong", "that's wrong", "thats wrong", "outdated", "incorrect"],
-        "ask_helper": ["ask_helper", "ask someone", "ask a person", "still stuck"],
-        "book_1_1": ["book_1_1", "book a 1:1", "schedule a 1:1", "book a meeting"],
-        "friction_map": ["friction map", "friction"],
-        "status": ["status", "any update"],
-    }.items():
-        if short and any(p in t for p in phrases):
+    for key, phrases in PHRASES.items():
+        if t in phrases:
             return key
     # Planner-routed card clicks arrive as a sentence that mentions the selection id.
-    # Only read them that way when a draft is waiting and it isn't a question.
-    if has_pending and "?" not in t:
-        for key in ("approve", "reject", "wrong_person", "wrong_answer", "ask_helper", "book_1_1"):
-            if re.search(rf"\b{key}\b", t):
-                return key
+    m = re.search(r"\bub_(" + "|".join(ACTIONS) + r")\b", t)
+    if m:
+        return m.group(1)
     return ""
 
 
@@ -131,7 +134,9 @@ class Orchestrator:
             return Reply(render.friction_text(fmap) + "\n\nPeople Ops can buy the full report with fix proposals from the Unblock Insights agent.")
         if cmd == "status":
             waiting = state.get("awaiting")
-            return Reply(f"Your request {waiting['request_id']} is waiting for {waiting['approver']}." if waiting else "Nothing is waiting on anyone right now.")
+            if waiting:
+                return Reply(f"Your request {waiting['request_id']} is waiting for {waiting['approver']}.")
+            return Reply(state.get("last_decision") or "Nothing is waiting on anyone right now.")
 
         pending = state.get("pending")
         if cmd == "approve" and pending:
@@ -174,7 +179,8 @@ class Orchestrator:
         people = load_people()
         risk = assess(question)
         if risk.level == "stop":
-            self.store.set(sender, {})
+            previous = self.store.get(sender) or {}
+            self.store.set(sender, {k: previous[k] for k in ("awaiting", "last_decision") if k in previous})
             human = people[risk.human_id]
             text = render.stop_text(risk.__dict__, human)
             return Reply(text, "detail", {"title": "This needs a person", "summary_rows": [
@@ -183,7 +189,9 @@ class Orchestrator:
                 {"label": "Right person", "value": f"{human['name']}, {human['role']}"}], "ctas": []}, terminal=True)
 
         answer = await self.s.knowledge(question, user)
-        state = {"question": question, "answer": answer, "risk": risk.__dict__}
+        previous = self.store.get(sender) or {}
+        state = {"question": question, "answer": answer, "risk": risk.__dict__,
+                 **{k: previous[k] for k in ("awaiting", "last_decision") if k in previous}}
 
         if risk.level == "approval":
             manager = dict(people[user["manager_id"]])
@@ -275,7 +283,6 @@ class Orchestrator:
             return None
         state = self.store.get(sender) or {}
         state.pop("awaiting", None)
-        self.store.set(sender, state)
         if decision["decision"] == "approved":
             text = f"**{decision.get('approver', 'Your manager')} approved request {decision['request_id']}.**"
             claims = (state.get("answer") or {}).get("claims", [])
@@ -285,4 +292,6 @@ class Orchestrator:
             text = f"**{decision.get('approver', 'Your manager')} didn't approve request {decision['request_id']}.**"
         if decision.get("note"):
             text += f"\n\nTheir note: {decision['note']}"
+        state["last_decision"] = text  # also shown when the new hire asks for "status"
+        self.store.set(sender, state)
         return sender, Reply(text)

@@ -98,7 +98,10 @@ def answer(question: str, user: dict, llm, verify: bool = True) -> AnswerResult:
                             route_reason="The reasoning model is unavailable, so a person should answer.", llm_mode=getattr(llm, "mode", ""),
                             error=str(exc), retrieved_doc_ids=[d.doc.id for d in result.docs])
 
-    claims, steps = _claims(raw.get("claims")), _claims(raw.get("steps"))
+    if not isinstance(raw, dict):
+        raw = {}
+    claims = _claims(raw.get("claims") if isinstance(raw.get("claims"), list) else [])
+    steps = _claims(raw.get("steps") if isinstance(raw.get("steps"), list) else [])
     total = len(claims) + len(steps)
     if verify:
         claim_verdicts = verify_all(claims, allowed)
@@ -114,7 +117,9 @@ def answer(question: str, user: dict, llm, verify: bool = True) -> AnswerResult:
     verified = len(ok_claims) + len(ok_steps)
     trace.append(f"Verified {verified} of {total} claims word for word" + (f"; blocked {len(blocked)}" if blocked else ""))
 
-    for c in raw.get("conflicts") or []:
+    for c in raw.get("conflicts") if isinstance(raw.get("conflicts"), list) else []:
+        if not isinstance(c, dict):
+            continue
         a = Claim("", str(c.get("quote_a", "")), str(c.get("source_a", "")).split("#")[0])
         b = Claim("", str(c.get("quote_b", "")), str(c.get("source_b", "")).split("#")[0])
         all_docs = {d.doc.id: d.doc for d in result.docs}
@@ -138,7 +143,7 @@ def answer(question: str, user: dict, llm, verify: bool = True) -> AnswerResult:
         citations.append({"id": doc.id, "title": doc.title, "updated_at": doc.updated_at.isoformat(),
                           "owner": owner.get("name", doc.owner), "owner_id": doc.owner})
 
-    can_answer = bool(raw.get("can_answer")) and verified > 0
+    can_answer = raw.get("can_answer") is True and verified > 0
     decision = "answer" if can_answer and conf.score >= ANSWER_AT and not open_conflict else "route"
     route_reason = ""
     if decision == "route":
@@ -152,6 +157,6 @@ def answer(question: str, user: dict, llm, verify: bool = True) -> AnswerResult:
     return AnswerResult(
         question=question, decision=decision, title=str(raw.get("title") or "Here's what the docs say")[:80],
         claims=ok_claims, steps=ok_steps, blocked=blocked, conflicts=conflicts, citations=citations,
-        confidence=conf.__dict__, trace=trace, missing=str(raw.get("missing") or ""), route_reason=route_reason,
+        confidence=conf.__dict__, trace=trace, missing=str(raw.get("missing") or "")[:300], route_reason=route_reason,
         llm_mode=getattr(llm, "mode", ""), retrieved_doc_ids=[d.doc.id for d in result.docs],
     )

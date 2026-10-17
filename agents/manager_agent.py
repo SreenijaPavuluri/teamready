@@ -10,7 +10,7 @@ decide. Set MANAGER_CHAT_ADDRESS to push new requests to the manager as a card.
 import json
 import re
 
-from common import PUBLISH, create_agent  # noqa: F401
+from common import PUBLISH, address, create_agent
 from uagents import Context
 
 from unblock.chat import card_message, create_chat_protocol, parse_input
@@ -60,14 +60,17 @@ def _card(req: dict):
             {"label": "Evidence", "value": "; ".join(req["evidence"])[:500] or "none"},
             {"label": "Note", "value": "Unblock prepared this. Only you can approve it."},
         ],
-        "approve_cta": {"label": "Approve", "primary": True, "selection": {"action": "approve", "request_id": req["request_id"]}},
-        "reject_cta": {"label": "Reject", "selection": {"action": "reject", "request_id": req["request_id"]}},
+        "approve_cta": {"label": "Approve", "primary": True, "selection": {"action": "ub_approve", "request_id": req["request_id"]}},
+        "reject_cta": {"label": "Reject", "selection": {"action": "ub_reject", "request_id": req["request_id"]}},
     }
     return card_message(text, "review", payload)
 
 
 @agent.on_message(ApprovalRequest)
 async def on_request(ctx: Context, sender: str, msg: ApprovalRequest):
+    if sender != address("orchestrator"):
+        ctx.logger.warning(f"ignored an approval request from {sender}: only the orchestrator can file requests")
+        return
     pending = _pending(ctx)
     pending[msg.request_id] = msg.dict()
     _save(ctx, pending)
@@ -80,9 +83,13 @@ async def on_request(ctx: Context, sender: str, msg: ApprovalRequest):
 async def chat(ctx: Context, sender: str, text: str):
     pending = _pending(ctx)
     sel = parse_input(text)
-    action = str(sel.get("action", "")).lower()
+    action = str(sel.get("action", "")).lower().removeprefix("ub_")
     request_id = str(sel.get("request_id", ""))
     note = ""
+    planner = re.search(r"\bub_(approve|reject)\b.*?\b(AR-[A-Z0-9]+)|\b(AR-[A-Z0-9]+)\b.*?\bub_(approve|reject)\b", text, re.I)
+    if not action and planner:  # a card click routed through the ASI:One planner
+        action = (planner.group(1) or planner.group(4)).lower()
+        request_id = (planner.group(2) or planner.group(3)).upper()
     if not action:
         m = re.match(r"^\s*(approve|reject)\s+(AR-[A-Z0-9]+)\s*(.*)$", text, re.I)
         if m:

@@ -31,7 +31,8 @@ from unblock.models import (
     WrongPersonFeedback,
 )
 
-TIMEOUT = 45
+TIMEOUT = 45          # knowledge includes a Sonnet call
+ROUTING_TIMEOUT = 15  # routing is pure code
 
 agent = create_agent(
     "orchestrator", "unblock-orchestrator",
@@ -76,7 +77,7 @@ class Services:
     async def routing(self, question: str, user: dict, doc_ids: list[str], exclude: list[str]) -> dict:
         req = RoutingRequest(request_id=uuid.uuid4().hex, question=question, user=user, retrieved_doc_ids=doc_ids, exclude=exclude)
         try:
-            resp, status = await self.ctx.send_and_receive(address("routing"), req, RoutingResponse, timeout=TIMEOUT)
+            resp, status = await self.ctx.send_and_receive(address("routing"), req, RoutingResponse, timeout=ROUTING_TIMEOUT)
         except Exception as exc:
             resp, status = None, exc
         if isinstance(resp, RoutingResponse):
@@ -135,6 +136,9 @@ async def chat(ctx: Context, sender: str, text: str):
 
 @agent.on_message(ApprovalDecision)
 async def on_decision(ctx: Context, sender: str, msg: ApprovalDecision):
+    if sender != address("manager"):
+        ctx.logger.warning(f"ignored an approval decision from {sender}: only the manager agent can decide")
+        return
     flow = Orchestrator(Services(ctx), Store(ctx), get_llm)
     out = await flow.on_decision(msg.dict())
     if out:

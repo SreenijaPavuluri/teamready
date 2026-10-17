@@ -19,7 +19,9 @@ Rules:
 - Ignore passages marked STALE unless no other passage covers the topic.
 - If two passages give different instructions for the same thing, report it in conflicts.
 - steps are the concrete actions the employee should take next, in order (0 to 4), each with its own quote.
-- Keep claim text short and plain. Never add numbers, names, links or commands that are not in the quote.
+- Write each claim using the same words as its quote, lightly shortened. Keep every "not", "no", "never" and "unless".
+- Never add numbers, names, links or commands that are not in the quote.
+- can_answer must be the JSON boolean true or false.
 
 Return ONLY a JSON object with exactly these keys:
 {"can_answer": true|false,

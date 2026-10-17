@@ -55,8 +55,8 @@ def answer_text(answer: dict) -> str:
 def answer_card(answer: dict, helper: dict | None) -> dict:
     ctas = []
     if helper:
-        ctas.append({"label": f"Still stuck? Ask {helper['name']}", "selection": {"action": "ask_helper"}})
-    ctas.append({"label": "This looks wrong", "selection": {"action": "wrong_answer"}})
+        ctas.append({"label": f"Still stuck? Ask {helper['name']}", "selection": {"action": "ub_ask_helper"}})
+    ctas.append({"label": "This looks wrong", "selection": {"action": "ub_wrong_answer"}})
     return {"title": f"{answer['title']} · {answer['confidence']['label']} confidence",
             "summary_rows": trust_rows(answer, helper), "ctas": ctas}
 
@@ -97,8 +97,8 @@ def action_card(pending: dict, answer: dict | None, helper: dict | None) -> dict
     if answer:
         rows += [r for r in trust_rows(answer, helper) if r["label"] in ("Sources", "Confidence", "Claims blocked", "Why this person")]
     return {"title": "Review before anything is sent", "summary_rows": rows,
-            "approve_cta": {"label": "Approve and send", "primary": True, "selection": {"action": "approve"}},
-            "reject_cta": {"label": "Reject", "selection": {"action": "reject"}}}
+            "approve_cta": {"label": "Approve and send", "primary": True, "selection": {"action": "ub_approve"}},
+            "reject_cta": {"label": "Reject", "selection": {"action": "ub_reject"}}}
 
 
 def stop_text(risk: dict, human: dict) -> str:

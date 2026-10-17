@@ -122,8 +122,39 @@ def test_stale_doc_offers_note_to_owner():
 def test_card_selection_json_works():
     flow, s = make()
     run(flow.handle("u", "Is there free lunch on Fridays?"))
-    run(flow.handle("u", "", {"action": "approve"}))
+    run(flow.handle("u", "", {"action": "ub_approve"}))
     assert len(s.sent) == 1
+
+
+def test_sentences_mentioning_approve_never_send():
+    flow, s = make()
+    run(flow.handle("u", "Is there free lunch on Fridays?"))
+    for text in ["don't approve this yet", "I will approve it later", "please do not send", "maybe approve tomorrow"]:
+        run(flow.handle("u", text))
+    assert not s.sent
+
+
+def test_planner_routed_click_uses_distinct_id():
+    flow, s = make()
+    run(flow.handle("u", "Is there free lunch on Fridays?"))
+    run(flow.handle("u", "The user clicked the button with action ub_approve"))
+    assert len(s.sent) == 1
+
+
+def test_short_questions_are_not_commands():
+    flow, s = make()
+    for q in ["Where is the status page?", "Is the VPN doc outdated?", "Can someone else review my PR?"]:
+        reply = run(flow.handle("u", q))
+        assert not reply.text.startswith("There's nothing waiting"), q
+    assert not s.feedback
+
+
+def test_pending_approval_survives_new_questions():
+    flow, s = make()
+    run(flow.handle("u", "Give me prod DB access"))
+    run(flow.handle("u", "approve"))
+    run(flow.handle("u", "How do I reset my password?"))
+    assert "waiting for Jordan Lee" in run(flow.handle("u", "status")).text
 
 
 def test_questions_containing_command_words_are_still_questions():

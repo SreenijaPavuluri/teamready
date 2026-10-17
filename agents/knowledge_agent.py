@@ -10,7 +10,8 @@ from uagents import Context
 
 from unblock import render
 from unblock.chat import create_chat_protocol
-from unblock.data import load_user
+from unblock.data import load_people, load_user
+from unblock.risk import assess
 from unblock.knowledge import answer
 from unblock.llm import get_llm_or_unavailable
 from unblock.models import KnowledgeRequest, KnowledgeResponse
@@ -34,7 +35,12 @@ async def on_request(ctx: Context, sender: str, msg: KnowledgeRequest):
 
 
 async def chat(ctx: Context, sender: str, text: str):
+    risk = assess(text)
+    if risk.level == "stop":
+        return render.stop_text(risk.__dict__, load_people()[risk.human_id])
     result = await run(text, load_user())
+    if risk.level == "approval":
+        return (render.answer_text(result) + f"\n\n{risk.reason} Ask the Unblock orchestrator to prepare the request for your manager.")
     if result["decision"] == "answer":
         return render.answer_text(result)
     return render.answer_text(result) + f"\n\n{result['route_reason']} Ask the Unblock orchestrator to find the right person."

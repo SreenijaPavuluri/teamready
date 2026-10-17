@@ -47,6 +47,7 @@ def create_agent(name: str, title: str, description: str, tags: list[str]) -> Ag
         mailbox=mailbox,
         publish_agent_details=bool(key),
         description=description,
+        handle_messages_concurrently=True,
         readme_path=str(readme) if readme.exists() else None,
         metadata={"tags": ["unblock", "la-hacks-ai-2026", "workday", "onboarding", "innovationlab", *tags]},
     )

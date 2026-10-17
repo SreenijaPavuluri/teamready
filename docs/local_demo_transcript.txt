@@ -107,7 +107,7 @@ approve
 ==============================================================================
 UNBLOCK -> new hire
 ------------------------------------------------------------------------------
-**Simulated (email not configured).** Email is not configured, so nothing was sent. Saved to outbox/20261017-121941-c85a38.eml. Reply **wrong person** if they can't help, and I'll find someone else.
+**Simulated (email not configured).** Email is not configured, so nothing was sent. Saved to outbox/20261017-122825-c5e676.eml. Reply **wrong person** if they can't help, and I'll find someone else.
 
 ==============================================================================
 USER says
@@ -147,7 +147,7 @@ approve
 ==============================================================================
 UNBLOCK -> new hire
 ------------------------------------------------------------------------------
-Sent request **AR-A72CBF** to Jordan Lee's approval agent. Delivered.
+Sent request **AR-B77058** to Jordan Lee's approval agent. Delivered.
 Only your manager can approve it. I'll message you here as soon as they decide.
 
 ==============================================================================
@@ -158,7 +158,7 @@ pending
 ==============================================================================
 MANAGER AGENT -> manager  [card: review]
 ------------------------------------------------------------------------------
-**Approval request AR-A72CBF**: analytics access
+**Approval request AR-B77058**: analytics access
 From: Maya Chen, Data Analyst (Growth Insights)
 Subject: New hire question: I need access to the analytics dashboard
 
@@ -176,7 +176,7 @@ Evidence Unblock verified in approved docs:
 - Standard access is read-only. Editor access to shared dashboards needs a second approval from the dashboard owner. [D01]
 - In the form, name the project or reporting task that needs access. Requests without a business reason are returned. [D01]
 
-Reply **approve AR-A72CBF** or **reject AR-A72CBF <reason>**.
+Reply **approve AR-B77058** or **reject AR-B77058 <reason>**.
 
 ==============================================================================
 MANAGER says
@@ -186,12 +186,12 @@ approve
 ==============================================================================
 MANAGER AGENT -> manager
 ------------------------------------------------------------------------------
-Done: AR-A72CBF approved. I've told the orchestrator, which will let Maya Chen know.
+Done: AR-B77058 approved. I've told the orchestrator, which will let Maya Chen know.
 
 ==============================================================================
 UNBLOCK -> new hire
 ------------------------------------------------------------------------------
-**Jordan Lee approved request AR-A72CBF.**
+**Jordan Lee approved request AR-B77058.**
 
 What happens next, from the docs:
 - Access to the Analytics Workspace (dashboards, saved reports and the Looker explore views) is granted through the Analytics Workspace Access form at go/analytics-access.  [D01]

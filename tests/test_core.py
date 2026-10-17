@@ -13,12 +13,12 @@ USER = load_user()
 
 # ---------- verifier ----------
 def test_verifier_accepts_exact_quote():
-    v = verify_claim(Claim("Meals are capped", "The meal limit is 75 USD per person including tax and tip.", "D04"), DOCS)
+    v = verify_claim(Claim("The meal limit is 75 USD per person", "The meal limit is 75 USD per person including tax and tip.", "D04"), DOCS)
     assert v.passed
 
 
 def test_verifier_ignores_case_spacing_and_quotes():
-    v = verify_claim(Claim("x", "the MEAL limit   is 75 USD per person", "D04"), DOCS)
+    v = verify_claim(Claim("The meal limit is 75 USD", "the MEAL limit   is 75 USD per person", "D04"), DOCS)
     assert v.passed
 
 
@@ -33,8 +33,23 @@ def test_verifier_blocks_wrong_number():
 
 
 def test_verifier_blocks_unretrieved_source_and_short_quote():
-    assert not verify_claim(Claim("x", "The meal limit is 75 USD", "D99"), DOCS).passed
-    assert not verify_claim(Claim("x", "meal limit", "D04"), DOCS).passed
+    assert not verify_claim(Claim("The meal limit is 75 USD", "The meal limit is 75 USD", "D99"), DOCS).passed
+    assert not verify_claim(Claim("meal limit", "meal limit", "D04"), DOCS).passed
+
+
+def test_verifier_blocks_quotes_cut_out_of_a_negation():
+    v = verify_claim(Claim("New engineers get production access in their first week",
+                           "get production access during their first 30 days", "D15"), DOCS)
+    assert not v.passed
+
+
+def test_verifier_blocks_claims_that_flip_or_stretch_the_quote():
+    assert not verify_claim(Claim("You need special access to deploy to staging",
+                                  "You do not need special access to deploy to staging", "D13"), DOCS).passed
+    assert not verify_claim(Claim("Alcohol is reimbursable, no approval needed",
+                                  "alcohol is not reimbursable unless", "D04"), DOCS).passed
+    assert verify_claim(Claim("You don't need special access to deploy to staging",
+                              "You do not need special access to deploy to staging", "D13"), DOCS).passed
 
 
 # ---------- risk gate ----------
@@ -42,6 +57,19 @@ def test_risk_stops_high_impact_topics():
     for q in ["Can the AI decide whether I deserve a promotion?", "What's my salary band?",
               "Am I eligible for benefits as an intern?", "I feel harassed by a coworker"]:
         assert assess(q).level == "stop", q
+
+
+def test_risk_catches_indirect_pay_and_benefits_questions():
+    for q in ["How much do I get paid?", "When is payday?", "How is my performance evaluated?",
+              "Does health insurance start on day one?"]:
+        assert assess(q).level == "stop", q
+    assert assess("I need access to the production DB").level == "approval"
+
+
+def test_risk_has_no_false_stops_on_substrings():
+    for q in ["I am quite lost on the VPN", "how do I pip install the cli", "How do I improve dashboard performance?",
+              "Is there a coverage report dashboard?"]:
+        assert assess(q).level == "routine", q
 
 
 def test_risk_requires_approval_for_elevated_access():
@@ -146,3 +174,21 @@ def test_live_events_update_the_map():
     log_live_event("D10", ["D10"], True)
     after = {c["topic"]: c["count"] for c in build_map()["clusters"]}["vpn and remote access"]
     assert after == before + 1
+
+
+# ---------- payments ----------
+def test_payment_commit_must_match_the_request(monkeypatch):
+    import sys
+    import time
+    sys.path.insert(0, str(__import__("pathlib").Path(__file__).resolve().parent.parent / "agents"))
+    import insights_agent as ia
+    from uagents_core.contrib.protocols.payment import CommitPayment, Funds
+
+    pending = {"reference": "FR-1", "expires": time.time() + 60}
+    good = CommitPayment(funds=Funds(amount="0.1", currency="FET"), recipient=ia._wallet(), transaction_id="tx", reference="FR-1")
+    assert ia._payment_problem(pending, good) == ""
+    assert ia._payment_problem(None, good)
+    assert ia._payment_problem(pending, good.copy(update={"reference": "FR-2"}))
+    assert ia._payment_problem(pending, good.copy(update={"funds": Funds(amount="0.01", currency="FET")}))
+    assert ia._payment_problem(pending, good.copy(update={"recipient": "fetch1someoneelse"}))
+    assert ia._payment_problem({"reference": "FR-1", "expires": time.time() - 1}, good)
