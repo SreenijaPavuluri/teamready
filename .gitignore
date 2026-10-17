@@ -9,3 +9,4 @@ eval/results_*.json
 agent*_data.json
 .venv/
 logs/
+friction.json
