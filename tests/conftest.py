@@ -30,4 +30,6 @@ def isolated_runtime(tmp_path, monkeypatch):
     from unblock import activity, portal
     monkeypatch.setattr(activity, "PATH", tmp_path / "activity.jsonl")
     monkeypatch.setattr(portal, "PATH", tmp_path / "portal.json")
+    from unblock import canary
+    monkeypatch.setattr(canary, "PATH", tmp_path / "canary.json")
     yield
