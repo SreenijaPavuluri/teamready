@@ -5,7 +5,7 @@ with the real agents over uAgents messages and print every reply.
     python scripts/local_demo.py                          # uses Sonnet
 
 Steps: a verified answer, a stale-doc flag, a question the docs can't answer
-(routed to a person, then "wrong person"), a Tracker follow-up when nobody
+(routed to a person, then "wrong person", then the Guardian blocking a password), a Tracker follow-up when nobody
 answers, an access request approved by the manager agent, and the high-impact stop.
 """
 import asyncio
@@ -39,6 +39,8 @@ SCRIPT = [
     ("user", "reject"),
     ("user", "How many vacation days do I get?"),
     ("user", "wrong person"),
+    ("user", "edit: Hi Sofia, quick question about vacation days. My password is hunter22 if you need to check my account."),
+    ("user", "edit: Hi Sofia, how many vacation days do new US hires get in their first year? Thanks, Maya"),
     ("user", "approve"),
     ("wait", "the Tracker notices no reply and offers a follow-up"),
     ("tracker", "approve"),

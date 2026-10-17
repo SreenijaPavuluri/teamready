@@ -60,6 +60,13 @@ Full checklist with what each sponsor asks for and the manual steps: [`docs/TRAC
 
 `uvicorn web.app:app --port 8080` serves a landing page where anyone can ask a question and see verified claims, blocked claims, sources and confidence; the live Friction Map; the agent addresses; and `POST /api/voice/ask` for the voice agent. It is read-only: actions only happen in ASI:One after approval.
 
+**Agent Activity (`/activity`)** shows the agents working, live: a map of who's messaging whom, and a feed of every
+step, check and stop (risk gate, verifier, Guardian, routing, manager approval, Tracker, payment, the CREAO run). All
+six agents and the web app append to `data/runtime/activity.jsonl` (`unblock/activity.py`); the page polls
+`/api/activity`. People's messages appear only when they hold no secrets or health details, and drafted emails never do.
+With nothing happening live, **Watch recorded demo** replays `data/demo_activity.json`, a real local run of all six agents.
+Turn it off with `UNBLOCK_ACTIVITY=false`.
+
 ## How it works
 
 ```

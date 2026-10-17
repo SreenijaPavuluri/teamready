@@ -9,6 +9,7 @@ if str(ROOT) not in sys.path:
 from uagents import Agent  # noqa: E402
 from uagents.crypto import Identity  # noqa: E402
 
+from unblock import activity  # noqa: E402
 from unblock.config import env, env_bool  # noqa: E402
 
 PUBLISH = bool(env("AGENTVERSE_API_KEY"))
@@ -32,6 +33,9 @@ def seed(name: str) -> str:
 
 def address(name: str) -> str:
     return Identity.from_seed(seed(name), 0).address
+
+
+activity.NAMES.update({address(n): n for n in AGENTS})
 
 
 def _auto_connect(agent: Agent, port: int, key: str) -> None:

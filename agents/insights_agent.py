@@ -27,7 +27,7 @@ from uagents_core.contrib.protocols.payment import (
     payment_protocol_spec,
 )
 
-from unblock import creao, render, solana_pay
+from unblock import activity, creao, render, solana_pay
 from unblock.actions import send_email
 from unblock.chat import card_message, create_chat_protocol, parse_input, text_message
 from unblock.config import env
@@ -66,6 +66,7 @@ def _wallet() -> str:
 async def _request_payment(ctx: Context, sender: str) -> None:
     reference = "FR-" + uuid.uuid4().hex[:8].upper()
     ctx.storage.set(f"pay:{sender}", json.dumps({"reference": reference, "expires": time.time() + 300}))
+    activity.log("insights", f"Payment request: {PRICE} FET (ref {reference})", to=activity.name_for(sender, "people_ops"), kind="message")
     testnet = env("FET_USE_TESTNET", "true").lower() == "true"
     await ctx.send(sender, RequestPayment(
         accepted_funds=[Funds(amount=PRICE, currency="FET", payment_method="fet_direct")],
@@ -150,6 +151,8 @@ def _start_creao(ctx: Context, sender: str) -> str:
     pending[run_id] = {"sender": sender, "doc_id": doc.id, "topic": cluster["topic"], "started": time.time()}
     ctx.storage.set("creao:pending", json.dumps(pending))
     ctx.logger.info(f"CREAO Doc Steward run {run_id} started for {cluster['topic']}")
+    activity.log("insights", f"Draft a fix for '{doc.title}': {cluster['count']} new-hire blockers about {cluster['topic']}", to="creao", kind="message")
+    activity.log("creao", f"Doc Steward run {run_id[:8]} started (runs take a few minutes)", kind="step")
     return (f"\n\n**The CREAO Doc Steward is drafting a fix for '{doc.title}'** (run `{run_id}`). "
             "It takes a few minutes; I'll post the proposal in this chat when it's ready.")
 
@@ -161,6 +164,10 @@ async def _send_report(ctx: Context, sender: str):
         if line:
             return text_message(text + line)
     proposal = await asyncio.to_thread(_proposal)
+    if proposal and "error" not in proposal:
+        activity.log("insights", f"Drafted a fix for '{proposal['doc_title']}'; exact-quote check passed", kind="check")
+    elif proposal:
+        activity.log("insights", proposal["error"], kind="block")
     return _proposal_message(ctx, sender, text, proposal)
 
 
@@ -177,6 +184,7 @@ async def check_creao(ctx: Context):
             ctx.logger.warning(f"CREAO poll {run_id}: {exc}")
             run = None
         if run is not None and run.get("status") not in creao.DONE and not timed_out:
+            activity.log("creao", f"Doc Steward run {run_id[:8]}: {run.get('status', 'running')}…", kind="step")
             continue
         if run is None and not timed_out:
             continue
@@ -192,10 +200,15 @@ async def check_creao(ctx: Context):
                 raise LLMError("the run took too long")
             proposal = _check_fix(creao.result_fix(run), cluster, doc)
             head = f"**CREAO Doc Steward finished** (run `{run_id}`)."
+            activity.log("creao", "Drafted a one-line fix to the doc", to="insights", kind="message")
+            activity.log("insights", "Exact-quote check " + ("failed: fix blocked" if "error" in proposal else "passed: the fix quotes the doc word for word"), kind="block" if "error" in proposal else "check")
         except LLMError as exc:
             ctx.logger.warning(f"CREAO run {run_id} unusable ({exc}); drafting locally")
+            activity.log("insights", f"CREAO run unusable ({exc}); drafting the fix here instead", kind="block")
             proposal = await asyncio.to_thread(_proposal)
             head = f"The CREAO run didn't return a usable fix ({exc}), so I drafted it here instead."
+        activity.log("insights", "[card] Send this doc fix to the doc owner?" if proposal and "error" not in proposal else "No usable fix this time",
+                     to=activity.name_for(job["sender"], "people_ops"), kind="message")
         await ctx.send(job["sender"], _proposal_message(ctx, job["sender"], head, proposal))
 
 
@@ -228,10 +241,12 @@ async def on_commit(ctx: Context, sender: str, msg: CommitPayment):
     problem = _payment_problem(json.loads(raw) if raw else None, msg)
     if problem:
         ctx.logger.warning(f"payment from {sender} refused: {problem}")
+        activity.log("insights", f"Payment refused: {problem}", kind="block")
         await ctx.send(sender, CancelPayment(transaction_id=msg.transaction_id, reason=problem))
         await ctx.send(sender, text_message(f"I couldn't accept that payment: {problem}. Nothing was charged for the report."))
         return
     ctx.storage.remove(f"pay:{sender}")
+    activity.log("insights", f"Payment checked: reference, amount and wallet match ({msg.funds.amount} FET)", kind="check")
     try:
         report = await _send_report(ctx, sender)
     except Exception as exc:  # never take payment without delivering
@@ -240,6 +255,7 @@ async def on_commit(ctx: Context, sender: str, msg: CommitPayment):
         await ctx.send(sender, text_message("Sorry, the report failed to generate, so I cancelled the payment. Please try again."))
         return
     await ctx.send(sender, CompletePayment(transaction_id=msg.transaction_id))
+    activity.log("insights", "Full Friction Map report (groups of 5+ only)", to=activity.name_for(sender, "people_ops"), kind="message")
     await ctx.send(sender, report)
 
 
@@ -270,6 +286,7 @@ async def chat(ctx: Context, sender: str, text: str):
                 f"{p['cluster']['topic']} in the last 30 days. {p['cluster']['pattern']}.\n\nProposed change to '{p['doc_title']}':\n"
                 f"Before: {p['before']}\nAfter: {p['after']}\n\nYou decide whether to publish it.\n\nPeople Ops, via Unblock")
         result = await asyncio.to_thread(send_email, owner["email"], f"Suggested fix for '{p['doc_title']}'", body, "people-ops@lumen.example")
+        activity.log("insights", f"Fix sent to {owner['name']}, the doc owner, who decides whether to publish ({result['status']})", to="people", kind="done")
         return f"**{result['status'].capitalize()}.** {result['detail']} {owner['name']} decides whether to publish it."
     if action in ("pay with solana", "solana", "pay with usdc", "usdc", "solana pay"):
         if not solana_pay.enabled():
@@ -297,7 +314,7 @@ async def chat(ctx: Context, sender: str, text: str):
     return render.friction_text(build_map()) + f"\n\nSay **full report** to get patterns and a drafted fix ({PRICE} FET){extra}."
 
 
-agent.include(create_chat_protocol("unblock-insights", chat), publish_manifest=PUBLISH)
+agent.include(create_chat_protocol("unblock-insights", chat, person="people_ops"), publish_manifest=PUBLISH)
 agent.include(payment, publish_manifest=PUBLISH)
 
 if __name__ == "__main__":

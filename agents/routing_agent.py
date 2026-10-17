@@ -8,6 +8,7 @@ import re
 from common import PUBLISH, create_agent  # noqa: F401
 from uagents import Context
 
+from unblock import activity
 from unblock.chat import create_chat_protocol
 from unblock.data import load_user
 from unblock.models import RoutingRequest, RoutingResponse, WrongPersonFeedback
@@ -24,12 +25,16 @@ agent = create_agent(
 @agent.on_message(RoutingRequest, replies=RoutingResponse)
 async def on_request(ctx: Context, sender: str, msg: RoutingRequest):
     result = rank(msg.question, msg.user, msg.retrieved_doc_ids or None, set(msg.exclude))
+    activity.log("routing", "Scored people: 50% skills, 30% team, 20% availability; no protected characteristics")
+    if result.rotation_note:
+        activity.log("routing", "Fairness: " + result.rotation_note, kind="check")
     await ctx.send(sender, RoutingResponse(request_id=msg.request_id, result=result.to_dict()))
 
 
 @agent.on_message(WrongPersonFeedback)
 async def on_feedback(ctx: Context, sender: str, msg: WrongPersonFeedback):
     count = record_wrong_person(msg.person_id, msg.topic_key)
+    activity.log("routing", f"Learned: lowered that person's score for this topic ({count}x)", kind="step")
     ctx.logger.info(f"feedback: {msg.person_id} wrong for {msg.topic_key} ({count}x)")
 
 

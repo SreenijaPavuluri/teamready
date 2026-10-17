@@ -13,6 +13,7 @@ import time
 from common import PUBLISH, address, create_agent
 from uagents import Context
 
+from unblock import activity
 from unblock import tracker
 from unblock.actions import send_email
 from unblock.chat import card_message, create_chat_protocol, parse_input
@@ -67,6 +68,7 @@ async def on_resolved(ctx: Context, sender: str, msg: TrackResolved):
         return
     items = _items(ctx)
     if tracker.resolve(items, msg.item_id, msg.outcome):
+        activity.log("tracker", f"{msg.item_id} closed: {msg.outcome}", kind="done")
         _save(ctx, items)
 
 
@@ -78,6 +80,8 @@ async def check(ctx: Context):
         item["nudged"] = True
         draft = tracker.reminder_draft(item, load_user()["name"])
         ctx.storage.set(f"draft:{item['user']}", json.dumps({"item_id": item["id"], **draft}))
+        activity.log("tracker", f"No reply from {item['to_name']} after {tracker.age_text(now - item['created'])}; offering a follow-up", kind="step")
+        activity.log("tracker", "[card] Want me to send a friendly reminder?", to="user", kind="message")
         await ctx.send(item["user"], _reminder_card(item, draft, tracker.age_text(now - item["created"])))
     if items:
         _save(ctx, items)
@@ -113,6 +117,7 @@ async def chat(ctx: Context, sender: str, text: str):
         if draft["guardian"]:
             return "Guardian stopped this follow-up: it " + "; it ".join(draft["guardian"]) + ". Edit it first. Nothing was sent."
         result = await asyncio.to_thread(send_email, item["to_email"], draft["subject"], draft["body"], load_user()["email"])
+        activity.log("tracker", f"Reminder to {item['to_name']} after your approval: {result['status']}", to="people", kind="done" if result["status"] != "failed" else "block")
         ctx.storage.remove(f"draft:{sender}")
         label = {"sent": "Sent", "simulated": "Simulated (email not configured)", "failed": "Not sent"}[result["status"]]
         return f"**{label}.** {result['detail']}"

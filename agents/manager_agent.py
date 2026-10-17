@@ -13,6 +13,7 @@ import re
 from common import PUBLISH, address, create_agent
 from uagents import Context
 
+from unblock import activity
 from unblock.chat import card_message, create_chat_protocol, parse_input
 from unblock.config import env
 from unblock.data import load_people, load_user
@@ -75,6 +76,7 @@ async def on_request(ctx: Context, sender: str, msg: ApprovalRequest):
     pending[msg.request_id] = msg.dict()
     _save(ctx, pending)
     ctx.logger.info(f"new approval request {msg.request_id} from {msg.requester.get('name')}")
+    activity.log("manager", f"{msg.request_id} is waiting for the manager. Only a person can approve it", kind="step")
     push_to = env("MANAGER_CHAT_ADDRESS")
     if push_to:
         await ctx.send(push_to, _card(pending[msg.request_id]))
@@ -117,7 +119,7 @@ async def chat(ctx: Context, sender: str, text: str):
     return reply
 
 
-agent.include(create_chat_protocol("unblock-manager", chat), publish_manifest=PUBLISH)
+agent.include(create_chat_protocol("unblock-manager", chat, person="manager_person"), publish_manifest=PUBLISH)
 
 if __name__ == "__main__":
     agent.run()

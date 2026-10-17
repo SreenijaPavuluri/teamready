@@ -77,6 +77,8 @@ Put your names in the brackets.
 
 ## 3-minute video script
 
+Record with `https://your-domain/activity` open next to ASI:One, so judges see each agent light up as it works.
+
 1. **0:00 Problem (20s).** A new hire's real blocker isn't finding a doc. It's knowing who to ask, and not getting a confident wrong answer.
 2. **0:20 ASI:One (60s).** Dev setup answer with sources → stale deploy doc flagged → vacation days: no guess, routed to a person with a draft → Guardian blocks a password in the draft.
 3. **1:20 Agents working together (40s).** Access request → manager agent approves from another account → the Tracker's follow-up card.

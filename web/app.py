@@ -7,6 +7,7 @@ The web app is read-only: it answers and explains, but every action (messages,
 access requests) happens in ASI:One, where the new hire approves it first.
 """
 import asyncio
+import json
 import sys
 import time
 from collections import defaultdict, deque
@@ -20,7 +21,7 @@ from fastapi import FastAPI, Header, HTTPException, Request  # noqa: E402
 from fastapi.responses import FileResponse, JSONResponse  # noqa: E402
 from pydantic import BaseModel, Field  # noqa: E402
 
-from unblock import creao, semantic, timeseries, workday  # noqa: E402
+from unblock import activity, creao, semantic, timeseries, workday  # noqa: E402
 from unblock.config import env  # noqa: E402
 from unblock.data import load_people, load_user  # noqa: E402
 from unblock.friction import build_map  # noqa: E402
@@ -71,7 +72,14 @@ def _speech(result: dict) -> str:
 def run_ask(question: str) -> dict:
     user = load_user()
     people = load_people()
+    activity.log("user", activity.said(question), to="orchestrator", kind="message")
     risk = assess(question)
+    if risk.level == "stop":
+        activity.log("orchestrator", f"Risk gate stopped it: {risk.category}. No search, no draft; handing it to a person", kind="block")
+    else:
+        activity.log("orchestrator", "Risk gate: " + ("needs the manager's approval" if risk.level == "approval" else "safe to answer from the docs"),
+                     kind="step" if risk.level == "approval" else "check")
+        activity.log("orchestrator", "Check the approved docs for this question", to="knowledge", kind="message")
     if risk.level == "stop":
         human = people[risk.human_id]
         result = {"kind": "stop", "title": "This needs a person", "reason": risk.reason, "category": risk.category,
@@ -79,10 +87,20 @@ def run_ask(question: str) -> dict:
                   "conflicts": [], "citations": [], "trace": ["Stopped before searching or drafting"], "confidence": None}
     else:
         a = answer(question, user, get_llm_or_unavailable()).to_dict()
+        for line in a["trace"]:
+            bad = any(w in line.lower() for w in ("blocked", "stale", "no approved doc", "unavailable", "disagree"))
+            activity.log("knowledge", line, kind="block" if bad else "step")
+        conf = (a.get("confidence") or {}).get("score")
+        activity.log("knowledge", ("Answer verified" if a["decision"] == "answer" else "No reliable answer: route to a person")
+                     + (f", confidence {conf}/100" if conf is not None else ""), to="orchestrator", kind="message")
         kind = "approval" if risk.level == "approval" else a["decision"]
         helper = None
         if kind == "route":
+            activity.log("orchestrator", "Who's the best person to help?", to="routing", kind="message")
             r = rank(question, user, a["retrieved_doc_ids"] or None)
+            if r.chosen:
+                activity.log("routing", f"Ask {r.chosen.name} ({r.chosen.role}), score {r.chosen.score:.2f}: " + "; ".join(r.chosen.reasons[:2]),
+                             to="orchestrator", kind="message")
             if r.chosen:
                 helper = {"name": r.chosen.name, "role": r.chosen.role, "reasons": r.chosen.reasons}
         result = {"kind": kind, "title": a["title"], "reason": risk.reason if kind == "approval" else a["route_reason"],
@@ -90,6 +108,9 @@ def run_ask(question: str) -> dict:
                   "citations": a["citations"], "trace": a["trace"], "confidence": a["confidence"], "helper": helper,
                   "llm": a["llm_mode"], "error": a["error"]}
     result["speech"] = _speech(result)
+    activity.log("orchestrator", {"answer": "Answer with sources", "route": "No guess: sent to a person",
+                                   "approval": "Needs manager approval", "stop": "Stopped: a person handles this"}.get(result["kind"], result["kind"]),
+                 to="user", kind="message")
     return result
 
 
@@ -126,6 +147,23 @@ def api_agents():
     from common import AGENTS, address
 
     return [{"name": f"unblock-{n}", "address": address(n)} for n in AGENTS]
+
+
+@app.get("/activity")
+def activity_page():
+    return FileResponse(STATIC / "activity.html")
+
+
+@app.get("/api/activity")
+def api_activity(after: int = 0):
+    return JSONResponse({"events": activity.since(after), "now": time.time_ns()})
+
+
+@app.get("/api/activity/replay")
+def api_activity_replay():
+    """A recorded run of all six agents (data/demo_activity.json), for when nothing is happening live."""
+    path = ROOT / "data" / "demo_activity.json"
+    return JSONResponse(json.loads(path.read_text()) if path.exists() else [])
 
 
 @app.get("/api/health")

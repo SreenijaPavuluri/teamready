@@ -20,6 +20,7 @@ from uagents_core.contrib.protocols.chat import (
     chat_protocol_spec,
 )
 
+from . import activity
 from .config import env_bool
 
 CARDS_ON = env_bool("UNBLOCK_CARDS", True)
@@ -64,8 +65,10 @@ def message_text(msg: ChatMessage) -> str:
     return "\n".join(item.text for item in msg.content if isinstance(item, TextContent)).strip()
 
 
-def create_chat_protocol(label: str, responder: Responder) -> Protocol:
+def create_chat_protocol(label: str, responder: Responder, person: str = "user") -> Protocol:
+    """person: who a message from an unknown address is, on the activity page (user, manager, people_ops)."""
     proto = Protocol(spec=chat_protocol_spec)
+    me = label.removeprefix("unblock-")
 
     @proto.on_message(ChatMessage)
     async def handle(ctx: Context, sender: str, msg: ChatMessage):
@@ -78,6 +81,8 @@ def create_chat_protocol(label: str, responder: Responder) -> Protocol:
         text = message_text(msg)
         if not text:
             return
+        who = activity.name_for(sender, person)
+        activity.log(who, activity.said(text), to=me, kind="message")
         try:
             reply = responder(ctx, sender, text)
             if isawaitable(reply):
@@ -87,7 +92,11 @@ def create_chat_protocol(label: str, responder: Responder) -> Protocol:
             reply = f"Sorry, something went wrong on my side ({type(exc).__name__}). Nothing was sent. Please try again."
         if reply is None:
             return
-        await ctx.send(sender, reply if isinstance(reply, ChatMessage) else text_message(str(reply)))
+        out = reply if isinstance(reply, ChatMessage) else text_message(str(reply))
+        cards = [c for c in out.content if getattr(c, "type", "") == "metadata"]
+        first = (message_text(out).strip().splitlines() or [""])[0]
+        activity.log(me, ("[card] " if cards else "") + first, to=who, kind="message")
+        await ctx.send(sender, out)
 
     @proto.on_message(ChatAcknowledgement)
     async def ack(ctx: Context, sender: str, msg: ChatAcknowledgement):

@@ -12,6 +12,7 @@ import uuid
 from common import PUBLISH, address, create_agent
 from uagents import Context
 
+from unblock import activity
 from unblock import knowledge as knowledge_lib
 from unblock import routing as routing_lib
 from unblock.actions import send_email
@@ -65,12 +66,15 @@ class Services:
 
     async def knowledge(self, question: str, user: dict) -> dict:
         req = KnowledgeRequest(request_id=uuid.uuid4().hex, question=question, user=user)
+        activity.log("orchestrator", "Check the approved docs for this question", to="knowledge", kind="message")
         try:
             resp, status = await self.ctx.send_and_receive(address("knowledge"), req, KnowledgeResponse, timeout=TIMEOUT)
         except Exception as exc:  # network errors
             resp, status = None, exc
         if isinstance(resp, KnowledgeResponse):
+            activity.log("knowledge", _knowledge_summary(resp.result), to="orchestrator", kind="message")
             return resp.result
+        activity.log("orchestrator", "Knowledge agent didn't answer in time; running the same check locally", kind="block")
         self.ctx.logger.warning(f"knowledge agent unavailable ({status}); answering locally")
         result = (await asyncio.to_thread(knowledge_lib.answer, question, user, get_llm_or_unavailable())).to_dict()
         result["trace"].insert(0, "Knowledge agent didn't respond in time, so I ran the same check locally")
@@ -78,16 +82,20 @@ class Services:
 
     async def routing(self, question: str, user: dict, doc_ids: list[str], exclude: list[str]) -> dict:
         req = RoutingRequest(request_id=uuid.uuid4().hex, question=question, user=user, retrieved_doc_ids=doc_ids, exclude=exclude)
+        activity.log("orchestrator", "Who's the best person to help?" + (f" (skip {len(exclude)} already tried)" if exclude else ""), to="routing", kind="message")
         try:
             resp, status = await self.ctx.send_and_receive(address("routing"), req, RoutingResponse, timeout=ROUTING_TIMEOUT)
         except Exception as exc:
             resp, status = None, exc
         if isinstance(resp, RoutingResponse):
+            activity.log("routing", _routing_summary(resp.result), to="orchestrator", kind="message")
             return resp.result
+        activity.log("orchestrator", "Routing agent didn't answer in time; ranking locally", kind="block")
         self.ctx.logger.warning(f"routing agent unavailable ({status}); ranking locally")
         return routing_lib.rank(question, user, doc_ids or None, set(exclude)).to_dict()
 
     async def wrong_person(self, person_id: str, topic_key: str) -> None:
+        activity.log("orchestrator", "Feedback: that person couldn't help, rank them lower for this topic", to="routing", kind="message")
         status = await self.ctx.send(address("routing"), WrongPersonFeedback(person_id=person_id, topic_key=topic_key))
         if getattr(status, "status", None) and str(status.status).lower().endswith("failed"):
             routing_lib.record_wrong_person(person_id, topic_key)
@@ -95,6 +103,7 @@ class Services:
     async def request_approval(self, req: dict) -> str:
         msg = ApprovalRequest(request_id=req["request_id"], category=req["category"], requester=req["requester"],
                               subject=req["subject"], body=req["body"], evidence=req["evidence"], reply_to=str(self.ctx.agent.address))
+        activity.log("orchestrator", f"Approval request {req['request_id']} ({req['category']}) for the manager", to="manager", kind="message")
         status = await self.ctx.send(address("manager"), msg)
         detail = str(getattr(status, "status", "")).lower()
         if "fail" in detail:
@@ -104,11 +113,13 @@ class Services:
     async def friction_event(self, doc_id: str, docs_read: list[str], resolved: bool) -> None:
         if not doc_id:
             return
+        activity.log("orchestrator", "Anonymous blocker logged (doc path only, no names or text)", to="insights", kind="message")
         status = await self.ctx.send(address("insights"), FrictionEvent(doc_id=doc_id, docs_read=docs_read, resolved=resolved))
         if "fail" in str(getattr(status, "status", "")).lower():
             log_live_event(doc_id, docs_read, resolved)
 
     async def track(self, item_id: str, user: str, kind: str, summary: str, to_name: str, to_email: str) -> None:
+        activity.log("orchestrator", f"Track {item_id}: waiting for {to_name} to reply", to="tracker", kind="message")
         await self.ctx.send(address("tracker"), TrackItem(item_id=item_id, user=user, kind=kind, summary=summary,
                                                           to_name=to_name, to_email=to_email))
 
@@ -119,7 +130,10 @@ class Services:
         return build_map()
 
     async def send_email(self, to: str, subject: str, body: str, sender: str, ics: str | None) -> dict:
-        return await asyncio.to_thread(send_email, to, subject, body, sender, ics)
+        result = await asyncio.to_thread(send_email, to, subject, body, sender, ics)
+        label = {"sent": "Email sent", "simulated": "Email simulated (no SMTP set up)", "failed": "Email failed"}[result["status"]]
+        activity.log("orchestrator", f"{label}: \"{subject}\" after your approval", to="people", kind="done" if result["status"] != "failed" else "block")
+        return result
 
     async def source_feedback(self, source_ids: list[str]) -> None:
         path = DATA_DIR / "runtime" / "source_feedback.json"
@@ -127,6 +141,19 @@ class Services:
         log = json.loads(path.read_text()) if path.exists() else []
         log.append({"source_ids": source_ids, "reason": "user_flagged", "message_text_stored": False})
         path.write_text(json.dumps(log, indent=1))
+
+
+def _knowledge_summary(r: dict) -> str:
+    conf = (r.get("confidence") or {}).get("score")
+    verdict = "Answer verified" if r.get("decision") == "answer" else "No reliable answer: route to a person"
+    return verdict + (f", confidence {conf}/100" if conf is not None else "")
+
+
+def _routing_summary(r: dict) -> str:
+    c = r.get("chosen")
+    if not c:
+        return "Nobody clearly owns this; fall back to People Ops"
+    return f"Ask {c['name']} ({c['role']}), score {c['score']:.2f}: " + "; ".join(c.get("reasons", [])[:2])
 
 
 def _to_message(reply: Reply):
@@ -148,6 +175,7 @@ async def on_decision(ctx: Context, sender: str, msg: ApprovalDecision):
     if sender != address("manager"):
         ctx.logger.warning(f"ignored an approval decision from {sender}: only the manager agent can decide")
         return
+    activity.log("manager", f"{msg.approver} {msg.decision} {msg.request_id}", to="orchestrator", kind="message")
     flow = Orchestrator(Services(ctx), Store(ctx), get_llm)
     out = await flow.on_decision(msg.dict())
     if out:

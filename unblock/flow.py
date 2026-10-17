@@ -9,7 +9,7 @@ import re
 import uuid
 from dataclasses import dataclass
 
-from . import render
+from . import activity, render
 from .data import load_people, load_user
 from .llm import ExtractiveLLM, LLMError
 from .risk import assess, check_draft
@@ -47,6 +47,13 @@ PHRASES = {
     "friction_map": {"friction map", "show the friction map"},
     "status": {"status", "any update", "any updates"},
 }
+
+
+def _guardian_log(issues: list[str], to_name: str) -> None:
+    if issues:
+        activity.log("orchestrator", f"Guardian blocked the draft to {to_name}: " + "; ".join(issues), kind="block")
+    else:
+        activity.log("orchestrator", f"Drafted a message to {to_name}; Guardian checked it: clear. Waiting for your approval", kind="check")
 
 
 def _command(text: str, selection: dict, has_pending: bool = False) -> str:
@@ -98,6 +105,7 @@ class Orchestrator:
              "to_name": person["name"], "to_role": person["role"], "to_email": person["email"],
              "subject": str(draft.get("subject", "Question from a new hire"))[:120], "body": str(draft.get("body", ""))[:1500]}
         p["guardian"] = check_draft(p["subject"], p["body"])
+        _guardian_log(p["guardian"], p["to_name"])
         return p
 
     def _review(self, state: dict, prefix: str = "") -> Reply:
@@ -156,6 +164,7 @@ class Orchestrator:
             if new_body:
                 pending["body"] = new_body
                 pending["guardian"] = check_draft(pending["subject"], new_body)
+                _guardian_log(pending["guardian"], pending["to_name"])
                 self.store.set(sender, state)
             return self._review(state, "Updated your draft." + ("" if pending.get("guardian") else " Guardian checked it: clear to send."))
         if cmd == "wrong_person" and state.get("helper"):
@@ -185,6 +194,12 @@ class Orchestrator:
         user = self._user()
         people = load_people()
         risk = assess(question)
+        if risk.level == "stop":
+            activity.log("orchestrator", f"Risk gate stopped it: {risk.category}. No search, no draft; handing it to a person", kind="block")
+        elif risk.level == "approval":
+            activity.log("orchestrator", f"Risk gate: {risk.category} needs the manager's approval", kind="step")
+        else:
+            activity.log("orchestrator", "Risk gate: safe to answer from the docs", kind="check")
         if risk.level == "stop":
             previous = self.store.get(sender) or {}
             self.store.set(sender, {k: previous[k] for k in ("awaiting", "last_decision") if k in previous})

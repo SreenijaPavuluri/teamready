@@ -8,7 +8,7 @@ import asyncio
 from common import PUBLISH, create_agent  # noqa: F401  (also fixes sys.path)
 from uagents import Context
 
-from unblock import render
+from unblock import activity, render
 from unblock.chat import create_chat_protocol
 from unblock.data import load_people, load_user
 from unblock.risk import assess
@@ -30,7 +30,11 @@ async def run(question: str, user: dict) -> dict:
 
 @agent.on_message(KnowledgeRequest, replies=KnowledgeResponse)
 async def on_request(ctx: Context, sender: str, msg: KnowledgeRequest):
+    activity.log("knowledge", "Searching approved docs and checking every claim against its source")
     result = await run(msg.question, msg.user)
+    for line in result.get("trace", []):
+        blocked = any(w in line.lower() for w in ("blocked", "stale", "no approved doc", "unavailable", "disagree"))
+        activity.log("knowledge", line, kind="block" if blocked else "step")
     await ctx.send(sender, KnowledgeResponse(request_id=msg.request_id, result=result))
 
 
