@@ -10,7 +10,11 @@ async def ask(q, user):
 
 
 def run():
-    return asyncio.run(canary.run(ask, "test"))
+    loop = asyncio.new_event_loop()  # not asyncio.run: it clears the loop other tests rely on
+    try:
+        return loop.run_until_complete(canary.run(ask, "test"))
+    finally:
+        loop.close()
 
 
 def test_canaries_find_the_walls_real_hires_hit_and_predict_new_ones():
