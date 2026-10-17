@@ -9,6 +9,10 @@
 | **Doc Steward** | API Trigger, called by `unblock-insights` | Reads the worst Friction Map cluster, the doc new hires started from, and the doc that has the missing step. Drafts a one-span edit as JSON. | No doc fixes get drafted; the same blocker keeps coming back |
 | **Weekly Digest** | Scheduled run, Mondays 9am | Reads `https://YOUR-DOMAIN/api/friction` (anonymous aggregates, groups of 5+). Posts each doc owner's top gap to Slack or Notion, with a link to ask Unblock for the fix. | Doc owners never hear that their doc is the problem |
 
+The Doc Steward also drafts the one-line edits for **Canary New Hires** detours (walls the synthetic new hires find
+before real hires do, `unblock/canary.py`): same inputs, same API Trigger, same exact-quote check, and the run link shows
+on `/canary`.
+
 The Doc Steward's output still goes through Unblock's exact-quote check, then a People Ops "approve", then the doc owner decides. A human approves every change.
 
 **The one rule:** a CREAO agent does the core work. For the doc-fix loop, it does: with `CREAO_APP_ID` set, the drafting happens only on CREAO. Say in the pitch: *"Remove the Doc Steward and the docs never get fixed. Every new hire keeps hitting the same wall."*

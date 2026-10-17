@@ -3,10 +3,40 @@
 ![tag:innovationlab](https://img.shields.io/badge/innovationlab-3D8BD3)
 ![tag:hackathon](https://img.shields.io/badge/hackathon-5F43F1)
 
-**A "who do I ask?" agent network for new hires that can't make things up.**
+**A "who do I ask?" agent network for new hires that can't make things up, and Canary New Hires: synthetic new hires who test your onboarding docs before your people do.**
 Built for LA Hacks AI Hackathon 2026: Workday "Build the Future of Work with AI", the Fetch.ai ASI:One Agent Challenge, and CREAO Best Team Empowerment.
 
 A new hire describes a blocker in ASI:One. Unblock answers only from approved company docs, verifies every claim word for word, finds the right person to ask when the docs fall short, drafts the message, and sends it only after the new hire approves. Access requests go to a human manager. Pay, performance and harassment questions go straight to a person. People Ops gets an anonymous Friction Map of what keeps blocking new hires, and pays for the full report through the Fetch.ai Payment Protocol.
+
+## Canary New Hires: your docs get a CI pipeline
+
+Every onboarding tool waits for a real new hire to get stuck, then helps. Unblock's **canaries** get stuck first.
+
+Three synthetic new hires (a Data Analyst, a Backend Engineer, a Product Designer in the EU office) go through
+onboarding with nothing but the company docs. They walk the New Hire Systems Checklist step by step, then their role's
+tasks, and ask Unblock how to do each one, through the same risk gate and verifier a real new hire gets. Where a canary
+couldn't do a step from what the docs say, that's a **wall**:
+
+| Wall | What the canary found |
+| --- | --- |
+| Detour | The checklist says what to do but not how, and doesn't link the doc that does (found only after rephrasing) |
+| Stale-doc trap | An out-of-date doc still comes up for the task and gives different instructions |
+| Circular | The only source is the checklist itself: no approved doc says how |
+| Dead end | No approved doc covers it for that office |
+
+Gated steps (production access needs the manager) and high-impact ones (a person handles them) are working as designed,
+not walls. Each wall is checked against the Friction Map: **confirmed** if real new hires already hit it, **predicted**
+if nobody has yet. Each one gets a fix for the doc owner: a one-line edit drafted by the CREAO Doc Steward (and checked
+word for word), an archive note for a stale doc, or a request to the right person to write the missing step. People Ops
+approves before anything is sent.
+
+**Backtest on our synthetic company:** with no knowledge of the Friction Map, the canaries rediscover the two walls real
+new hires hit most (13 blockers on analytics access from the checklist, 10 on the legacy deploy runbook) and predict two
+nobody has reported yet (no doc says how to turn on MFA; no badge doc for the EU office).
+
+Watch it at **`/canary`**, or message **unblock-canary** in ASI:One: `run`, `report`, `fixes`, `approve F1`. It also runs
+on a schedule (`CANARY_INTERVAL_HOURS`, default daily). Code: `unblock/canary.py`, `agents/canary_agent.py`,
+personas in `data/canaries.json`. Keyless demo: `UNBLOCK_LLM=extractive python scripts/local_canary_demo.py`.
 
 ## The problem
 
@@ -14,7 +44,7 @@ New hires get stuck on questions nobody has answered for them. Ownership lives i
 
 ## Agents
 
-Six agents, each registered on Agentverse with the Chat Protocol and usable on its own from ASI:One. Run `python scripts/addresses.py` to print the addresses for your seeds. **Go live:** [`docs/GO_LIVE.md`](docs/GO_LIVE.md).
+Seven agents, each registered on Agentverse with the Chat Protocol and usable on its own from ASI:One. Run `python scripts/addresses.py` to print the addresses for your seeds. **Go live:** [`docs/GO_LIVE.md`](docs/GO_LIVE.md).
 
 | Agent | What it does | Address |
 | --- | --- | --- |
@@ -24,6 +54,7 @@ Six agents, each registered on Agentverse with the Chat Protocol and usable on i
 | `unblock-manager` | Human approval gate. Only the manager can approve access requests. | `agent1q...` |
 | `unblock-insights` | Friction Map from anonymous events (groups of 5+ only). Full report with an AI-drafted doc fix for 0.1 FET via the Payment Protocol. | `agent1q...` |
 | `unblock-tracker` | Follows up when a message or request gets no answer, with a reminder sent only after approval. | `agent1q...` |
+| `unblock-canary` | Canary New Hires: synthetic new hires walk the onboarding docs through `unblock-knowledge`, find walls before real hires do, and draft fixes for the doc owners. | `agent1q...` |
 
 ### What each agent may do (and nothing more)
 
@@ -37,6 +68,7 @@ Every agent gets only the tools its job needs. The **Guardian** is not a separat
 | Manager | Hold requests, send decisions | The request, its business reason and verified evidence | Only a human manager decides |
 | Insights | Friction Map, doc-fix drafts, payments | Topics and doc ids of past blockers, no names or messages | Drafts a fix; the doc owner publishes it |
 | Tracker | Its follow-up list, reminder drafts, email after approval | What was sent, to whom, and when | Only after the new hire approves |
+| Canary | Questions to the knowledge agent as fictional new hires, the Friction Map, fix drafts (CREAO) | Approved docs, aggregate blocker counts; never a real person | Drafts fixes; only People Ops can send one |
 | Guardian (code) | Rules for pay, performance, benefits, harassment, health, personal data and secrets | Each outgoing draft | Can only stop a draft |
 
 ## Sponsor tracks
@@ -46,8 +78,8 @@ Full checklist with what each sponsor asks for and the manual steps: [`docs/TRAC
 | Track | How Unblock uses it |
 | --- | --- |
 | Workday | The product: a new-hire agent with visible responsible-AI controls and a People Ops Friction Map. Reads the new hire's profile from a Workday Build development tenant ([setup](docs/WORKDAY.md)) |
-| Fetch.ai | Six uAgents on Agentverse, Chat Protocol, ASI:One, Interactive Cards, Payment Protocol (FET) |
-| CREAO (Team Empowerment) | The Doc Steward agent on CREAO drafts every doc fix from the Friction Map (API Trigger, async), and a scheduled Weekly Digest agent tells doc owners on Slack ([setup](docs/CREAO.md)). Agent ID: `TODO` · Run: `TODO share link` |
+| Fetch.ai | Seven uAgents on Agentverse (one of them sends synthetic new hires through the others), Chat Protocol, ASI:One, Interactive Cards, Payment Protocol (FET) |
+| CREAO (Team Empowerment) | The Doc Steward agent on CREAO drafts every doc fix, from the Friction Map and from the walls Canary New Hires find (API Trigger, async), and a scheduled Weekly Digest agent tells doc owners on Slack ([setup](docs/CREAO.md)). Agent ID: `TODO` · Run: `TODO share link` |
 | Gemini | Hybrid retrieval with Gemini embeddings; Gemini as a drop-in reasoning model behind the same verifier |
 | Snowflake | Cortex chat completions REST API as a third reasoning model |
 | Tiger Data | Friction events in a TimescaleDB hypertable, 30-day view from a continuous aggregate |
@@ -65,9 +97,13 @@ approve/edit/reject every draft (Guardian checks each version), "wrong person", 
 the Manager tab, Tracker reminders, a first-two-weeks checklist from the approved docs, and the profile from Workday
 when connected. Details: [`docs/PORTAL.md`](docs/PORTAL.md).
 
+**Canary New Hires (`/canary`)**: press Run and watch three synthetic new hires walk the docs step by step, then see
+the walls (confirmed or predicted), the estimated hours a cohort would lose, and the drafted fixes with a before/after.
+Sending a fix needs the People Ops key (`PORTAL_MANAGER_KEY`).
+
 **Agent Activity (`/activity`)** shows the agents working, live: a map of who's messaging whom, and a feed of every
-step, check and stop (risk gate, verifier, Guardian, routing, manager approval, Tracker, payment, the CREAO run). All
-six agents and the web app append to `data/runtime/activity.jsonl` (`unblock/activity.py`); the page polls
+step, check and stop (risk gate, verifier, Guardian, routing, manager approval, Tracker, payment, the CREAO run, the
+canaries). All seven agents and the web app append to `data/runtime/activity.jsonl` (`unblock/activity.py`); the page polls
 `/api/activity`. People's messages appear only when they hold no secrets or health details, and drafted emails never do.
 With nothing happening live, **Watch recorded demo** replays `data/demo_activity.json`, a real local run of all six agents.
 Turn it off with `UNBLOCK_ACTIVITY=false`.
@@ -156,9 +192,9 @@ Baseline with no model (extractive): 34/40 behavior, 27/27 citations, 2/2 helper
 pip install -r requirements.txt
 cp .env.example .env          # fill in the keys and your own agent seeds
 python scripts/generate_events.py
-python -m pytest -q           # 70 tests, no network needed
-./scripts/run_all.sh          # runs the five agents as separate processes (logs in logs/)
-# or: python agents/main.py   # all five in one process
+python -m pytest -q           # 88 tests, no network needed
+./scripts/run_all.sh          # runs the seven agents as separate processes (logs in logs/)
+# or: python agents/main.py   # all seven in one process
 ```
 
 With `AGENTVERSE_API_KEY` set, each agent starts in mailbox mode and prints an Agent Inspector link. Open each link once and connect the mailbox; the agent then appears in Agentverse with its README and badges. In ASI:One, search for **unblock-orchestrator** (or @-mention its address) and start chatting.
@@ -169,7 +205,7 @@ With `AGENTVERSE_API_KEY` set, each agent starts in mailbox mode and prints an A
 UNBLOCK_LLM=extractive python scripts/local_demo.py
 ```
 
-This runs the five real agents plus a test new hire and a test manager, and prints the whole conversation: verified answer, stale-doc flag, routing to a person, "wrong person", an access request approved by the manager agent, and the high-impact stop.
+This runs the real agents plus a test new hire and a test manager, and prints the whole conversation: verified answer, stale-doc flag, routing to a person, "wrong person", an access request approved by the manager agent, and the high-impact stop.
 
 **Real email (optional):** set the SMTP values in `.env` (a Gmail app password works) and `DEMO_RECIPIENT_OVERRIDE` to an inbox you control. Without SMTP, approved emails are saved to `outbox/` and the reply says "Simulated". Unblock never claims a send that didn't happen.
 
@@ -181,26 +217,29 @@ This runs the five real agents plus a test new hire and a test manager, and prin
 
 ## Demo script (3 minutes)
 
-1. **Hook:** "It's Maya's third week. She's stuck, and she doesn't know who to ask."
+1. **Hook:** "It's Maya's third week. She's stuck, and she doesn't know who to ask. What if someone had hit that wall before her?"
 2. "How do I set up my dev environment?" Verified, cited answer and the trust panel.
 3. "What's our deploy process for staging?" The legacy runbook is flagged as two years stale and left out; Unblock offers to tell its owner.
 4. "How many vacation days do I get?" The docs don't say. Unblock doesn't guess: it routes to People Ops and drafts the message. Click "wrong person"; the ranking updates live.
 5. "I need access to the analytics dashboard." A request goes to the manager agent; the manager approves in their own chat; Maya is notified.
 6. "Can the AI decide whether I deserve a promotion?" Stopped before any search, with the right person named.
 7. Switch to People Ops: "friction map", then "full report", pay 0.1 FET, get the drafted fix for the onboarding checklist, send it to the doc owner.
-8. Close on the eval numbers.
+8. **Canary New Hires:** open `/canary`, press Run. Three synthetic new hires walk the docs; they hit the same analytics
+   and staging walls real hires did (confirmed), and two nobody has hit yet (predicted). Send the CREAO-drafted fix.
+   "New hires stop being your QA team."
+9. Close on the eval numbers.
 
 ## Project layout
 
 ```
-agents/      the five uAgents (+ readmes/ for Agentverse profiles, main.py to run all)
+agents/      the seven uAgents (+ readmes/ for Agentverse profiles, main.py to run all)
 unblock/     shared library: retrieval, verifier, confidence, risk gate, routing, friction map, flow, cards
 data/        synthetic company: 30 docs, 15 people, the new hire, policies, events
 eval/        40 labeled questions and the eval runner
-scripts/     local end-to-end demo, event generator, address printer
-web/         landing page, live demo, Friction Map dashboard, voice tool endpoint (FastAPI)
+scripts/     local end-to-end demos (chat, payment, canaries), event generator, address printer, deploy.sh
+web/         landing page, live demo, Canary New Hires page, Friction Map dashboard, voice tool endpoint (FastAPI)
 docs/        track checklist, ElevenLabs and deploy guides, DEV article draft, local demo transcript
-tests/       70 tests: verifier, risk gate, retrieval, routing, friction map, payments (FET + Solana), providers, web, conversation flow
+tests/       88 tests: canaries, verifier, risk gate, retrieval, routing, friction map, payments (FET + Solana), providers, web, conversation flow
 Dockerfile, docker-compose.yml   one-server deploy with HTTPS
 ```
 

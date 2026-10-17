@@ -16,12 +16,12 @@ Phase 5 adds the other sponsors.
 2. Get the two required keys and put them in `.env`:
    - `ANTHROPIC_API_KEY` from console.anthropic.com
    - `AGENTVERSE_API_KEY` from agentverse.ai (Profile → API Keys)
-3. Set six seeds in `.env` to long random strings, one per agent. Anyone who knows a seed controls that
+3. Set seven seeds in `.env` to long random strings, one per agent. Anyone who knows a seed controls that
    agent, so never commit `.env`:
    ```bash
-   python -c "import secrets; [print(f'{n}_SEED={secrets.token_hex(24)}') for n in ['ORCHESTRATOR','KNOWLEDGE','ROUTING','MANAGER','INSIGHTS','TRACKER']]"
+   python -c "import secrets; [print(f'{n}_SEED={secrets.token_hex(24)}') for n in ['ORCHESTRATOR','KNOWLEDGE','ROUTING','MANAGER','INSIGHTS','TRACKER','CANARY']]"
    ```
-   Paste the six lines into `.env`, replacing the empty ones.
+   Paste the seven lines into `.env`, replacing the empty ones.
 4. Check the code works:
    ```bash
    python scripts/generate_events.py
@@ -33,15 +33,15 @@ Phase 5 adds the other sponsors.
 
 ## Phase 2: Put the agents on Agentverse (about 15 minutes)
 
-1. Start all six agents, each as its own process:
+1. Start all seven agents, each as its own process:
    ```bash
    ./scripts/run_all.sh            # Windows: run each agents/*_agent.py and agents/orchestrator.py in its own terminal
    tail -f logs/*.log
    ```
 2. Each agent connects its mailbox automatically with your API key. In the logs, look for
-   **"Agentverse mailbox connected"** six times.
+   **"Agentverse mailbox connected"** seven times.
    If an agent says "auto-connect failed", open the **Agent Inspector** link printed above it and click **Connect** → Mailbox.
-3. On agentverse.ai → Agents, you should see six agents named `unblock-…`, each with its README and the
+3. On agentverse.ai → Agents, you should see seven agents named `unblock-…`, each with its README and the
    innovationlab and hackathon badges.
 4. Print the addresses and paste them into the README's agent table:
    ```bash
@@ -65,6 +65,7 @@ Go through the demo script and tick each line:
 - [ ] Wait for the Tracker (for the demo set `TRACKER_DUE_MINUTES=2` in `.env` and restart) → follow-up card → "approve"
 - [ ] "Can the AI decide whether I deserve a promotion?" → stopped, HR named
 - [ ] Message **unblock-insights**: "friction map", then "full report" → pay 0.1 FET in the ASI:One wallet → report and doc fix
+- [ ] Message **unblock-canary**: "run" → report card with confirmed and predicted walls → "fixes" → "approve F1"
 
 **Lock the manager gate:** put the manager account's address in `MANAGER_ALLOWED_SENDERS` and restart.
 (The manager agent logs the sender address of every message; copy it from there.)
@@ -91,10 +92,10 @@ message text, so the flow still works; set `UNBLOCK_CARDS=false` to send text on
 5. Start everything:
    ```bash
    docker compose up -d --build
-   docker compose logs -f agents      # expect "Agentverse mailbox connected" six times
+   docker compose logs -f agents      # expect "Agentverse mailbox connected" seven times
    ```
    If an agent can't auto-connect, tunnel its port and use the Inspector link from your laptop:
-   `ssh -L 8100:127.0.0.1:8100 -L 8101:127.0.0.1:8101 ... -L 8105:127.0.0.1:8105 root@SERVER_IP`
+   `ssh -L 8100:127.0.0.1:8100 -L 8101:127.0.0.1:8101 ... -L 8106:127.0.0.1:8106 root@SERVER_IP`
 6. **Check:** `https://unblock-ai.xyz` shows the page; `https://unblock-ai.xyz/api/health` lists the model,
    retrieval, Friction Map store and profile source; the ASI:One flow from Phase 3 still works.
 7. **Update after a change:** `git pull && docker compose up -d --build`.
@@ -114,7 +115,7 @@ After each one, check `/api/health` and run one question.
 
 ## Phase 6: Submit
 
-- [ ] Make the GitHub repo public; README has the six agent addresses and the eval results
+- [ ] Make the GitHub repo public; README has the seven agent addresses and the eval results
 - [ ] Record the 3-minute demo video (keep a backup recording of the full flow)
 - [ ] Devpost submission, listing every sponsor track you actually demo
 - [ ] Fetch.ai: submit through the ASI:One Submission Agent
