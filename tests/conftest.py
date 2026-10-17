@@ -8,6 +8,13 @@ os.environ["UNBLOCK_TODAY"] = "2026-10-17"
 os.environ["UNBLOCK_LLM"] = "extractive"
 os.environ["SMTP_HOST"] = ""
 os.environ["DEMO_RECIPIENT_OVERRIDE"] = ""
+# Keep tests independent of the deployment .env (load_dotenv never overrides a variable that is already set).
+for _name in ("VOICE_TOOL_SECRET", "PORTAL_MANAGER_KEY", "MANAGER_ALLOWED_SENDERS", "MANAGER_CHAT_ADDRESS",
+              "TRACKER_DUE_MINUTES", "TRACKER_DUE_HOURS", "UNBLOCK_EMBEDDINGS", "GEMINI_API_KEY", "TIMESCALE_URL",
+              "CREAO_APP_ID", "CREAO_API_KEY", "CREAO_WEBHOOK_URL", "WORKDAY_HOST", "WORKDAY_TENANT",
+              "WORKDAY_CLIENT_ID", "WORKDAY_CLIENT_SECRET", "WORKDAY_REFRESH_TOKEN", "SNOWFLAKE_ACCOUNT",
+              "SNOWFLAKE_PAT", "SOLANA_RECIPIENT", "SMTP_USER", "SMTP_PASSWORD", "WEB_RATE_PER_MIN"):
+    os.environ[_name] = ""
 
 import pytest  # noqa: E402
 
