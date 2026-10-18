@@ -384,7 +384,7 @@ svg.i { width: 18px; height: 18px; flex: none; stroke: currentColor; fill: none;
 
     <div class="stack" data-role="mgr" hidden>
       <section class="card">
-        <div class="card-h"><h2>Awaiting Your Approval</h2><span class="meta">Only you can approve access for your team</span></div>
+        <div class="card-h"><h2>Awaiting Your Approval</h2><div class="end"><span class="meta">Only you can approve access for your team</span><button class="btn sm" id="mgrLock" hidden>Lock</button></div></div>
         <ul class="tiles" id="mgrInbox"></ul>
         <div class="inline-key" id="mgrKeyRow" hidden><input id="mgrKey" type="password" placeholder="Manager key" aria-label="Manager key"><button class="btn primary" id="mgrKeyGo">Unlock</button></div>
       </section>
@@ -455,7 +455,7 @@ svg.i { width: 18px; height: 18px; flex: none; stroke: currentColor; fill: none;
     set(k, v) { try { localStorage.setItem(k, JSON.stringify(v)); } catch (e) {} },
   };
   let session = store.get("ub.session", null), after = store.get("ub.wd.after", 0), role = store.get("ub.wd.role", "hire");
-  let mgrKey = ""; try { mgrKey = sessionStorage.getItem("ub.mkey") || ""; } catch (e) {}
+  let mgrKey = ""; try { sessionStorage.removeItem("ub.mkey"); } catch (e) {}  // kept in memory only: a reload locks it again
   let last = null, busy = false;
   const ago = t => { if (!t) return ""; const s = Math.max(0, Date.now() / 1000 - t); return s < 60 ? "just now" : s < 3600 ? `${Math.round(s / 60)} min ago` : `${Math.round(s / 3600)} h ago`; };
   const cap = s => String(s || "").replace(/^./, c => c.toUpperCase());
@@ -696,7 +696,7 @@ svg.i { width: 18px; height: 18px; flex: none; stroke: currentColor; fill: none;
   async function renderMgr() {
     let res;
     try { res = await fetch("/api/portal/manager", { headers: { "X-Manager-Key": mgrKey } }); } catch (e) { return; }
-    $("mgrKeyRow").hidden = res.status !== 403;
+    $("mgrKeyRow").hidden = res.status !== 403; $("mgrLock").hidden = res.status === 403;
     const inbox = $("mgrInbox"); inbox.replaceChildren();
     if (res.status === 403) { inbox.appendChild(emptyBox("Locked", "Enter the manager key to see your team's requests.")); setBandKpis([]); $("mgrHistory").replaceChildren(emptyBox("Locked", "Unlock to see what you decided.")); $("team").replaceChildren(emptyBox("Locked", "Unlock to see your team's onboarding.")); return; }
     const list = await res.json();
@@ -733,7 +733,9 @@ svg.i { width: 18px; height: 18px; flex: none; stroke: currentColor; fill: none;
         [pill(done === last.checklist.length ? "green" : "blue", `${done} of ${last.checklist.length}`)], `${last.profile.role} · ${(last.done_for_you || []).length} tasks done by TeamReady`));
     }
   }
-  $("mgrKeyGo").onclick = () => { mgrKey = $("mgrKey").value; try { sessionStorage.setItem("ub.mkey", mgrKey); } catch (e) {} renderMgr(); };
+  $("mgrKeyGo").onclick = () => { mgrKey = $("mgrKey").value; $("mgrKey").value = ""; renderMgr(); };
+  $("mgrKey").onkeydown = e => { if (e.key === "Enter") $("mgrKeyGo").click(); };
+  $("mgrLock").onclick = () => { mgrKey = ""; renderMgr(); };
 
   async function renderOps() {
     try {

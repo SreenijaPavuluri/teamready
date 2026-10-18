@@ -238,7 +238,7 @@ button:disabled { opacity: 0.5; cursor: not-allowed; }
   };
   let session = store.get("ub.session", null), after = store.get("ub.after", 0), history = store.get("ub.history", []);
   let busy = false, mgrKey = "";
-  try { mgrKey = sessionStorage.getItem("ub.mkey") || ""; } catch (e) {}
+  try { sessionStorage.removeItem("ub.mkey"); } catch (e) {}  // kept in memory only: a reload locks it again
 
   // ---------- text rendering (escape first, then a little markdown) ----------
   const esc = s => String(s).replace(/[&<>"]/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
@@ -519,7 +519,7 @@ button:disabled { opacity: 0.5; cursor: not-allowed; }
       return s;
     }));
   }
-  $("mkeyGo").onclick = () => { mgrKey = $("mkey").value; try { sessionStorage.setItem("ub.mkey", mgrKey); } catch (e) {} loadQueue(); };
+  $("mkeyGo").onclick = () => { mgrKey = $("mkey").value;  loadQueue(); };
 
   function view(which) {
     $("tabHire").setAttribute("aria-selected", which === "hire"); $("tabMgr").setAttribute("aria-selected", which === "mgr");
