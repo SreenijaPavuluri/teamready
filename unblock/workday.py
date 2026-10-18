@@ -29,7 +29,8 @@ def enabled() -> bool:
 
 
 def _base() -> str:
-    return f"https://{env('WORKDAY_HOST')}"
+    host = env("WORKDAY_HOST").strip().removeprefix("https://").removeprefix("http://").rstrip("/")
+    return f"https://{host}"
 
 
 def access_token(client: httpx.Client) -> str:
