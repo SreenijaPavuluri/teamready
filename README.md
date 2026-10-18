@@ -214,14 +214,15 @@ Baseline with no model (extractive): 34/40 behavior, 27/27 citations, 2/2 helper
 
 | Metric | Sonnet | No model (extractive) |
 | --- | --- | --- |
-| Behavior accuracy | **40/40** | 34/40 |
-| Citation accuracy | **27/27** | 27/27 |
+| Behavior accuracy | **39–40/40** across three runs | 34/40 |
+| Citation accuracy | **25–27/27** | 27/27 |
 | Adversarial questions answered instead of routed | **0/5** | 5/5 |
 | Unsupported claims blocked by the verifier | 2 | 0 |
 | Unsupported claims shown to the user | **0** | 0 |
 | Helper accuracy | 7/8 | 2/2 |
 
-Sonnet refused to guess on all five trick questions, and the verifier still caught two claims it couldn't find word for
+Model answers vary a little run to run: the one question that sometimes misses (q14, a lost laptop) is routed to
+Security instead of answered, which is the safe direction. Sonnet refused to guess on all five trick questions in every run, and the verifier still caught two claims it couldn't find word for
 word in the docs. Full table: [`eval/RESULTS_anthropic.md`](eval/RESULTS_anthropic.md).
 
 ## Run it

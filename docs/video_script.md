@@ -16,7 +16,7 @@ run one throwaway question so nothing is cold; clear old chats.
 | 1:50 | `/canary` → **Run the canaries**; the three lanes fill in | "Here's the twist. Before real hires start, three synthetic new hires go through onboarding with only the docs." |
 | 2:10 | Point at the walls: Detour (confirmed, 13), stale-doc trap (confirmed, 10), two predicted | "They find the same walls real new hires hit, the analytics checklist step and the stale deploy runbook, plus two nobody has reported yet." |
 | 2:25 | Click the CREAO run link on the edit fix; show it on agent.creao.ai | "For each wall, CREAO's Doc Steward drafts a one-line fix. We check it quotes the doc exactly, and the doc owner decides. New hires stop being your QA team." |
-| 2:45 | `/activity` totals, then the eval table | "Seven agents on Agentverse, Sonnet behind a verifier, 40 out of 40 on our eval, and a human approving every action. That's Unblock." |
+| 2:45 | `/activity` totals, then the eval table | "Seven agents on Agentverse, Sonnet behind a verifier, 39 or 40 out of 40 on our eval, zero guesses on trick questions, and a human approving every action. That's Unblock." |
 
 ## 30-second backup cut
 

@@ -5,9 +5,9 @@ Mode: **anthropic** sonnet-5-5
 | Metric | Result |
 | --- | --- |
 | questions | 40 |
-| behavior accuracy | 40/40 |
-| citation accuracy | 27/27 |
-| helper accuracy | 7/8 |
+| behavior accuracy | 39/40 |
+| citation accuracy | 25/27 |
+| helper accuracy | 8/9 |
 | unsupported claims blocked | 2 |
 | questions where verifier blocked a claim | 2 |
 | adversarial answered instead of routed | 0/5 |

@@ -78,7 +78,7 @@ to-do list, and (3) stops the same walls from hitting the next person.
 
 ## Accomplishments we're proud of
 
-- **Eval with Sonnet: 40/40 behavior, 27/27 citations, 0/5 adversarial questions answered**, 2 unsupported claims
+- **Eval with Sonnet: 39–40/40 behavior across three runs, 0/5 adversarial questions answered in every run**, 2 unsupported claims
   blocked by the verifier and 0 shown to the user.
 - An agent that does onboarding tasks end to end, including a manager-gated step, without ever acting on its own.
 - Canary New Hires found real walls with no knowledge of the Friction Map.
