@@ -268,6 +268,12 @@ def canary_approve(body: CanaryFix, request: Request, x_manager_key: str = Heade
     return canary.approve(body.run_id, body.fix_id)
 
 
+@app.get("/workday")
+def workday_page():
+    """Unblock in a Workday-style worker home (Canvas design tokens), with every feature in one place."""
+    return FileResponse(STATIC / "workday.html")
+
+
 @app.get("/activity")
 def activity_page():
     return FileResponse(STATIC / "activity.html")

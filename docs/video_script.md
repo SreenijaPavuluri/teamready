@@ -20,7 +20,8 @@ run one throwaway question so nothing is cold; clear old chats.
 
 ## 30-second backup cut
 
-If ASI:One is slow on the day, record this from the web portal (`/app`) instead. It runs the same logic in the web app:
+If ASI:One is slow on the day, record this from the Workday view (`/workday`) instead: switch between Maya, Jordan and
+Elena with the toggle at the top, and press **Do my checklist** in the Onboarding Journey. It runs the same logic in the web app:
 1. (0:00) "Unblock: an onboarding buddy that can't make things up and does the work." Ask the staging question; show
    the source and the stale-doc flag.
 2. (0:10) Click **Do my checklist for me** → **Approve and do them**; show the "Done for you" panel.

@@ -92,3 +92,12 @@ def test_access_request_filed_only_after_manager_approves():
     rid = next(p for p in client.get("/api/portal/manager").json() if p["status"] == "pending")["request_id"]
     client.post("/api/portal/decide", json={"request_id": rid, "decision": "rejected"})
     assert autopilot.records(s) == []
+
+
+def test_workday_home_and_what_awaits_the_new_hire():
+    assert "Unblock for Workday" in client.get("/workday").text
+    s = session()
+    assert client.get(f"/api/portal/state?session={s}").json()["awaiting_you"] is None
+    chat(s, "do my checklist")
+    waiting = client.get(f"/api/portal/state?session={s}").json()["awaiting_you"]
+    assert waiting["type"] == "system_batch" and not waiting["blocked"]

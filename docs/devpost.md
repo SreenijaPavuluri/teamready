@@ -109,7 +109,9 @@ claim cited and verified, approve-before-act on every action, a human manager fo
 to a person. It reads the new hire's profile from a Workday Build development tenant (four fields only)
 <!-- if the tenant isn't connected by submission, replace with: "with a local fallback profile in the demo" -->. For
 People Ops, the Friction Map and Canary New Hires turn individual blockers into fixable patterns, and doc owners stay in
-control.
+control. The `/workday` view puts all of it in a Workday-style worker home built with Workday's open Canvas design
+tokens: Awaiting Your Action, an Onboarding Journey that Unblock completes, Done for You (process history), the manager's
+approval inbox, People Ops onboarding health, and a trust card that answers each "Design for Trust" question.
 
 **CREAO: Best Team Empowerment.** The CREAO Doc Steward (agent ID `b450ed0d-985d-4079-917f-d9f9ee75e812`) does the core
 work of the doc-fix loop. Our backend calls it through the API Trigger, polls the run, and checks its reply quotes the

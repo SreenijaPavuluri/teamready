@@ -1,0 +1,657 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Unblock for Workday</title>
+<meta name="description" content="Unblock in a Workday-style worker home: an onboarding agent that does the work, with a human approving every action.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&family=Roboto+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+/* Colors and type follow Workday's open Canvas design tokens (@workday/canvas-tokens-web): blueberry, soap,
+   licorice, cinnamon, cantaloupe, green apple; Roboto. This page is a prototype, not a Workday product. */
+:root {
+  --blueberry-100: #D7EAFC; --blueberry-200: #A6D2FF; --blueberry-400: #0875E1; --blueberry-500: #005cb9; --blueberry-600: #004387;
+  --soap-100: #f6f7f8; --soap-200: #F0F1F2; --soap-300: #e8ebed; --soap-400: #DFE2E6; --soap-500: #ced3d9;
+  --licorice-100: #A1AAB3; --licorice-300: #5E6A75; --licorice-500: #333d47; --black-pepper: #1e1e1e; --white: #ffffff;
+  --cinnamon-100: #ffefee; --cinnamon-500: #de2e21; --cinnamon-600: #a31b12;
+  --cantaloupe-100: #ffeed9; --cantaloupe-400: #ffa126; --cantaloupe-600: #c06c00;
+  --green-100: #ebfff0; --green-500: #319c4c; --green-600: #217a37; --plum-100: #e6f1ff; --plum-500: #3166ab;
+  --bg: var(--soap-100); --card: var(--white); --ink: var(--black-pepper); --muted: var(--licorice-300); --line: var(--soap-400);
+  --nav: var(--white); --chip: var(--soap-200); --input: var(--white);
+  --depth-1: 0 1px 4px rgba(31, 38, 46, 0.12), 0 2px 8px rgba(31, 38, 46, 0.08);
+  --depth-2: 0 2px 8px rgba(31, 38, 46, 0.12), 0 4px 16px rgba(31, 38, 46, 0.08);
+  --font: "Roboto", system-ui, -apple-system, "Segoe UI", sans-serif; --mono: "Roboto Mono", ui-monospace, Menlo, monospace;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #121820; --card: #1b232d; --ink: #e9edf1; --muted: #a1aab3; --line: #2c3743; --nav: #1b232d; --chip: #26313d; --input: #121820;
+    --blueberry-100: #13304f; --green-100: #12301c; --cantaloupe-100: #3a2a14; --cinnamon-100: #3d1e1c; --plum-100: #1a2740;
+    --blueberry-500: #6db3ff; --green-600: #6fd08a; --cantaloupe-600: #ffb75a; --cinnamon-600: #ff8b80; --plum-500: #8fb2ea;
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #121820; --card: #1b232d; --ink: #e9edf1; --muted: #a1aab3; --line: #2c3743; --nav: #1b232d; --chip: #26313d; --input: #121820;
+  --blueberry-100: #13304f; --green-100: #12301c; --cantaloupe-100: #3a2a14; --cinnamon-100: #3d1e1c; --plum-100: #1a2740;
+  --blueberry-500: #6db3ff; --green-600: #6fd08a; --cantaloupe-600: #ffb75a; --cinnamon-600: #ff8b80; --plum-500: #8fb2ea;
+  color-scheme: dark;
+}
+* { box-sizing: border-box; }
+[hidden] { display: none !important; }
+html, body { margin: 0; }
+body { background: var(--bg); color: var(--ink); font: 400 14px/1.5 var(--font); overflow-wrap: anywhere; }
+button, input, textarea, select { font: inherit; color: inherit; }
+a { color: var(--blueberry-500); }
+
+/* top navigation */
+.nav { position: sticky; top: 0; z-index: 10; background: var(--nav); box-shadow: var(--depth-2); }
+.nav-in { max-width: 1320px; margin: 0 auto; height: 64px; display: flex; align-items: center; gap: 16px;
+  padding: 0 max(16px, env(safe-area-inset-right, 0px)) 0 max(16px, env(safe-area-inset-left, 0px)); }
+.mark { display: flex; align-items: center; gap: 10px; text-decoration: none; color: var(--ink); flex: none; }
+.mark i { width: 34px; height: 34px; border-radius: 50%; background: var(--blueberry-400); color: #fff; display: grid; place-items: center;
+  font: 700 17px var(--font); font-style: normal; }
+.mark b { font-weight: 500; font-size: 16px; }
+.mark span { color: var(--muted); font-size: 13px; }
+.search { flex: 1; max-width: 560px; position: relative; }
+.search input { width: 100%; height: 40px; border-radius: 999px; border: 1px solid var(--line); background: var(--chip); padding: 0 16px 0 40px; }
+.search input:focus { outline: 2px solid var(--blueberry-400); outline-offset: 1px; background: var(--input); }
+.search svg { position: absolute; left: 14px; top: 12px; width: 16px; height: 16px; color: var(--muted); }
+.navr { margin-left: auto; display: flex; align-items: center; gap: 8px; flex: none; }
+.iconbtn { position: relative; width: 40px; height: 40px; border-radius: 50%; border: 0; background: transparent; display: grid; place-items: center; cursor: pointer; color: var(--muted); }
+.iconbtn:hover { background: var(--chip); }
+.iconbtn svg { width: 20px; height: 20px; }
+.badge { position: absolute; top: 4px; right: 3px; min-width: 18px; height: 18px; border-radius: 9px; background: var(--cinnamon-500); color: #fff; font: 700 11px/18px var(--font); text-align: center; padding: 0 4px; }
+.roles { display: flex; background: var(--chip); border-radius: 999px; padding: 3px; gap: 2px; }
+.roles button { border: 0; background: transparent; border-radius: 999px; padding: 6px 12px; font-weight: 500; font-size: 13px; color: var(--muted); cursor: pointer; white-space: nowrap; }
+.roles button[aria-pressed="true"] { background: var(--card); color: var(--ink); box-shadow: var(--depth-1); }
+.avatar { width: 34px; height: 34px; border-radius: 50%; background: var(--plum-100); color: var(--plum-500); display: grid; place-items: center; font-weight: 700; font-size: 13px; flex: none; }
+
+/* page */
+.wrap { max-width: 1320px; margin: 0 auto; padding: 0 max(16px, env(safe-area-inset-right, 0px)) 48px max(16px, env(safe-area-inset-left, 0px)); }
+.hero { margin: 20px 0; border-radius: 16px; padding: 24px 28px; color: #fff; background: linear-gradient(110deg, #004387 0%, #0875E1 62%, #3c9cf5 100%);
+  display: flex; flex-wrap: wrap; gap: 16px 32px; align-items: center; justify-content: space-between; box-shadow: var(--depth-1); }
+.hero h1 { margin: 0 0 4px; font: 500 26px/1.2 var(--font); }
+.hero p { margin: 0; opacity: 0.9; }
+.meter { min-width: 240px; }
+.meter .lbl { display: flex; justify-content: space-between; font-size: 13px; opacity: 0.92; margin-bottom: 6px; }
+.meter .bar { height: 8px; background: rgba(255,255,255,0.28); border-radius: 4px; overflow: hidden; }
+.meter .bar div { height: 100%; background: #fff; width: 0; transition: width 0.4s; }
+.grid { display: grid; grid-template-columns: minmax(0, 1fr) minmax(360px, 420px); gap: 20px; align-items: start; }
+.col { display: grid; gap: 20px; min-width: 0; }
+.two { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 20px; }
+.card { background: var(--card); border-radius: 12px; box-shadow: var(--depth-1); min-width: 0; }
+.card > header { display: flex; align-items: center; justify-content: space-between; gap: 8px; padding: 16px 20px 12px; border-bottom: 1px solid var(--line); }
+.card > header h2 { margin: 0; font: 500 16px var(--font); }
+.card > header .sub { color: var(--muted); font-size: 13px; }
+.card .body { padding: 12px 20px 16px; }
+.empty { color: var(--muted); padding: 6px 0; margin: 0; }
+.btn { border: 1px solid var(--licorice-100); background: var(--card); border-radius: 999px; padding: 7px 16px; font-weight: 500; cursor: pointer; white-space: nowrap; }
+.btn:hover { border-color: var(--licorice-300); }
+.btn.primary { background: var(--blueberry-400); border-color: var(--blueberry-400); color: #fff; }
+.btn.primary:hover { background: var(--blueberry-500); }
+.btn.danger { color: var(--cinnamon-600); border-color: var(--cinnamon-500); }
+.btn.sm { padding: 4px 12px; font-size: 13px; }
+.btn:disabled { opacity: 0.5; cursor: default; }
+.pill { display: inline-flex; align-items: center; gap: 6px; font: 500 12px var(--font); padding: 2px 10px; border-radius: 999px; white-space: nowrap; }
+.pill.done { background: var(--green-100); color: var(--green-600); }
+.pill.wait { background: var(--cantaloupe-100); color: var(--cantaloupe-600); }
+.pill.todo { background: var(--blueberry-100); color: var(--blueberry-500); }
+.pill.you { background: var(--chip); color: var(--muted); }
+.pill.bad { background: var(--cinnamon-100); color: var(--cinnamon-600); }
+.pill.ai { background: var(--plum-100); color: var(--plum-500); }
+
+/* inbox */
+.inbox { list-style: none; margin: 0; padding: 0; }
+.inbox li { display: grid; grid-template-columns: 36px minmax(0, 1fr) auto; gap: 12px; align-items: center; padding: 12px 0; border-top: 1px solid var(--line); }
+.inbox li:first-child { border-top: 0; }
+.inbox .ic { width: 36px; height: 36px; border-radius: 50%; background: var(--blueberry-100); color: var(--blueberry-500); display: grid; place-items: center; }
+.inbox .ic.warn { background: var(--cantaloupe-100); color: var(--cantaloupe-600); }
+.inbox .ic svg { width: 18px; height: 18px; }
+.inbox b { font-weight: 500; display: block; }
+.inbox small { color: var(--muted); display: block; }
+.inbox .acts { display: flex; gap: 6px; flex-wrap: wrap; justify-content: flex-end; }
+
+/* journey */
+.journey { list-style: none; margin: 0; padding: 0; position: relative; }
+.journey li { display: grid; grid-template-columns: 28px minmax(0, 1fr) auto; gap: 12px; align-items: center; padding: 10px 0; position: relative; }
+.journey li::before { content: ""; position: absolute; left: 13px; top: 38px; bottom: -10px; width: 2px; background: var(--line); }
+.journey li:last-child::before { display: none; }
+.journey .dot { width: 28px; height: 28px; border-radius: 50%; border: 2px solid var(--soap-500); background: var(--card); display: grid; place-items: center; font-size: 12px; font-weight: 700; color: var(--muted); position: relative; z-index: 1; }
+.journey li.done .dot { background: var(--green-500); border-color: var(--green-500); color: #fff; }
+.journey li.wait .dot { border-color: var(--cantaloupe-400); color: var(--cantaloupe-600); }
+.journey li.todo .dot { border-color: var(--blueberry-400); color: var(--blueberry-500); }
+.journey .t { font-weight: 500; }
+.journey small { display: block; color: var(--muted); }
+
+/* lists */
+.rows { list-style: none; margin: 0; padding: 0; }
+.rows li { padding: 10px 0; border-top: 1px solid var(--line); display: grid; gap: 2px; }
+.rows li:first-child { border-top: 0; }
+.rows li.empty, .inbox li.empty { display: block; }
+.rows .top { display: flex; justify-content: space-between; gap: 8px; align-items: baseline; }
+.rows b { font-weight: 500; }
+.rows small { color: var(--muted); }
+.rows code { font: 500 12px var(--mono); color: var(--muted); }
+
+/* trust */
+.trust { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 2px 20px; margin: 0; }
+.trust dt { font-weight: 500; margin-top: 10px; }
+.trust dd { margin: 0; color: var(--muted); }
+.trust div { min-width: 0; }
+
+/* assistant */
+.assist { position: sticky; top: 84px; display: flex; flex-direction: column; height: calc(100vh - 104px); min-height: 520px; }
+.assist > header .ai { display: flex; align-items: center; gap: 10px; }
+.assist > header .ai i { width: 30px; height: 30px; border-radius: 50%; background: linear-gradient(135deg, #0875E1, #3166ab); color: #fff; display: grid; place-items: center; font-style: normal; font-weight: 700; }
+.log { flex: 1; overflow-y: auto; padding: 16px 16px 8px; display: grid; gap: 12px; align-content: start; }
+.msg { display: flex; gap: 8px; max-width: 100%; }
+.msg.me { justify-content: flex-end; }
+.bub { border-radius: 14px; padding: 10px 12px; max-width: 92%; background: var(--chip); }
+.msg.me .bub { background: var(--blueberry-400); color: #fff; border-bottom-right-radius: 4px; }
+.msg.bot .bub { border-bottom-left-radius: 4px; }
+.bub p { margin: 0 0 6px; } .bub p:last-child { margin: 0; }
+.bub ul { margin: 4px 0 6px; padding-left: 18px; }
+.bub code { font: 12px var(--mono); }
+.acard { margin-top: 8px; background: var(--card); border: 1px solid var(--line); border-radius: 10px; padding: 10px 12px; }
+.acard h3 { margin: 0 0 6px; font: 500 14px var(--font); }
+.acard dl { margin: 0; display: grid; grid-template-columns: max-content minmax(0, 1fr); gap: 4px 10px; font-size: 13px; }
+.acard dt { color: var(--muted); }
+.acard dd { margin: 0; white-space: pre-wrap; }
+.acard details summary { cursor: pointer; color: var(--blueberry-500); font-size: 13px; margin-bottom: 6px; }
+.acard .acts { display: flex; gap: 6px; flex-wrap: wrap; margin-top: 10px; }
+.acard textarea { width: 100%; min-height: 110px; border: 1px solid var(--licorice-100); border-radius: 8px; padding: 8px; background: var(--input); }
+.guard { margin-top: 8px; font-size: 13px; padding: 6px 10px; border-radius: 8px; background: var(--green-100); color: var(--green-600); }
+.guard.bad { background: var(--cinnamon-100); color: var(--cinnamon-600); }
+.chips { display: flex; gap: 6px; flex-wrap: wrap; padding: 8px 16px 0; }
+.chips button { border: 1px solid var(--line); background: var(--card); border-radius: 999px; padding: 4px 10px; font-size: 12.5px; color: var(--muted); cursor: pointer; }
+.chips button:hover { color: var(--ink); border-color: var(--licorice-300); }
+.composer { display: flex; gap: 8px; padding: 12px 16px 16px; }
+.composer input { flex: 1; min-width: 0; height: 40px; border-radius: 999px; border: 1px solid var(--licorice-100); background: var(--input); padding: 0 16px; }
+.composer input:focus { outline: 2px solid var(--blueberry-400); outline-offset: 1px; }
+.foot { color: var(--muted); font-size: 12px; padding: 0 16px 12px; margin: 0; }
+.typing { color: var(--muted); font-size: 13px; }
+
+/* ops */
+.bars { display: grid; gap: 10px; }
+.barrow { display: grid; grid-template-columns: minmax(120px, 190px) minmax(0, 1fr) 40px; gap: 10px; align-items: center; font-size: 13px; }
+.barrow .track { height: 10px; background: var(--soap-300); border-radius: 5px; overflow: hidden; }
+.barrow .fill { height: 100%; background: var(--blueberry-400); border-radius: 5px; }
+.barrow .fill.gap { background: var(--cantaloupe-400); }
+.barrow span:last-child { text-align: right; font-variant-numeric: tabular-nums; color: var(--muted); }
+.stat3 { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px; margin-bottom: 14px; }
+.stat3 div { background: var(--soap-200); border-radius: 10px; padding: 10px 12px; }
+.stat3 b { display: block; font: 500 24px var(--font); font-variant-numeric: tabular-nums; }
+.stat3 small { color: var(--muted); }
+.note { color: var(--muted); font-size: 12px; margin: 10px 0 0; }
+
+@media (max-width: 1040px) {
+  .grid { grid-template-columns: minmax(0, 1fr); }
+  .assist { position: static; height: 640px; }
+}
+@media (max-width: 720px) {
+  .two, .trust { grid-template-columns: minmax(0, 1fr); }
+  .search, .mark span, .mark b, .roles .long, #avatar { display: none; }
+  .nav-in { gap: 6px; }
+  .roles button { padding: 6px 10px; }
+  .hero { padding: 18px; }
+  .stat3 { grid-template-columns: minmax(0, 1fr); }
+  .inbox li { grid-template-columns: 36px minmax(0, 1fr); }
+  .inbox .acts { grid-column: 2; justify-content: flex-start; }
+}
+</style>
+</head>
+<body>
+<nav class="nav">
+  <div class="nav-in">
+    <a class="mark" href="/"><i>U</i><b>Unblock</b><span>Lumen Labs</span></a>
+    <form class="search" id="search" role="search">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
+      <input id="searchIn" placeholder="Search or ask Unblock: &quot;do my checklist&quot;, &quot;how do I deploy to staging?&quot;" aria-label="Search or ask Unblock">
+    </form>
+    <div class="navr">
+      <div class="roles" role="group" aria-label="View as">
+        <button id="rHire" aria-pressed="true">Maya<span class="long"> · new hire</span></button>
+        <button id="rMgr" aria-pressed="false">Jordan<span class="long"> · manager</span></button>
+        <button id="rOps" aria-pressed="false">Elena<span class="long"> · People Ops</span></button>
+      </div>
+      <button class="iconbtn" id="inboxBtn" aria-label="Inbox">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M4 13h4l2 3h4l2-3h4"/><path d="M5 5h14l1 8v6H4v-6z"/></svg>
+        <span class="badge" id="badge" hidden>0</span>
+      </button>
+      <div class="avatar" id="avatar">MC</div>
+    </div>
+  </div>
+</nav>
+
+<div class="wrap">
+  <section class="hero" id="hero">
+    <div><h1 id="hello">Welcome, Maya</h1><p id="heroSub">Data Analyst · Growth Insights · week 2</p></div>
+    <div class="meter" id="meter"><div class="lbl"><span>Onboarding journey</span><span id="meterTxt">0 of 6</span></div><div class="bar"><div id="meterBar"></div></div></div>
+  </section>
+
+  <div class="grid">
+    <main class="col" id="main">
+      <!-- new hire -->
+      <section class="card" data-role="hire" id="inboxCard">
+        <header><h2>Awaiting Your Action</h2><span class="sub">Unblock never acts until you approve</span></header>
+        <div class="body"><ul class="inbox" id="hireInbox"></ul></div>
+      </section>
+      <div class="two" data-role="hire">
+        <section class="card">
+          <header><h2>Onboarding Journey</h2><button class="btn sm primary" id="autoBtn">Do my checklist</button></header>
+          <div class="body"><ol class="journey" id="journey"></ol></div>
+        </section>
+        <section class="card">
+          <header><h2>Done for You</h2><span class="sub">business process history</span></header>
+          <div class="body"><ul class="rows" id="history"><li class="empty">Nothing yet. Ask Unblock to do something, or press <b>Do my checklist</b>.</li></ul></div>
+        </section>
+      </div>
+      <div class="two" data-role="hire">
+        <section class="card">
+          <header><h2>Waiting on Others</h2><span class="sub">the Tracker follows up</span></header>
+          <div class="body"><ul class="rows" id="waiting"><li class="empty">Nothing waiting. Requests and messages you approve show up here.</li></ul></div>
+        </section>
+        <section class="card">
+          <header><h2>My Profile</h2><span class="pill you" id="profSrc">Sample profile</span></header>
+          <div class="body"><dl class="acard" style="border:0;padding:0;margin:0" id="profile"></dl></div>
+        </section>
+      </div>
+
+      <!-- manager -->
+      <section class="card" data-role="mgr" hidden>
+        <header><h2>Awaiting Your Action</h2><span class="sub">only you can approve access for your team</span></header>
+        <div class="body"><ul class="inbox" id="mgrInbox"></ul><div id="mgrKeyRow" hidden style="display:flex;gap:8px;margin-top:8px">
+          <input id="mgrKey" type="password" placeholder="Manager key" aria-label="Manager key" style="flex:1;height:36px;border-radius:999px;border:1px solid var(--licorice-100);padding:0 14px;background:var(--input)">
+          <button class="btn primary" id="mgrKeyGo">Unlock</button></div></div>
+      </section>
+      <section class="card" data-role="mgr" hidden>
+        <header><h2>My Team's New Hires</h2></header>
+        <div class="body"><ul class="rows" id="team"></ul></div>
+      </section>
+      <section class="card" data-role="mgr" hidden>
+        <header><h2>Decided</h2><span class="sub">your approval history</span></header>
+        <div class="body"><ul class="rows" id="mgrHistory"><li class="empty">No decisions yet.</li></ul></div>
+      </section>
+
+      <!-- people ops -->
+      <section class="card" data-role="ops" hidden>
+        <header><h2>Onboarding Health</h2><span class="sub" id="fmSub">last 30 days</span></header>
+        <div class="body"><div class="stat3" id="fmStats"></div><div class="bars" id="fmBars"></div>
+          <p class="note">Anonymous: topics and doc paths only, groups of 5+. Orange = a process gap with a fixable doc.</p></div>
+      </section>
+      <section class="card" data-role="ops" hidden>
+        <header><h2>Canary New Hires</h2><div style="display:flex;gap:8px"><a class="btn sm" href="/canary">Watch the walk</a><button class="btn sm primary" id="canaryRun">Run canaries</button></div></header>
+        <div class="body"><p class="empty" id="canarySub">Synthetic new hires walk the docs before real people start.</p><ul class="rows" id="walls"></ul></div>
+      </section>
+      <section class="card" data-role="ops" hidden>
+        <header><h2>Doc Fixes Awaiting Your Approval</h2><span class="sub">drafted by the CREAO Doc Steward</span></header>
+        <div class="body"><ul class="rows" id="fixes"><li class="empty">Run the canaries to draft fixes.</li></ul></div>
+      </section>
+
+      <!-- everyone -->
+      <section class="card">
+        <header><h2>How Unblock Earns Your Trust</h2><span class="pill ai">Responsible AI</span></header>
+        <div class="body"><dl class="trust">
+          <div><dt>What the AI is doing</dt><dd>Every step is logged live on <a href="/activity" target="_blank" rel="noopener">Agent Activity</a>: which agent, which check, which stop.</dd></div>
+          <div><dt>Why it recommended this</dt><dd>Every claim quotes an approved doc word for word, with its date and owner. Unsupported claims are blocked before you see them.</dd></div>
+          <div><dt>What data it used</dt><dd>Your name, role, team and office from your profile, and the question. Never private messages, reviews or pay.</dd></div>
+          <div><dt>What it wants to do</dt><dd>Each action shows the system, the exact form fields and the source doc before anything happens.</dd></div>
+          <div><dt>Where you decide</dt><dd>Approve, edit or reject every message and action. Access also needs your manager.</dd></div>
+          <div><dt>What it will never do</dt><dd>Touch passwords or MFA, approve its own requests, or decide pay, performance, benefits or anyone's job.</dd></div>
+          <div><dt>When a person steps in</dt><dd>High-impact questions stop before any search and name the right person. Gated access goes to your manager.</dd></div>
+          <div><dt>When it's unsure</dt><dd>Below 60/100 confidence, or when docs disagree, it doesn't guess: it finds who to ask and drafts the message.</dd></div>
+          <div><dt>How to challenge it</dt><dd>Say "this looks wrong" (the doc owner is asked) or "wrong person" (routing learns). Fairness rotation spreads questions across qualified people.</dd></div>
+        </dl></div>
+      </section>
+      <p class="note">Prototype for the Workday "Build the Future of Work with AI" challenge. Fictional company and people. Colors and type from Workday's open Canvas design tokens; not a Workday product.</p>
+    </main>
+
+    <aside class="card assist" aria-label="Unblock Assistant">
+      <header><div class="ai"><i>U</i><div><h2 style="margin:0;font:500 16px var(--font)">Unblock Assistant</h2><span class="sub">answers from approved docs · acts only with your OK</span></div></div></header>
+      <div class="log" id="log" aria-live="polite"></div>
+      <div class="chips" id="chips">
+        <button>Do my checklist</button><button>How do I deploy to staging?</button><button>Which Slack channels should I join?</button>
+        <button>My laptop screen is cracked</button><button>I need access to the analytics dashboard</button><button>How many vacation days do I get?</button>
+      </div>
+      <form class="composer" id="composer"><input id="q" autocomplete="off" placeholder="What's blocking you?" aria-label="Message Unblock"><button class="btn primary" type="submit">Send</button></form>
+      <p class="foot">The same agents run in ASI:One. Nothing is sent or done until you approve.</p>
+    </aside>
+  </div>
+</div>
+
+<script>
+(() => {
+  const $ = id => document.getElementById(id);
+  const h = (tag, cls, text) => { const e = document.createElement(tag); if (cls) e.className = cls; if (text != null) e.textContent = text; return e; };
+  const esc = s => String(s == null ? "" : s).replace(/[&<>"']/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
+  const store = {
+    get(k, d) { try { const v = localStorage.getItem(k); return v === null ? d : JSON.parse(v); } catch (e) { return d; } },
+    set(k, v) { try { localStorage.setItem(k, JSON.stringify(v)); } catch (e) {} },
+  };
+  let session = store.get("ub.session", null), after = store.get("ub.wd.after", 0), role = store.get("ub.wd.role", "hire");
+  let mgrKey = ""; try { mgrKey = sessionStorage.getItem("ub.mkey") || ""; } catch (e) {}
+  let last = null, busy = false;
+  const ICON = {
+    check: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m5 12 5 5 9-10"/></svg>',
+    clock: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="8"/><path d="M12 8v4l3 2"/></svg>',
+    doc: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M7 3h7l4 4v14H7z"/><path d="M14 3v4h4M10 12h5M10 16h5"/></svg>',
+    key: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="8" cy="15" r="4"/><path d="m11 12 8-8M16 7l2 2"/></svg>',
+  };
+
+  // ---------- markdown-lite for assistant text ----------
+  function md(text) {
+    const lines = esc(text).split("\n"); let out = "", inList = false;
+    for (const raw of lines) {
+      const line = raw.replace(/\*\*(.+?)\*\*/g, "<b>$1</b>").replace(/`([^`]+)`/g, "<code>$1</code>").replace(/_(Mode:[^_]+)_/g, "<i>$1</i>");
+      if (/^\s*[-•]\s+/.test(line)) { if (!inList) { out += "<ul>"; inList = true; } out += "<li>" + line.replace(/^\s*[-•]\s+/, "") + "</li>"; continue; }
+      if (inList) { out += "</ul>"; inList = false; }
+      if (line.trim()) out += "<p>" + line + "</p>";
+    }
+    return out + (inList ? "</ul>" : "");
+  }
+
+  // ---------- assistant ----------
+  const log = $("log");
+  function bubble(who, html, extra) {
+    const m = h("div", "msg " + who); const b = h("div", "bub");
+    if (html) b.innerHTML = html;
+    if (extra) b.appendChild(extra);
+    m.appendChild(b); log.appendChild(m); log.scrollTop = log.scrollHeight; return b;
+  }
+  function disable(el) { el.querySelectorAll("button, textarea").forEach(x => x.disabled = true); }
+  function cardEl(payload, kind, live) {
+    const c = h("div", "acard"); c.appendChild(h("h3", "", payload.title || ""));
+    if (payload.summary_rows && payload.summary_rows.length) {
+      const d = h("details"); if (payload.approve_cta) d.open = true;
+      d.appendChild(h("summary", "", kind === "detail" ? "Why you can trust this" : "Details"));
+      const dl = h("dl"); for (const r of payload.summary_rows) dl.append(h("dt", "", r.label), h("dd", "", r.value)); d.appendChild(dl); c.appendChild(d);
+    }
+    const ctas = [payload.approve_cta, ...(payload.ctas || []), payload.reject_cta].filter(x => x && x.selection);
+    if (ctas.length && live) {
+      const a = h("div", "acts");
+      for (const x of ctas) { const btn = h("button", "btn sm" + (x.primary ? " primary" : ""), x.label); btn.onclick = () => { disable(c); send("", x.selection, x.label); }; a.appendChild(btn); }
+      c.appendChild(a);
+    }
+    return c;
+  }
+  function draftEl(d, live) {
+    const c = h("div", "acard");
+    const label = { message_helper: "Message", book_1_1: "1:1 invite", access_request: "Access request to your manager", doc_owner_note: "Note to the doc owner" }[d.type] || "Message";
+    c.appendChild(h("h3", "", "Review before it's sent · " + label));
+    const dl = h("dl"); dl.append(h("dt", "", "To"), h("dd", "", d.to_name + (d.to_role ? " · " + d.to_role : "")), h("dt", "", "Subject"), h("dd", "", d.subject));
+    const body = h("dd", "", d.body); dl.append(h("dt", "", "Message"), body); c.appendChild(dl);
+    const bad = d.guardian && d.guardian.length;
+    c.appendChild(h("div", "guard" + (bad ? " bad" : ""), bad ? "Guardian blocked: " + d.guardian.join("; ") + ". Edit to remove it." : "Guardian: clear. No secrets, personal data, pay, performance or health details."));
+    if (live) {
+      const a = h("div", "acts");
+      const ok = h("button", "btn sm primary", "Approve and send"); ok.disabled = !!bad;
+      const ed = h("button", "btn sm", "Edit"), no = h("button", "btn sm danger", "Reject");
+      ok.onclick = () => { disable(c); send("", { action: "ub_approve" }, "Approve"); };
+      no.onclick = () => { disable(c); send("", { action: "ub_reject" }, "Reject"); };
+      ed.onclick = () => {
+        const ta = h("textarea"); ta.value = d.body; body.replaceWith(ta); ta.focus(); ok.disabled = true; ed.textContent = "Save edit";
+        ed.onclick = () => { const v = ta.value.trim(); if (v) { disable(c); send("edit: " + v, null, "Edited the message"); } };
+      };
+      a.append(ok, ed, no);
+      if (d.type === "message_helper") { const wp = h("button", "btn sm", "Wrong person"); wp.onclick = () => { disable(c); send("", { action: "ub_wrong_person" }, "Wrong person"); }; a.append(wp); }
+      c.appendChild(a);
+    }
+    return c;
+  }
+  function renderBot(r) {
+    let text = r.text || "";
+    if (r.draft) { const cut = text.search(/\n\s*I drafted this /); if (cut > 0) text = text.slice(0, cut); text = text.replace(/\*\*Guardian stopped this draft:\*\*[^\n]*\n?/, ""); }
+    text = text.replace(/\n*Reply \*\*approve\*\*[^\n]*$/, "").replace(/\n*Nothing happens until you reply \*\*approve\*\* \(or \*\*reject\*\*\)\.?/, "");
+    const extra = r.draft ? draftEl(r.draft, true) : r.payload ? cardEl(r.payload, r.kind, true) : null;
+    bubble("bot", md(text), extra);
+  }
+  async function ensureSession() {
+    if (session) return session;
+    const r = await fetch("/api/portal/session"); session = (await r.json()).session; store.set("ub.session", session); return session;
+  }
+  async function send(text, selection, shown) {
+    if (busy) return; busy = true;
+    if (role !== "hire") setRole("hire");
+    bubble("me", esc(shown || text));
+    const t = bubble("bot", '<span class="typing">Unblock is checking the docs…</span>');
+    try {
+      await ensureSession();
+      const res = await fetch("/api/portal/chat", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ session, text, selection }) });
+      t.parentElement.remove();
+      if (!res.ok) { const e = await res.json().catch(() => ({})); bubble("bot", md(e.detail || "Something went wrong. Nothing was sent.")); }
+      else renderBot(await res.json());
+    } catch (e) { t.parentElement.remove(); bubble("bot", md("I couldn't reach Unblock. Nothing was sent.")); }
+    busy = false; poll();
+  }
+  async function remind(itemId, doSend) {
+    if (role !== "hire") setRole("hire");
+    const res = await fetch("/api/portal/remind", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ session, item_id: itemId, send: doSend }) });
+    const r = await res.json();
+    if (!r.draft) { bubble("bot", md(r.text)); poll(); return; }
+    const c = h("div", "acard"); c.appendChild(h("h3", "", "Review before it's sent · Reminder"));
+    const dl = h("dl"); dl.append(h("dt", "", "To"), h("dd", "", r.draft.to_name), h("dt", "", "Subject"), h("dd", "", r.draft.subject), h("dt", "", "Message"), h("dd", "", r.draft.body)); c.appendChild(dl);
+    const bad = r.draft.guardian && r.draft.guardian.length;
+    c.appendChild(h("div", "guard" + (bad ? " bad" : ""), bad ? "Guardian blocked: " + r.draft.guardian.join("; ") : "Guardian: clear."));
+    const a = h("div", "acts"); const ok = h("button", "btn sm primary", "Approve and send"); ok.disabled = !!bad; const no = h("button", "btn sm", "Not now");
+    ok.onclick = () => { disable(c); bubble("me", "Approve"); remind(itemId, true); }; no.onclick = () => disable(c);
+    a.append(ok, no); c.appendChild(a); bubble("bot", md(r.text), c);
+  }
+  $("composer").onsubmit = e => { e.preventDefault(); const v = $("q").value.trim(); if (v) { $("q").value = ""; send(v); } };
+  $("search").onsubmit = e => { e.preventDefault(); const v = $("searchIn").value.trim(); if (v) { $("searchIn").value = ""; send(v); } };
+  $("chips").onclick = e => { if (e.target.tagName === "BUTTON") send(e.target.textContent); };
+  $("autoBtn").onclick = () => send("Do my checklist");
+
+  // ---------- new hire home ----------
+  function inboxItem(icon, warn, title, sub, buttons) {
+    const li = h("li"); const ic = h("div", "ic" + (warn ? " warn" : "")); ic.innerHTML = ICON[icon]; li.appendChild(ic);
+    const t = h("div"); t.append(h("b", "", title), h("small", "", sub)); li.appendChild(t);
+    const a = h("div", "acts"); for (const b of buttons) a.appendChild(b); li.appendChild(a); return li;
+  }
+  function renderHire(s) {
+    last = s;
+    const p = s.profile;
+    $("hello").textContent = `Welcome, ${p.name.split(" ")[0]}`;
+    $("heroSub").textContent = [p.role, p.team, p.office ? p.office + " office" : ""].filter(Boolean).join(" · ");
+    const done = s.checklist_done || [], waiting = s.checklist_waiting || [], doable = s.checklist_doable || [];
+    $("meterTxt").textContent = `${done.length} of ${s.checklist.length} done`;
+    $("meterBar").style.width = (s.checklist.length ? 100 * done.length / s.checklist.length : 0) + "%";
+
+    // Awaiting your action: the pending review, reminders from the Tracker, and the next doable step
+    const inbox = $("hireInbox"); inbox.replaceChildren(); let count = 0;
+    if (s.awaiting_you) {
+      const a = s.awaiting_you; count++;
+      const what = { system_action: "Action ready for your approval", system_batch: "Checklist plan ready for your approval", access_request: "Access request ready to send to your manager",
+                     message_helper: "Message ready for your approval", book_1_1: "1:1 invite ready for your approval", doc_owner_note: "Note to a doc owner ready" }[a.type] || "Ready for your approval";
+      const ok = h("button", "btn sm primary", "Approve"); ok.disabled = a.blocked; ok.onclick = () => send("", { action: "ub_approve" }, "Approve");
+      const no = h("button", "btn sm", "Reject"); no.onclick = () => send("", { action: "ub_reject" }, "Reject");
+      inbox.appendChild(inboxItem("check", a.blocked, what, (a.title || "") + (a.to ? " · " + a.to : "") + (a.blocked ? " · Guardian blocked it" : ""), [ok, no]));
+    }
+    for (const f of s.followups.filter(f => f.nudged && f.status === "waiting")) {
+      count++;
+      const b = h("button", "btn sm", "Show reminder"); b.onclick = () => remind(f.id, false);
+      inbox.appendChild(inboxItem("clock", true, `No reply yet from ${f.to}`, `${f.kind} · sent ${f.age} ago · the Tracker drafted a reminder`, [b]));
+    }
+    const nextIdx = doable.find(i => !waiting.includes(i));
+    if (nextIdx != null && !s.awaiting_you) {
+      count++;
+      const b = h("button", "btn sm primary", "Do it for me"); b.onclick = () => send("Do my checklist");
+      inbox.appendChild(inboxItem("doc", false, "Onboarding step Unblock can do for you", s.checklist[nextIdx].replace(/\.$/, ""), [b]));
+    }
+    if (!inbox.children.length) inbox.appendChild(h("li", "empty", "You're all caught up."));
+    const badge = $("badge"); badge.hidden = !count; badge.textContent = count;
+
+    // Journey
+    const j = $("journey"); j.replaceChildren();
+    s.checklist.forEach((step, i) => {
+      const st = done.includes(i) ? "done" : waiting.includes(i) ? "wait" : doable.includes(i) ? "todo" : "you";
+      const li = h("li", st); const dot = h("div", "dot", st === "done" ? "✓" : String(i + 1));
+      const t = h("div"); t.append(h("div", "t", step.replace(/\.$/, "")),
+        h("small", "", { done: "Done by Unblock", wait: "With your manager", todo: "Unblock can do this", you: /multi-factor/i.test(step) ? "You: Unblock never touches MFA" : "You, with IT on day one" }[st]));
+      const pill = h("span", "pill " + st, { done: "Done", wait: "Waiting", todo: "Ready", you: "Yours" }[st]);
+      li.append(dot, t, pill); j.appendChild(li);
+    });
+
+    // History
+    const hist = $("history");
+    if ((s.done_for_you || []).length) hist.replaceChildren(...s.done_for_you.map(r => {
+      const li = h("li"); const top = h("div", "top"); top.append(h("b", "", r.title), h("span", "pill " + (r.status === "done" ? "done" : "wait"), r.status));
+      li.append(top, h("small", "", r.detail)); const c = h("code", "", `${r.id} · ${r.system}`); li.appendChild(c); return li;
+    }));
+
+    // Waiting on others
+    const items = [];
+    for (const r of s.requests) items.push([`${r.request_id}: ${r.category}`, `To your manager · ${r.subject || ""}`, r.status === "pending" ? "waiting" : r.status]);
+    for (const f of s.followups) if (!f.id.startsWith("AR-")) items.push([`${f.kind} to ${f.to}`, `"${f.summary}" · ${f.age} ago${f.nudged ? " · reminder offered" : ""}`, f.status]);
+    if (items.length) $("waiting").replaceChildren(...items.map(([t, sub, st]) => {
+      const li = h("li"); const top = h("div", "top"); top.append(h("b", "", t), h("span", "pill " + (/approved|done|answered/.test(st) ? "done" : /rejected/.test(st) ? "bad" : "wait"), st));
+      li.append(top, h("small", "", sub)); return li;
+    }));
+
+    // Profile
+    const prof = $("profile"); prof.replaceChildren();
+    for (const [k, v] of [["Name", p.name], ["Job title", p.role], ["Team", p.team], ["Manager", p.manager], ["Office", p.office]]) if (v) prof.append(h("dt", "", k), h("dd", "", v));
+    $("profSrc").textContent = p.source === "Workday" ? "From Workday" : "Sample profile";
+    $("profSrc").className = "pill " + (p.source === "Workday" ? "done" : "you");
+
+    // Messages from the manager or the Tracker arrive in the assistant
+    for (const m of s.inbox || []) {
+      after = Math.max(after, m.id);
+      bubble("bot", md((m.from === "manager" ? "**From your manager's approval agent:** " : m.from === "tracker" ? "**Tracker:** " : "") + m.text));
+    }
+    store.set("ub.wd.after", after);
+  }
+
+  // ---------- manager ----------
+  async function renderMgr() {
+    let res;
+    try { res = await fetch("/api/portal/manager", { headers: { "X-Manager-Key": mgrKey } }); } catch (e) { return; }
+    $("mgrKeyRow").hidden = res.status !== 403;
+    const inbox = $("mgrInbox"); inbox.replaceChildren();
+    if (res.status === 403) { inbox.appendChild(h("li", "empty", "Enter the manager key to see your team's requests.")); return; }
+    const list = await res.json();
+    const pending = list.filter(r => r.status === "pending"), decided = list.filter(r => r.status !== "pending");
+    $("badge").hidden = !pending.length; $("badge").textContent = pending.length;
+    if (!pending.length) inbox.appendChild(h("li", "empty", "Nothing is waiting for you."));
+    for (const r of pending) {
+      const li = h("li"); li.style.alignItems = "start";
+      const ic = h("div", "ic"); ic.innerHTML = ICON.key; li.appendChild(ic);
+      const t = h("div"); t.append(h("b", "", `${r.request_id}: ${r.category} for ${r.requester ? r.requester.name : "a new hire"}`),
+        h("small", "", r.subject || ""));
+      if (r.body) { const d = h("details"); d.append(h("summary", "", "Message and evidence")); d.append(h("p", "", r.body));
+        if ((r.evidence || []).length) { const ul = h("ul"); for (const e of r.evidence) ul.appendChild(h("li", "", e)); d.appendChild(ul); } t.appendChild(d); }
+      const note = h("input"); note.placeholder = "Comment (optional)"; note.setAttribute("aria-label", "Comment");
+      note.style.cssText = "width:100%;margin-top:8px;height:32px;border-radius:999px;border:1px solid var(--licorice-100);padding:0 12px;background:var(--input)";
+      t.appendChild(note); li.appendChild(t);
+      const a = h("div", "acts");
+      for (const [label, decision, cls] of [["Approve", "approved", "btn sm primary"], ["Deny", "rejected", "btn sm danger"]]) {
+        const b = h("button", cls, label);
+        b.onclick = async () => {
+          a.querySelectorAll("button").forEach(x => x.disabled = true);
+          await fetch("/api/portal/decide", { method: "POST", headers: { "Content-Type": "application/json", "X-Manager-Key": mgrKey },
+            body: JSON.stringify({ request_id: r.request_id, decision, note: note.value.trim() }) });
+          renderMgr();
+        };
+        a.appendChild(b);
+      }
+      li.appendChild(a); inbox.appendChild(li);
+    }
+    $("mgrHistory").replaceChildren(...(decided.length ? decided.map(r => {
+      const li = h("li"); const top = h("div", "top"); top.append(h("b", "", `${r.request_id}: ${r.category}`), h("span", "pill " + (r.status === "approved" ? "done" : "bad"), r.status));
+      li.append(top, h("small", "", (r.requester ? r.requester.name + " · " : "") + (r.note ? `"${r.note}"` : "no comment")));
+      if (r.status === "approved" && /analytics/.test(r.category)) li.appendChild(h("small", "", "Unblock filed the go/analytics-access form automatically after your approval."));
+      return li;
+    }) : [h("li", "empty", "No decisions yet.")]));
+    if (last) {
+      const done = (last.checklist_done || []).length;
+      $("team").replaceChildren((() => { const li = h("li"); const top = h("div", "top");
+        top.append(h("b", "", `${last.profile.name} · ${last.profile.role}`), h("span", "pill todo", `${done} of ${last.checklist.length} steps`));
+        li.append(top, h("small", "", `${(last.done_for_you || []).length} tasks done by Unblock · ${pending.length} waiting for you`)); return li; })());
+    }
+  }
+  $("mgrKeyGo").onclick = () => { mgrKey = $("mgrKey").value; try { sessionStorage.setItem("ub.mkey", mgrKey); } catch (e) {} renderMgr(); };
+
+  // ---------- people ops ----------
+  async function renderOps() {
+    try {
+      const fm = await (await fetch("/api/friction")).json();
+      $("fmSub").textContent = `last ${fm.window_days} days · ${fm.storage}`;
+      $("fmStats").replaceChildren(...[[fm.total_blockers, "blockers"], [Math.round(fm.resolved_without_ticket_share * 100) + "%", "resolved without a ticket"], [fm.process_gaps, "process gaps"]]
+        .map(([v, l]) => { const d = h("div"); d.append(h("b", "", v), h("small", "", l)); return d; }));
+      const max = Math.max(1, ...fm.clusters.map(c => c.count));
+      $("fmBars").replaceChildren(...fm.clusters.slice(0, 7).map(c => {
+        const row = h("div", "barrow"); row.title = c.pattern || "";
+        const tr = h("div", "track"); const f = h("div", "fill" + (c.fixable ? " gap" : "")); f.style.width = (100 * c.count / max) + "%"; tr.appendChild(f);
+        row.append(h("span", "", c.topic), tr, h("span", "", c.count)); return row;
+      }));
+      const run = await (await fetch("/api/canary/latest")).json();
+      if (run.status === "none") { $("canarySub").textContent = "No run yet. Synthetic new hires walk the docs before real people start."; return; }
+      const sm = run.summary || {};
+      $("canarySub").textContent = run.status === "running" ? "The canaries are walking the docs now…"
+        : `${run.run_id}: ${sm.walls} walls · ${sm.confirmed} already hit by real hires · ${sm.predicted} predicted · about ${(sm.minutes_saved_per_cohort / 60).toFixed(1)} hours saved per 3-person cohort (estimate)`;
+      $("walls").replaceChildren(...(run.walls || []).map(w => {
+        const li = h("li"); const top = h("div", "top"); top.append(h("b", "", w.label), h("span", "pill " + (w.predicted ? "wait" : "todo"), w.predicted ? "Predicted" : `Confirmed · ${w.humans_hit} real blockers`));
+        li.append(top, h("small", "", w.headline)); return li;
+      }));
+      if ((run.fixes || []).length) $("fixes").replaceChildren(...run.fixes.map(f => {
+        const li = h("li"); const top = h("div", "top");
+        top.append(h("b", "", `${f.id} · ${{ edit: "One-line edit", archive: "Archive note", write: "Writing request" }[f.kind]} → ${f.to.name}`),
+          h("span", "pill " + (f.status === "sent" ? "done" : f.status === "ready" ? "todo" : "wait"), f.status));
+        li.appendChild(top);
+        if (f.doc_title) li.appendChild(h("small", "", f.doc_title));
+        if (f.after) li.appendChild(h("small", "", (f.before ? "Adds: " : "") + f.after));
+        if (f.status === "ready") {
+          const b = h("button", "btn sm primary", "Send to " + f.to.name.split(" ")[0]); b.style.justifySelf = "start"; b.style.marginTop = "6px";
+          b.onclick = async () => {
+            b.disabled = true;
+            const go = () => fetch("/api/canary/approve", { method: "POST", headers: { "Content-Type": "application/json", "X-Manager-Key": mgrKey }, body: JSON.stringify({ run_id: run.run_id, fix_id: f.id }) });
+            let r = await go();
+            if (r.status === 403) { mgrKey = prompt("People Ops key (the portal's manager key):") || ""; try { sessionStorage.setItem("ub.mkey", mgrKey); } catch (e) {} r = await go(); }
+            renderOps();
+          };
+          li.appendChild(b);
+        }
+        return li;
+      }));
+      if (run.status === "running") setTimeout(renderOps, 1500);
+    } catch (e) {}
+  }
+  $("canaryRun").onclick = async () => {
+    $("canaryRun").disabled = true;
+    const r = await fetch("/api/canary/run", { method: "POST" });
+    if (!r.ok) { const e = await r.json().catch(() => ({})); alert(e.detail || "Couldn't start a run."); }
+    $("canaryRun").disabled = false; renderOps();
+  };
+
+  // ---------- roles ----------
+  const ROLES = { hire: ["rHire", "MC", "Maya"], mgr: ["rMgr", "JL", "Jordan"], ops: ["rOps", "EG", "Elena"] };
+  function setRole(r) {
+    role = r; store.set("ub.wd.role", r);
+    for (const [k, [id]] of Object.entries(ROLES)) $(id).setAttribute("aria-pressed", String(k === r));
+    document.querySelectorAll("[data-role]").forEach(el => el.hidden = el.dataset.role !== r);
+    $("avatar").textContent = ROLES[r][1];
+    $("meter").hidden = r !== "hire";
+    if (r === "mgr") { $("hello").textContent = "Welcome, Jordan"; $("heroSub").textContent = "Analytics Manager · Growth Insights · 1 new hire ramping"; renderMgr(); }
+    if (r === "ops") { $("hello").textContent = "Welcome, Elena"; $("heroSub").textContent = "People Operations Partner · onboarding health for Lumen Labs"; renderOps(); }
+    if (r === "hire") poll();
+  }
+  $("rHire").onclick = () => setRole("hire"); $("rMgr").onclick = () => setRole("mgr"); $("rOps").onclick = () => setRole("ops");
+  $("inboxBtn").onclick = () => (document.querySelector(`[data-role="${role}"]`) || $("main")).scrollIntoView({ behavior: "smooth", block: "start" });
+
+  async function poll() {
+    if (!session) await ensureSession();
+    try {
+      const r = await fetch(`/api/portal/state?session=${encodeURIComponent(session)}&after=${after}`);
+      if (r.ok) { const s = await r.json(); renderHireIfShown(s); }
+    } catch (e) {}
+  }
+  function renderHireIfShown(s) { if (role === "hire") renderHire(s); else last = s; }
+
+  bubble("bot", md("Hi, I'm **Unblock**, your onboarding buddy. I answer only from approved Lumen Labs docs and show my sources, and I can **do** onboarding tasks for you: join your Slack channels, enroll you in training, book your 1:1, open IT tickets. I always show you first and act only when you approve.\n\nTry **Do my checklist**."));
+  setRole(role);
+  setInterval(() => { if (role === "hire") poll(); else if (role === "mgr") renderMgr(); }, 4000);
+})();
+</script>
+</body>
+</html>

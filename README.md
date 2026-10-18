@@ -12,7 +12,9 @@ A new hire describes a blocker in ASI:One. Unblock answers only from approved co
 
 - **ASI:One** (asi1.ai): message **unblock-orchestrator** with "do my checklist", "What's our deploy process for
   staging?" or "my laptop screen is cracked". Message **unblock-canary** with "run". Addresses are in the agent table below.
-- **Web:** `/app` (New Hire Portal, with a manager tab), `/canary` (Canary New Hires), `/activity` (the agents talking, live).
+- **Web:** **`/workday`** (Unblock in a Workday-style worker home: Awaiting Your Action, Onboarding Journey, Done for
+  You, the Unblock Assistant, plus Jordan's manager inbox and Elena's onboarding health; colors and type from Workday's
+  open Canvas design tokens), `/app` (New Hire Portal), `/canary` (Canary New Hires), `/activity` (the agents talking, live).
 - **No keys at all:** `UNBLOCK_LLM=extractive python scripts/local_demo.py` and `scripts/local_canary_demo.py`.
 
 ## Unblock does the work, not just answers

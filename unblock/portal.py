@@ -196,6 +196,9 @@ def state(session: str, after: int = 0) -> dict:
     requests = [{k: r[k] for k in ("request_id", "category", "subject", "status", "decided_by", "created") if k in r}
                 for r in db.get("approvals", {}).values() if r.get("session") == session]
     inbox = [m for m in db.get("inbox", {}).get(session, []) if m["id"] > after]
+    pend = (db.get("state", {}).get(session) or {}).get("pending")
+    awaiting = ({"type": pend["type"], "title": pend.get("title") or pend.get("subject", ""), "to": pend.get("to_name", ""),
+                 "blocked": bool(pend.get("guardian"))} if pend else None)
     return {
         "profile": {"name": user["name"], "role": user["role"], "team": user.get("team", ""), "office": user.get("office", ""),
                     "manager": load_people().get(user.get("manager_id", ""), {}).get("name", ""),
@@ -216,6 +219,7 @@ def state(session: str, after: int = 0) -> dict:
                             key=lambda x: x["id"]),
         "requests": sorted(requests, key=lambda r: r.get("created", 0)),
         "inbox": inbox,
+        "awaiting_you": awaiting,  # what's waiting for the new hire's approve / reject right now
     }
 
 
