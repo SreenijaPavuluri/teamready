@@ -409,7 +409,11 @@ def _load() -> dict:
         return {"runs": []}
 
 
+STALE_SECONDS = 300  # a live run saves after every step; a "running" run quiet for this long was interrupted
+
+
 def save(run: dict) -> None:
+    run["updated"] = time.time()
     with _lock:
         db = _load()
         db["runs"] = [r for r in db["runs"] if r["run_id"] != run["run_id"]][-9:] + [run]
@@ -423,6 +427,9 @@ def latest() -> dict | None:
     with _lock:
         runs = _load()["runs"]
         run = runs[-1] if runs else None
+    if run and run["status"] == "running" and time.time() - run.get("updated", 0) > STALE_SECONDS:
+        run["status"] = "interrupted"  # its process stopped mid-run (restart, deploy); a new run can start
+        save(run)
     if run and refresh(run):
         save(run)
     return run

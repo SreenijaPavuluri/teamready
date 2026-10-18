@@ -88,3 +88,11 @@ def test_report_text_and_map_feed_have_no_people_from_messages():
     assert "PREDICTED" in text and "confirmed by" in text
     feed = canary.predicted_for_map(r)
     assert feed and set(feed[0]) == {"wall", "task", "doc", "canaries", "humans_hit", "predicted"}
+
+
+def test_a_run_whose_process_stopped_shows_as_interrupted(monkeypatch):
+    rec = canary.new_run("scheduled")
+    canary.save(rec)
+    assert canary.latest()["status"] == "running"
+    monkeypatch.setattr(canary, "STALE_SECONDS", -1)
+    assert canary.latest()["status"] == "interrupted"

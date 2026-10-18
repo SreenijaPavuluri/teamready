@@ -166,8 +166,8 @@ a { color: var(--sky); }
     const pill = $("state");
     if (!r || r.status === "none") { pill.className = "pill idle"; $("stateText").textContent = "No run yet"; return; }
     const running = r.status === "running";
-    pill.className = "pill" + (running ? " running" : "");
-    $("stateText").textContent = running ? "Walking the docs" : "Done";
+    pill.className = "pill" + (running ? " running" : r.status === "interrupted" ? " idle" : "");
+    $("stateText").textContent = running ? "Walking the docs" : r.status === "interrupted" ? "Interrupted" : "Done";
     const when = new Date(r.finished || r.started);
     $("runinfo").textContent = `${r.run_id} · ${running ? "started" : "finished"} ${when.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}`
       + ` · ${r.trigger === "scheduled" ? "scheduled run" : "started by hand"} · model: ${r.llm}`;
@@ -203,6 +203,7 @@ a { color: var(--sky); }
 
   function walls(r) {
     const box = $("walls"); box.textContent = "";
+    if (r.status === "interrupted") { box.append(h("div", "empty", "This run was interrupted before it finished. Press Run the canaries to start a new one.")); return; }
     if (r.status !== "done") { box.append(h("div", "empty", "Walls show up here when the run finishes.")); return; }
     if (!r.walls.length) { box.append(h("div", "empty", "No walls. Every canary could finish onboarding from the docs.")); return; }
     for (const w of r.walls) {
