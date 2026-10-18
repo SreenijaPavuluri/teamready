@@ -810,6 +810,16 @@ svg.i { width: 18px; height: 18px; flex: none; stroke: currentColor; fill: none;
   setRole(role);
   setInterval(() => { if (role === "hire") poll(); else if (role === "mgr") renderMgr(); }, 4000);
 
+  // After a demo reset the server restarts: reload so every open page starts fresh and the manager view locks again.
+  let boot = null;
+  setInterval(async () => {
+    try {
+      const b = (await (await fetch("/api/boot")).json()).boot;
+      if (boot && b !== boot) { try { localStorage.removeItem("ub.session"); localStorage.removeItem("ub.wd.after"); } catch (e) {} location.reload(); }
+      boot = b;
+    } catch (e) {}
+  }, 3000);
+
   // Voice: the ElevenLabs agent answers out loud through the same verifier (/api/voice/ask). Shown only when configured.
   fetch("/api/voice/config").then(r => r.ok ? r.json() : {}).then(({ agent_id }) => {
     if (!agent_id) return;

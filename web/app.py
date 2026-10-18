@@ -138,6 +138,15 @@ async def voice_ask(body: Ask, request: Request, x_unblock_secret: str = Header(
             "sources": [c["title"] for c in result["citations"]], "blocked_claims": len(result["blocked"])}
 
 
+BOOT = str(int(time.time()))
+
+
+@app.get("/api/boot")
+def api_boot():
+    # Changes every time the server starts, so open pages know a demo reset happened and reload (locking the manager view).
+    return {"boot": BOOT}
+
+
 @app.get("/api/voice/config")
 def voice_config():
     # The agent id is public (the widget puts it in the page); the tool secret never leaves the server.
