@@ -1,4 +1,4 @@
-"""unblock-orchestrator: the ASI:One front door.
+"""teamready-orchestrator: the ASI:One front door.
 
 Runs the risk gate, asks the knowledge and routing agents, drafts actions, shows
 Interactive Cards, executes approved actions, and relays manager decisions.
@@ -38,7 +38,7 @@ TIMEOUT = 45          # knowledge includes a model call
 ROUTING_TIMEOUT = 15  # routing is pure code
 
 agent = create_agent(
-    "orchestrator", "unblock-orchestrator",
+    "orchestrator", "teamready-orchestrator",
     "TeamReady: an onboarding buddy for new hires. Ask 'who do I ask?' or 'how do I...?' and get an answer "
     "verified against approved docs, the right person to ask, and a drafted message that is only sent "
     "after you approve. High-impact requests go to your manager; pay and performance go to a person.",
@@ -183,7 +183,7 @@ async def on_decision(ctx: Context, sender: str, msg: ApprovalDecision):
         await ctx.send(user_address, _to_message(reply))
 
 
-agent.include(create_chat_protocol("unblock-orchestrator", chat), publish_manifest=PUBLISH)
+agent.include(create_chat_protocol("teamready-orchestrator", chat), publish_manifest=PUBLISH)
 
 if __name__ == "__main__":
     agent.run()

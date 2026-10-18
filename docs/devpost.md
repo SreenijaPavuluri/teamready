@@ -7,7 +7,7 @@ with synthetic new hires before real people start.
 
 **Links:** GitHub https://github.com/SreenijaPavuluri/unblock · Demo video VIDEO-LINK · Live site LIVE-LINK (`/workday`,
 `/canary`, `/activity`) · CREAO run https://agent.creao.ai/share/0773babf9c5d456f0fc0446a58d6da2f · ASI:One: message
-`unblock-orchestrator` (addresses in the README)
+`teamready-orchestrator` (addresses in the README)
 
 ## Project description (short)
 
@@ -62,10 +62,10 @@ to-do list, and (3) stops the same walls from hitting the next person.
 
 ## How we built it
 
-- **Seven Fetch.ai uAgents on Agentverse** (Chat Protocol, mailbox mode, ASI:One): `unblock-orchestrator` (front door,
-  risk gate, Guardian, actions), `unblock-knowledge` (search + Sonnet + verifier), `unblock-routing` (who to ask),
-  `unblock-manager` (the human approval gate), `unblock-insights` (Friction Map + Payment Protocol), `unblock-tracker`
-  (follow-ups) and `unblock-canary` (Canary New Hires). They exchange typed messages (knowledge, routing, approval and
+- **Seven Fetch.ai uAgents on Agentverse** (Chat Protocol, mailbox mode, ASI:One): `teamready-orchestrator` (front door,
+  risk gate, Guardian, actions), `teamready-knowledge` (search + Sonnet + verifier), `teamready-routing` (who to ask),
+  `teamready-manager` (the human approval gate), `teamready-insights` (Friction Map + Payment Protocol), `teamready-tracker`
+  (follow-ups) and `teamready-canary` (Canary New Hires). They exchange typed messages (knowledge, routing, approval and
   tracking requests). Interactive Cards carry the review, approve and reject buttons. If a specialist doesn't answer in
   time, the orchestrator runs the same step locally and says so.
 - **Anthropic's Sonnet model** drafts claims with quotes; **plain Python decides** what's shown (the verifier checks
@@ -119,8 +119,8 @@ canaries for every role and office, and measuring time-to-first-commit for new h
 usable from ASI:One. The orchestrator coordinates the knowledge, routing, manager and tracker agents with typed
 messages. The manager agent is a human approval gate (only the configured manager's address can approve). The canary
 agent sends synthetic new hires through the knowledge agent. Interactive Cards for every review. The insights agent
-sells its full report through the Payment Protocol (FET). Try `unblock-orchestrator` with "do my checklist", or
-`unblock-canary` with "run". Agent addresses are in the README.
+sells its full report through the Payment Protocol (FET). Try `teamready-orchestrator` with "do my checklist", or
+`teamready-canary` with "run". Agent addresses are in the README.
 
 **Workday: Build the Future of Work with AI.** A new-hire agent built on Workday's responsible-AI principles: every
 claim cited and verified, approve-before-act on every action, a human manager for access, and high-impact topics handed

@@ -7,4 +7,4 @@ sys.path.insert(0, str(Path(__file__).resolve().parent.parent / "agents"))
 from common import AGENTS, address  # noqa: E402
 
 for name in AGENTS:
-    print(f"unblock-{name:13s} {address(name)}")
+    print(f"teamready-{name:13s} {address(name)}")

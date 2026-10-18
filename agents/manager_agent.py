@@ -1,4 +1,4 @@
-"""unblock-manager: the human approval gate for high-impact requests.
+"""teamready-manager: the human approval gate for high-impact requests.
 
 The orchestrator never grants access. It sends an ApprovalRequest here, and a
 human manager approves or rejects it from ASI:One. The decision goes back to the
@@ -20,7 +20,7 @@ from unblock.data import load_people, load_user
 from unblock.models import ApprovalDecision, ApprovalRequest
 
 agent = create_agent(
-    "manager", "unblock-manager",
+    "manager", "teamready-manager",
     "Human approval gate for new-hire access requests. Managers review the request, the evidence and the "
     "business reason, then approve or reject. TeamReady never grants access by itself.",
     ["approval", "human-in-the-loop"],
@@ -119,7 +119,7 @@ async def chat(ctx: Context, sender: str, text: str):
     return reply
 
 
-agent.include(create_chat_protocol("unblock-manager", chat, person="manager_person"), publish_manifest=PUBLISH)
+agent.include(create_chat_protocol("teamready-manager", chat, person="manager_person"), publish_manifest=PUBLISH)
 
 if __name__ == "__main__":
     agent.run()

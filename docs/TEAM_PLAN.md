@@ -23,7 +23,7 @@ Put your names in the brackets.
 | By | Task | Done when |
 | --- | --- | --- |
 | 4:00pm | Anthropic + Agentverse keys in `.env`, six seeds generated (GO_LIVE Phase 1) | `.env` filled; shared with B over a private channel, never committed |
-| 5:00pm | `./scripts/run_all.sh`; six mailboxes connected (Phase 2) | Six `unblock-…` agents on agentverse.ai with READMEs and badges |
+| 5:00pm | `./scripts/run_all.sh`; six mailboxes connected (Phase 2) | Six `teamready-…` agents on agentverse.ai with READMEs and badges |
 | 7:00pm | Whole Phase 3 checklist in ASI:One | Every line ticked; screenshots of each card |
 | 7:30pm | Second ASI:One account as the manager; set `MANAGER_ALLOWED_SENDERS` | Fake manager gets refused, real one approves |
 | 8:00pm | Fix anything that broke in ASI:One (cards not rendering → `UNBLOCK_CARDS=false` is the fallback) | Send the bug list to the group |

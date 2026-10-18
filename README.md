@@ -12,8 +12,8 @@ A new hire describes a blocker in ASI:One. TeamReady answers only from approved 
 
 ## Try it
 
-- **ASI:One** (asi1.ai): message **unblock-orchestrator** with "do my checklist", "What's our deploy process for
-  staging?" or "my laptop screen is cracked". Message **unblock-canary** with "run". Addresses are in the agent table below.
+- **ASI:One** (asi1.ai): message **teamready-orchestrator** with "do my checklist", "What's our deploy process for
+  staging?" or "my laptop screen is cracked". Message **teamready-canary** with "run". Addresses are in the agent table below.
 - **Web:** **`/workday`** (TeamReady in a Workday-style worker home: Awaiting Your Action, Onboarding Journey, Done for
   You and the TeamReady Assistant for Maya; Jordan's approval inbox; Elena's onboarding health), `/app` (New Hire Portal),
   `/canary` (Canary New Hires), `/activity` (the agents talking, live).
@@ -64,7 +64,7 @@ approves before anything is sent.
 new hires hit most (13 blockers on analytics access from the checklist, 10 on the legacy deploy runbook) and predict two
 nobody has reported yet (no doc says how to turn on MFA; no badge doc for the EU office).
 
-Watch it at **`/canary`**, or message **unblock-canary** in ASI:One: `run`, `report`, `fixes`, `approve F1`. It also runs
+Watch it at **`/canary`**, or message **teamready-canary** in ASI:One: `run`, `report`, `fixes`, `approve F1`. It also runs
 on a schedule (`CANARY_INTERVAL_HOURS`, default daily). Code: `unblock/canary.py`, `agents/canary_agent.py`,
 personas in `data/canaries.json`. Keyless demo: `UNBLOCK_LLM=extractive python scripts/local_canary_demo.py`.
 
@@ -78,13 +78,13 @@ Seven agents, each registered on Agentverse with the Chat Protocol and usable on
 
 | Agent | What it does | Address |
 | --- | --- | --- |
-| `unblock-orchestrator` | ASI:One front door. Risk gate, coordinates the others, Interactive Cards, does approved tasks in Lumen's systems (Slack, training, calendar, IT tickets, access forms), relays manager decisions. | `agent1qvxgega6yer28glv25lyrkrr2j5r4dhky93twt94gjntrk2lcpswud2vcg7` |
-| `unblock-knowledge` | Search over approved docs, Sonnet drafts claims with quotes, a plain-code verifier keeps only verified claims, flags stale and conflicting docs, computes confidence. | `agent1qwh3qfy6nzlzaz9qw34prd5n0a94ns0kkqfjzcxqeqy7hqta8rfq2ql3jdv` |
-| `unblock-routing` | Who to ask: 50% skills, 30% team, 20% availability, fairness rotation, learns from "wrong person". | `agent1qgwxm40ue8umthyvdqmx32hfzt4xkvw66r7qwfervdl5zdhgdnl7q0c9ndk` |
-| `unblock-manager` | Human approval gate. Only the manager can approve access requests. | `agent1qvff097rt08j5jqgr9zpvhmusaulnrmyc0zrkmqsfe3jqqalpafmkruga7s` |
-| `unblock-insights` | Friction Map from anonymous events (groups of 5+ only). Full report with an AI-drafted doc fix for 0.1 FET via the Payment Protocol. | `agent1qtqytcznnvddv0u0y62u2ufnugsuvc7c8v3mqdxp4yr8jfun775ejn3f4rl` |
-| `unblock-tracker` | Follows up when a message or request gets no answer, with a reminder sent only after approval. | `agent1qds99je8gj9ez2pxwwq0mmy8ytavereqakgfydfr5jauhym2v6j56aeukm7` |
-| `unblock-canary` | Canary New Hires: synthetic new hires walk the onboarding docs through `unblock-knowledge`, find walls before real hires do, and draft fixes for the doc owners. | `agent1qd0h9mhhr3wv3dwanf4qjhexmr8ww82ldmzgmcmwmjpj6ja6tvpm62fptn6` |
+| `teamready-orchestrator` | ASI:One front door. Risk gate, coordinates the others, Interactive Cards, does approved tasks in Lumen's systems (Slack, training, calendar, IT tickets, access forms), relays manager decisions. | `agent1qvxgega6yer28glv25lyrkrr2j5r4dhky93twt94gjntrk2lcpswud2vcg7` |
+| `teamready-knowledge` | Search over approved docs, Sonnet drafts claims with quotes, a plain-code verifier keeps only verified claims, flags stale and conflicting docs, computes confidence. | `agent1qwh3qfy6nzlzaz9qw34prd5n0a94ns0kkqfjzcxqeqy7hqta8rfq2ql3jdv` |
+| `teamready-routing` | Who to ask: 50% skills, 30% team, 20% availability, fairness rotation, learns from "wrong person". | `agent1qgwxm40ue8umthyvdqmx32hfzt4xkvw66r7qwfervdl5zdhgdnl7q0c9ndk` |
+| `teamready-manager` | Human approval gate. Only the manager can approve access requests. | `agent1qvff097rt08j5jqgr9zpvhmusaulnrmyc0zrkmqsfe3jqqalpafmkruga7s` |
+| `teamready-insights` | Friction Map from anonymous events (groups of 5+ only). Full report with an AI-drafted doc fix for 0.1 FET via the Payment Protocol. | `agent1qtqytcznnvddv0u0y62u2ufnugsuvc7c8v3mqdxp4yr8jfun775ejn3f4rl` |
+| `teamready-tracker` | Follows up when a message or request gets no answer, with a reminder sent only after approval. | `agent1qds99je8gj9ez2pxwwq0mmy8ytavereqakgfydfr5jauhym2v6j56aeukm7` |
+| `teamready-canary` | Canary New Hires: synthetic new hires walk the onboarding docs through `teamready-knowledge`, find walls before real hires do, and draft fixes for the doc owners. | `agent1qd0h9mhhr3wv3dwanf4qjhexmr8ww82ldmzgmcmwmjpj6ja6tvpm62fptn6` |
 
 ### What each agent may do (and nothing more)
 
@@ -144,20 +144,20 @@ Turn it off with `UNBLOCK_ACTIVITY=false`.
  New hire (ASI:One chat)
         |
         v
- unblock-orchestrator ---- risk gate (code, before any model call)
+ teamready-orchestrator ---- risk gate (code, before any model call)
         |                    |-- pay / performance / benefits eligibility / harassment -> STOP, name the right person
-        |                    |-- elevated access -> prepare request -> unblock-manager (human approves)
+        |                    |-- elevated access -> prepare request -> teamready-manager (human approves)
         |                    '-- routine -> continue
         |
-        |-- KnowledgeRequest --> unblock-knowledge
+        |-- KnowledgeRequest --> teamready-knowledge
         |                          BM25 search -> Sonnet (claims + quotes) -> VERIFIER -> confidence
         |                          only verified claims come back; stale/other-region docs flagged
         |
-        |-- RoutingRequest ----> unblock-routing   (weighted score + fairness rotation + feedback)
+        |-- RoutingRequest ----> teamready-routing   (weighted score + fairness rotation + feedback)
         |
         |-- drafts message / 1:1 invite / access request  ->  review card: Approve / Edit / Reject
-        |-- on approve: send email (+ .ics invite)  or  ApprovalRequest -> unblock-manager
-        |-- FrictionEvent (topic only) --> unblock-insights  <-- People Ops: "full report" -> RequestPayment (FET)
+        |-- on approve: send email (+ .ics invite)  or  ApprovalRequest -> teamready-manager
+        |-- FrictionEvent (topic only) --> teamready-insights  <-- People Ops: "full report" -> RequestPayment (FET)
 ```
 
 If a specialist agent doesn't respond in time, the orchestrator runs the same step locally and says so in the trust trace, so the new hire is never left waiting.
@@ -240,7 +240,7 @@ python scripts/run_agents.py  # starts the seven agents as separate processes, c
 # or: ./scripts/run_all.sh     # same, from a shell (logs in logs/; stop with kill $(cat logs/pids))
 ```
 
-With `AGENTVERSE_API_KEY` set, each agent starts in mailbox mode and prints an Agent Inspector link. Open each link once and connect the mailbox; the agent then appears in Agentverse with its README and badges. In ASI:One, search for **unblock-orchestrator** (or @-mention its address) and start chatting.
+With `AGENTVERSE_API_KEY` set, each agent starts in mailbox mode and prints an Agent Inspector link. Open each link once and connect the mailbox; the agent then appears in Agentverse with its README and badges. In ASI:One, search for **teamready-orchestrator** (or @-mention its address) and start chatting.
 
 **Try it without ASI:One or an API key:**
 

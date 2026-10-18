@@ -1,4 +1,4 @@
-"""Canary New Hires, locally with no ASI:One: People Ops chats with unblock-canary,
+"""Canary New Hires, locally with no ASI:One: People Ops chats with teamready-canary,
 which sends three synthetic new hires through the docs via the real knowledge agent.
 
     UNBLOCK_LLM=extractive python scripts/local_canary_demo.py   # no API key needed

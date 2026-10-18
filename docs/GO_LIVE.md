@@ -41,7 +41,7 @@ Phase 5 adds the other sponsors.
 2. Each agent connects its mailbox automatically with your API key. In the logs, look for
    **"Agentverse mailbox connected"** seven times.
    If an agent says "auto-connect failed", open the **Agent Inspector** link printed above it and click **Connect** → Mailbox.
-3. On agentverse.ai → Agents, you should see seven agents named `unblock-…`, each with its README and the
+3. On agentverse.ai → Agents, you should see seven agents named `teamready-…`, each with its README and the
    innovationlab and hackathon badges.
 4. Print the addresses and paste them into the README's agent table:
    ```bash
@@ -50,7 +50,7 @@ Phase 5 adds the other sponsors.
 
 ## Phase 3: Test the whole flow in ASI:One (about 30 minutes)
 
-Open asi1.ai, sign in, and message **unblock-orchestrator** (search for it, or @-mention its address).
+Open asi1.ai, sign in, and message **teamready-orchestrator** (search for it, or @-mention its address).
 Go through the demo script and tick each line:
 
 - [ ] "How do I set up my dev environment?" → answer with sources and an Interactive Card
@@ -60,15 +60,15 @@ Go through the demo script and tick each line:
 - [ ] "edit: <clean message>" then "approve" → sent (or "Simulated" without email set up)
 - [ ] "wrong person" → a different person, ranking updated
 - [ ] "I need access to the analytics dashboard" → "approve" → request goes to the manager agent
-- [ ] From a **second ASI:One account** (the manager), message **unblock-manager**: "pending" → "approve"
+- [ ] From a **second ASI:One account** (the manager), message **teamready-manager**: "pending" → "approve"
 - [ ] The new hire's chat gets "Jordan Lee approved…" (if it doesn't appear, type "status": it's shown there)
 - [ ] Wait for the Tracker (for the demo set `TRACKER_DUE_MINUTES=2` in `.env` and restart) → follow-up card → "approve"
 - [ ] "Can the AI decide whether I deserve a promotion?" → stopped, HR named
 - [ ] "do my checklist" → plan card → "approve" → Slack, training and 1:1 done (record ids), access request to the manager;
       after the manager approves, the new hire gets "I filed it for you: ACC-…"
 - [ ] "my laptop screen is cracked" → IT ticket card → "approve" → ITH-… ; "what have you done" lists everything
-- [ ] Message **unblock-insights**: "friction map", then "full report" → pay 0.1 FET in the ASI:One wallet → report and doc fix
-- [ ] Message **unblock-canary**: "run" → report card with confirmed and predicted walls → "fixes" → "approve F1"
+- [ ] Message **teamready-insights**: "friction map", then "full report" → pay 0.1 FET in the ASI:One wallet → report and doc fix
+- [ ] Message **teamready-canary**: "run" → report card with confirmed and predicted walls → "fixes" → "approve F1"
 
 **Lock the manager gate:** put the manager account's address in `MANAGER_ALLOWED_SENDERS` and restart.
 (The manager agent logs the sender address of every message; copy it from there.)
@@ -82,15 +82,15 @@ message text, so the flow still works; set `UNBLOCK_CARDS=false` to send text on
 
 ## Phase 4: Deploy on Vultr with your domain (about 30 minutes)
 
-1. **Domain:** register one on GoDaddy (for example `unblock-ai.xyz`).
+1. **Domain:** register one on GoDaddy (for example `teamready-ai.xyz`).
 2. **Server:** on Vultr, deploy Cloud Compute → Ubuntu 24.04, 2 GB RAM. Add your SSH key. Then:
    ```bash
    ssh root@SERVER_IP
    curl -fsSL https://get.docker.com | sh
    git clone https://github.com/<you>/unblock.git && cd unblock
-   nano .env              # paste your laptop's .env, then add DOMAIN=unblock-ai.xyz
+   nano .env              # paste your laptop's .env, then add DOMAIN=teamready-ai.xyz
    ```
-3. **DNS:** in GoDaddy, add an A record: host `@`, value `SERVER_IP`. Wait until `ping unblock-ai.xyz` shows it.
+3. **DNS:** in GoDaddy, add an A record: host `@`, value `SERVER_IP`. Wait until `ping teamready-ai.xyz` shows it.
 4. **Stop the agents on your laptop first.** Two copies with the same seeds would fight over the mailboxes.
 5. Start everything:
    ```bash
@@ -99,7 +99,7 @@ message text, so the flow still works; set `UNBLOCK_CARDS=false` to send text on
    ```
    If an agent can't auto-connect, tunnel its port and use the Inspector link from your laptop:
    `ssh -L 8100:127.0.0.1:8100 -L 8101:127.0.0.1:8101 ... -L 8106:127.0.0.1:8106 root@SERVER_IP`
-6. **Check:** `https://unblock-ai.xyz` shows the page; `https://unblock-ai.xyz/api/health` lists the model,
+6. **Check:** `https://teamready-ai.xyz` shows the page; `https://teamready-ai.xyz/api/health` lists the model,
    retrieval, Friction Map store and profile source; the ASI:One flow from Phase 3 still works.
 7. **Update after a change:** `git pull && docker compose up -d --build`.
 

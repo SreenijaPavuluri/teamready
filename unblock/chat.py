@@ -77,7 +77,7 @@ def message_text(msg: ChatMessage) -> str:
 def create_chat_protocol(label: str, responder: Responder, person: str = "user") -> Protocol:
     """person: who a message from an unknown address is, on the activity page (user, manager, people_ops)."""
     proto = Protocol(spec=chat_protocol_spec)
-    me = label.removeprefix("unblock-")
+    me = label.removeprefix("teamready-")
 
     @proto.on_message(ChatMessage)
     async def handle(ctx: Context, sender: str, msg: ChatMessage):

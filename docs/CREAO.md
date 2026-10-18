@@ -6,7 +6,7 @@
 
 | CREAO agent | Trigger | What it does | Without it |
 | --- | --- | --- | --- |
-| **Doc Steward** | API Trigger, called by `unblock-insights` | Reads the worst Friction Map cluster, the doc new hires started from, and the doc that has the missing step. Drafts a one-span edit as JSON. | No doc fixes get drafted; the same blocker keeps coming back |
+| **Doc Steward** | API Trigger, called by `teamready-insights` | Reads the worst Friction Map cluster, the doc new hires started from, and the doc that has the missing step. Drafts a one-span edit as JSON. | No doc fixes get drafted; the same blocker keeps coming back |
 | **Weekly Digest** | Scheduled run, Mondays 9am | Reads `https://YOUR-DOMAIN/api/friction` (anonymous aggregates, groups of 5+). Posts each doc owner's top gap to Slack or Notion, with a link to ask TeamReady for the fix. | Doc owners never hear that their doc is the problem |
 
 The Doc Steward also drafts the one-line edits for **Canary New Hires** detours (walls the synthetic new hires find
@@ -31,7 +31,7 @@ The Doc Steward's output still goes through TeamReady's exact-quote check, then 
    ```
    Keep the key on the server only. Never put it in the browser, the repo, or the README.
 4. Restart the agents. `/api/health` should show `"doc_fixes": "CREAO Doc Steward (…)"`.
-5. Test in ASI:One: message **unblock-insights** "full report", then pay. The report arrives with
+5. Test in ASI:One: message **teamready-insights** "full report", then pay. The report arrives with
    "The CREAO Doc Steward is drafting…". A few minutes later the proposal card arrives in the same chat.
    Locally, without ASI:One: `python scripts/local_payment_demo.py` (with the two CREAO variables set).
 6. Create the **Weekly Digest** agent (instructions below). Connect Slack or Notion under Skills and connectors. Schedule it weekly, and run it once by hand for the demo.
@@ -64,7 +64,7 @@ Reply with ONLY this JSON, nothing else:
 ```
 Every Monday, fetch https://YOUR-DOMAIN/api/friction (public, anonymous aggregates only).
 For each cluster with "fixable": true, write a 3-line note for the owner of the doc in "start_doc":
-what new hires got stuck on, how many (count), and that they can ask unblock-insights on ASI:One for a drafted fix.
+what new hires got stuck on, how many (count), and that they can ask teamready-insights on ASI:One for a drafted fix.
 Post the notes to the #onboarding-docs Slack channel (or the "Onboarding health" Notion page).
 Never name individual new hires; the data has none, and don't add any.
 ```

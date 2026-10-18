@@ -1,4 +1,4 @@
-"""unblock-tracker: follows up when a message or request gets no answer.
+"""teamready-tracker: follows up when a message or request gets no answer.
 
 Gets TrackItem / TrackResolved from the orchestrator only. Every few minutes it
 checks for items past their due time and messages the new hire in ASI:One with a
@@ -24,7 +24,7 @@ from unblock.models import TrackItem, TrackResolved
 CHECK_SECONDS = float(env("TRACKER_CHECK_SECONDS", "300"))
 
 agent = create_agent(
-    "tracker", "unblock-tracker",
+    "tracker", "teamready-tracker",
     "Follows up for new hires: watches messages and access requests TeamReady sent, and when one gets no answer, "
     "drafts a friendly reminder that is sent only after the new hire approves. Say 'my plan' to see what's pending.",
     ["follow-up", "reminders"],
@@ -131,7 +131,7 @@ async def chat(ctx: Context, sender: str, text: str):
     return tracker.plan_text(_items(ctx), sender) + "\n\nSay **done <id>** when someone answers, so I stop following up."
 
 
-agent.include(create_chat_protocol("unblock-tracker", chat), publish_manifest=PUBLISH)
+agent.include(create_chat_protocol("teamready-tracker", chat), publish_manifest=PUBLISH)
 
 if __name__ == "__main__":
     agent.run()

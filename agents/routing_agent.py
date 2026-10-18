@@ -1,4 +1,4 @@
-"""unblock-routing: finds the right person to ask, fairly, and learns from feedback.
+"""teamready-routing: finds the right person to ask, fairly, and learns from feedback.
 
 Usable directly from ASI:One ("Who should I ask about VPN problems?") and by the
 orchestrator through RoutingRequest and WrongPersonFeedback.
@@ -15,7 +15,7 @@ from unblock.models import RoutingRequest, RoutingResponse, WrongPersonFeedback
 from unblock.routing import rank, record_wrong_person
 
 agent = create_agent(
-    "routing", "unblock-routing",
+    "routing", "teamready-routing",
     "Finds who a new hire should ask, with a transparent score (50% skills, 30% team, 20% availability), "
     "fairness rotation across qualified people, and learning from 'wrong person' feedback.",
     ["routing", "fairness"],
@@ -57,7 +57,7 @@ async def chat(ctx: Context, sender: str, text: str):
     return "\n".join(lines)
 
 
-agent.include(create_chat_protocol("unblock-routing", chat), publish_manifest=PUBLISH)
+agent.include(create_chat_protocol("teamready-routing", chat), publish_manifest=PUBLISH)
 
 if __name__ == "__main__":
     agent.run()

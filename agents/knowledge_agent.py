@@ -1,4 +1,4 @@
-"""unblock-knowledge: answers from approved docs, and only shows verified claims.
+"""teamready-knowledge: answers from approved docs, and only shows verified claims.
 
 Usable directly from ASI:One ("How do I deploy to staging?") and by the
 orchestrator through KnowledgeRequest.
@@ -17,7 +17,7 @@ from unblock.llm import get_llm_or_unavailable
 from unblock.models import KnowledgeRequest, KnowledgeResponse
 
 agent = create_agent(
-    "knowledge", "unblock-knowledge",
+    "knowledge", "teamready-knowledge",
     "Answers new-hire questions only from approved company docs. Every claim is checked word for word "
     "against its source; anything unsupported is blocked. Flags stale and conflicting docs.",
     ["rag", "verification"],
@@ -50,7 +50,7 @@ async def chat(ctx: Context, sender: str, text: str):
     return render.answer_text(result) + f"\n\n{result['route_reason']} Ask the TeamReady orchestrator to find the right person."
 
 
-agent.include(create_chat_protocol("unblock-knowledge", chat), publish_manifest=PUBLISH)
+agent.include(create_chat_protocol("teamready-knowledge", chat), publish_manifest=PUBLISH)
 
 if __name__ == "__main__":
     agent.run()

@@ -136,7 +136,7 @@ def main() -> int:
         p = subprocess.Popen([sys.executable, str(ROOT / "agents" / f"{file}.py")],
                              cwd=ROOT, stdout=log, stderr=subprocess.STDOUT)
         procs.append((name, file, port, p))
-        print(f"started unblock-{name:13s} pid {p.pid}  port {port}")
+        print(f"started teamready-{name:13s} pid {p.pid}  port {port}")
         time.sleep(STAGGER_SECONDS)
     PIDS.write_text("\n".join(str(p.pid) for *_, p in procs) + "\n")
 
@@ -163,7 +163,7 @@ def main() -> int:
 
     print("\nAgent                Status")
     for name, *_ in procs:
-        print(f"unblock-{name:13s} {status[name]}")
+        print(f"teamready-{name:13s} {status[name]}")
     if any(s.startswith(("NOT", "CRASHED")) for s in status.values()):
         print("\nSome agents are not connected. Open that agent's 'Agent inspector' link in its "
               "log, sign in to Agentverse, click Connect -> Mailbox.")
@@ -175,7 +175,7 @@ def main() -> int:
             for name, file, _, p in procs:
                 if p.poll() is not None and not status[name].startswith("CRASHED"):
                     status[name] = "CRASHED"
-                    print(f"!! unblock-{name} stopped (exit {p.returncode}) - see logs/{file}.log")
+                    print(f"!! teamready-{name} stopped (exit {p.returncode}) - see logs/{file}.log")
     except KeyboardInterrupt:
         print("\nStopping...")
         for *_, p in procs:

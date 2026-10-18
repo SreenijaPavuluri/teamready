@@ -165,7 +165,7 @@ def api_friction():
 def api_agents():
     from common import AGENTS, address
 
-    return [{"name": f"unblock-{n}", "address": address(n)} for n in AGENTS]
+    return [{"name": f"teamready-{n}", "address": address(n)} for n in AGENTS]
 
 
 # ---------- New Hire Portal ----------

@@ -1,4 +1,4 @@
-"""unblock-insights: the Friction Map, sold to People Ops through the Payment Protocol.
+"""teamready-insights: the Friction Map, sold to People Ops through the Payment Protocol.
 
 Free:  "friction map" -> top clusters (anonymous aggregates only).
 Paid:  "full report"  -> 0.1 FET via the Payment Protocol, then the full report
@@ -42,7 +42,7 @@ CREAO_CHECK_SECONDS = float(env("CREAO_CHECK_SECONDS", "20"))
 CREAO_TIMEOUT_SECONDS = float(env("CREAO_TIMEOUT_MINUTES", "12")) * 60
 
 agent = create_agent(
-    "insights", "unblock-insights",
+    "insights", "teamready-insights",
     "Friction Map for People Ops: groups repeated new-hire blockers into anonymous patterns (groups of 5+ only), "
     "finds the doc behind them, and drafts a fix for the doc owner to approve. Full report: 0.1 FET.",
     ["analytics", "people-ops", "payments"],
@@ -72,7 +72,7 @@ async def _request_payment(ctx: Context, sender: str) -> None:
         accepted_funds=[Funds(amount=PRICE, currency="FET", payment_method="fet_direct")],
         recipient=_wallet(), deadline_seconds=300, reference=reference,
         description="TeamReady Friction Map full report with doc-fix proposal",
-        metadata={"agent": "unblock-insights", "service": "friction_map_report",
+        metadata={"agent": "teamready-insights", "service": "friction_map_report",
                   "fet_network": "stable-testnet" if testnet else "mainnet", "mainnet": "false" if testnet else "true",
                   "provider_agent_wallet": _wallet(),
                   "content": f"Pay {PRICE} FET to get the full Friction Map report and a drafted fix for the biggest process gap."},
@@ -314,7 +314,7 @@ async def chat(ctx: Context, sender: str, text: str):
     return render.friction_text(build_map()) + f"\n\nSay **full report** to get patterns and a drafted fix ({PRICE} FET){extra}."
 
 
-agent.include(create_chat_protocol("unblock-insights", chat, person="people_ops"), publish_manifest=PUBLISH)
+agent.include(create_chat_protocol("teamready-insights", chat, person="people_ops"), publish_manifest=PUBLISH)
 agent.include(payment, publish_manifest=PUBLISH)
 
 if __name__ == "__main__":

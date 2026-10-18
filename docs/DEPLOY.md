@@ -5,7 +5,7 @@ The full step-by-step, including Agentverse and ASI:One testing, is in [`GO_LIVE
 One server runs the web app, the seven agents, and HTTPS.
 
 ## 1. Domain (GoDaddy)
-Register a domain (for example `unblock-ai.xyz`). Keep the DNS page open; you'll add the server IP in step 3.
+Register a domain (for example `teamready-ai.xyz`). Keep the DNS page open; you'll add the server IP in step 3.
 
 ## 2. Server (Vultr)
 1. Deploy → Cloud Compute → Shared CPU, Ubuntu 24.04, 2 GB RAM is enough. Add your SSH key.

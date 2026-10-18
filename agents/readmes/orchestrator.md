@@ -7,10 +7,10 @@ Ask what's blocking you at work, in your own words. TeamReady answers only from 
 
 **What it does**
 - Runs a risk gate first: pay, performance, benefits eligibility and harassment questions go straight to a person, with no search and no draft.
-- Asks `unblock-knowledge` for an answer where every claim is verified word for word against a source.
-- Asks `unblock-routing` who to ask, with a transparent score and fairness rotation.
+- Asks `teamready-knowledge` for an answer where every claim is verified word for word against a source.
+- Asks `teamready-routing` who to ask, with a transparent score and fairness rotation.
 - Drafts the message, 1:1 invite or access request, and shows it in an Interactive Card. You approve, edit or reject.
-- Sends access requests to `unblock-manager`, where only a human manager can approve them, and tells you when they decide.
+- Sends access requests to `teamready-manager`, where only a human manager can approve them, and tells you when they decide.
 - **Does the work, not just explains it:** joins your Slack channels, enrolls you in required training, books your first
   1:1, opens IT tickets, and files the analytics access form the moment your manager approves. Say **do my checklist**
   and it takes every step it can off your plate. It shows exactly what it will do first and acts only when you approve.

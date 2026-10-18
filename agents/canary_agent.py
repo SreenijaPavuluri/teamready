@@ -1,8 +1,8 @@
-"""unblock-canary: synthetic new hires who onboard before real people do.
+"""teamready-canary: synthetic new hires who onboard before real people do.
 
 Every CANARY_INTERVAL_HOURS (and whenever someone says "run"), three fictional
 new hires walk the onboarding checklist and their role's tasks. Each step is a
-real question to the unblock-knowledge agent, through the same verified-answer
+real question to the teamready-knowledge agent, through the same verified-answer
 pipeline a new hire gets. Where a canary can't do a step from the docs, that's a
 wall: checked against the Friction Map (already hit by real hires, or predicted),
 with a fix for the doc owner. Fixes go out only after a person approves them.
@@ -29,7 +29,7 @@ TIMEOUT = 45
 INTERVAL_HOURS = float(env("CANARY_INTERVAL_HOURS", "24"))
 
 agent = create_agent(
-    "canary", "unblock-canary",
+    "canary", "teamready-canary",
     "Canary New Hires: synthetic new hires who try your onboarding docs before real people do. They walk the "
     "checklist step by step, find the walls (stale docs, missing how-tos, dead ends), check which ones real new "
     "hires already hit, and draft fixes for the doc owners. Say 'run', 'report' or 'fixes'.",
@@ -129,12 +129,12 @@ async def chat(ctx: Context, sender: str, text: str):
         if not run:
             return "There's no canary run yet. Say **run**."
         return _report_card(run) if run["status"] == "done" else "The canary run is still going. Try again in a minute."
-    return ("I'm **unblock-canary**. I send synthetic new hires through your onboarding docs before real people start, "
+    return ("I'm **teamready-canary**. I send synthetic new hires through your onboarding docs before real people start, "
             "and tell you where they'd get stuck.\n\nSay **run** to start a run, **report** for the latest results, "
             "**fixes** to review the drafted fixes, or **approve F1** to send one to its doc owner.")
 
 
-agent.include(create_chat_protocol("unblock-canary", chat, person="people_ops"), publish_manifest=PUBLISH)
+agent.include(create_chat_protocol("teamready-canary", chat, person="people_ops"), publish_manifest=PUBLISH)
 
 if __name__ == "__main__":
     agent.run()
