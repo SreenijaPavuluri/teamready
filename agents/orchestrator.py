@@ -39,10 +39,10 @@ ROUTING_TIMEOUT = 15  # routing is pure code
 
 agent = create_agent(
     "orchestrator", "teamready-orchestrator",
-    "TeamReady: an onboarding buddy for new hires. Ask 'who do I ask?' or 'how do I...?' and get an answer "
-    "verified against approved docs, the right person to ask, and a drafted message that is only sent "
-    "after you approve. High-impact requests go to your manager; pay and performance go to a person.",
-    ["orchestrator", "asi-one", "chat"],
+    "TeamReady does a new hire's onboarding: say 'do my checklist' and it joins Slack channels, enrolls training, "
+    "books your 1:1, opens IT tickets and files access forms once your manager approves. Every action waits for "
+    "your OK; answers are verified against approved docs.",
+    ["orchestrator", "asi-one", "chat", "new-hire", "employee-onboarding", "hr", "it-help", "employee-experience", "first-week", "takes-action"],
 )
 
 

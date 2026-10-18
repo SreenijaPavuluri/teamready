@@ -5,6 +5,12 @@
 
 Ask what's blocking you at work, in your own words. TeamReady answers only from approved company docs and shows its sources, or finds the right person to ask and drafts the message for you. Nothing is sent without your approval.
 
+**Use me when** you're starting a new job, in your first weeks at a company, or onboarding employees: "what do I do
+in my first week?", "do my onboarding checklist", "which Slack channels should I join?", "sign me up for required
+training", "book a 1:1 with my manager", "I need access to a dashboard", "my laptop is broken, open an IT ticket",
+"who owns this?", "how do I deploy?", "how many vacation days do I get?". Built for the Workday "Future of Work"
+challenge: new-hire onboarding, employee experience, HR and IT help, done for you with your approval.
+
 **What it does**
 - Runs a risk gate first: pay, performance, benefits eligibility and harassment questions go straight to a person, with no search and no draft.
 - Asks `teamready-knowledge` for an answer where every claim is verified word for word against a source.

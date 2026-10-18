@@ -128,7 +128,7 @@ to a person. It has a Workday REST connector (four profile fields only) and a cl
 tools; the demo uses a local fallback profile because our sandbox tenant was unavailable. For People Ops, the Friction
 Map and Canary New Hires turn individual blockers into fixable patterns, and doc owners stay in control. The `/workday`
 view puts all of it in a Workday-style worker home: Awaiting Your Action, an Onboarding Journey that TeamReady completes,
-Done for You (process history), the manager's approval inbox, People Ops onboarding health, and a "How TeamReady Works"
+Done for You (process history), Grow at Lumen Labs (learning budget, mentorship and internal moves, answered from approved docs), the manager's approval inbox, People Ops onboarding health, and a "How TeamReady Works"
 card that answers each "Design for Trust" question.
 
 **CREAO: Best Team Empowerment.** The CREAO Doc Steward (agent ID `b450ed0d-985d-4079-917f-d9f9ee75e812`) does the core

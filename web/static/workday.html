@@ -372,6 +372,14 @@ svg.i { width: 18px; height: 18px; flex: none; stroke: currentColor; fill: none;
           <li><button data-q="My laptop screen is cracked"><span class="ai"><svg class="i"><use href="#i-laptop"/></svg></span>Report a laptop problem</button></li>
         </ul>
       </section>
+      <section class="card">
+        <div class="card-h"><h2>Grow at Lumen Labs</h2><span class="meta">Skills and growth, answered from approved docs</span></div>
+        <ul class="acts" id="grow">
+          <li><button data-q="How do I use my learning and development budget?"><span class="ai"><svg class="i"><use href="#i-cap"/></svg></span>Use my learning budget</button></li>
+          <li><button data-q="How do I get a mentor?"><span class="ai"><svg class="i"><use href="#i-chat"/></svg></span>Find a mentor</button></li>
+          <li><button data-q="How does internal mobility work?"><span class="ai"><svg class="i"><use href="#i-send"/></svg></span>Explore internal moves</button></li>
+        </ul>
+      </section>
     </div>
 
     <div class="stack" data-role="mgr" hidden>
@@ -564,6 +572,7 @@ svg.i { width: 18px; height: 18px; flex: none; stroke: currentColor; fill: none;
   $("search").onsubmit = e => { e.preventDefault(); const v = $("searchIn").value.trim(); if (v) { $("searchIn").value = ""; send(v); } };
   $("chips").onclick = e => { if (e.target.tagName === "BUTTON") send(e.target.textContent); };
   $("apps").onclick = e => { const b = e.target.closest("button"); if (b) send(b.dataset.q, null, b.dataset.q); };
+  $("grow").onclick = e => { const b = e.target.closest("button"); if (b) send(b.dataset.q, null, b.dataset.q); };
   $("autoBtn").onclick = () => send("Do my checklist");
 
   function btn(label, cls, fn) { const b = h("button", "btn" + (cls ? " " + cls : ""), label); b.onclick = fn; return b; }
@@ -672,7 +681,7 @@ svg.i { width: 18px; height: 18px; flex: none; stroke: currentColor; fill: none;
     $("profile").replaceChildren(...[["Manager", p.manager], ["Started", p.start_date ? day(p.start_date).toLocaleDateString([], { month: "long", day: "numeric" }) : ""],
       ["Training due", p.start_date ? fmtDay(plus(day(p.start_date), 14)) : ""], ["Day 30 check-in", p.start_date ? fmtDay(plus(day(p.start_date), 29)) : ""]]
       .filter(([, v]) => v).flatMap(([k, v]) => [h("dt", "", k), h("dd", "", v)]));
-    $("profSrc").textContent = `Profile: ${p.source === "Workday" ? "Workday" : "sample data"} · Workday tools ${p.workday_mcp && /^connected/.test(p.workday_mcp) ? "connected" : "not connected"}`;
+    $("profSrc").textContent = p.source === "Workday" ? "Profile from Workday" : "Profile: synthetic sample data (Lumen Labs is fictional)";
 
     for (const m of s.inbox || []) {
       after = Math.max(after, m.id);
@@ -753,8 +762,11 @@ svg.i { width: 18px; height: 18px; flex: none; stroke: currentColor; fill: none;
           if (r.status === 403) { $("canarySub").textContent = "Enter the manager key in Jordan's view first, then send fixes."; ev.target.disabled = false; return; }
           renderOps();
         }));
-        return row(f.status === "sent" ? "check" : "file", f.status === "sent" ? "" : "blue",
+        const li = row(f.status === "sent" ? "check" : "file", f.status === "sent" ? "" : "blue",
           `${{ edit: "Edit", archive: "Archive note", write: "Writing request" }[f.kind]}${f.doc_title ? " · " + f.doc_title : ""} → ${f.to.name}`, right, f.after || "");
+        const by = h("small", "", `Drafted by ${f.drafter || "TeamReady"}`);
+        if (f.run_url) { const a = h("a", "", " · open the CREAO run ↗"); a.href = f.run_url; a.target = "_blank"; a.rel = "noopener"; by.appendChild(a); }
+        li.appendChild(by); return li;
       }));
       if (run.status === "running") setTimeout(renderOps, 1500);
     } catch (e) {}
