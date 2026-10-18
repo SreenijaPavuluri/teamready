@@ -12,6 +12,7 @@ WORKDAY_WORKER_SEARCH  who the demo new hire is, e.g. "mcneil" (the sample perso
 
 If anything fails, Unblock falls back to data/user.json and says so in /api/health.
 """
+import threading
 import time
 
 import httpx
@@ -59,17 +60,28 @@ def fetch_profile(client: httpx.Client | None = None) -> dict:
             "team": org, "email": w.get("primaryWorkEmail", "")}
 
 
-def profile(client: httpx.Client | None = None) -> dict | None:
-    """Cached profile, or None (with the reason kept in status()) if Workday isn't usable."""
-    if not enabled():
-        return None
-    if time.time() - _profile["at"] < CACHE_SECONDS:
-        return _profile["value"]
+def _refresh(client: httpx.Client | None = None) -> None:
     try:
         _profile.update(value=fetch_profile(client), error="")
     except Exception as exc:  # keep working on the local profile
         _profile.update(value=None, error=f"{type(exc).__name__}: {exc}"[:200])
     _profile["at"] = time.time()
+    _profile["busy"] = False
+
+
+def profile(client: httpx.Client | None = None, wait: bool = False) -> dict | None:
+    """Cached profile, or None (with the reason kept in status()) if Workday isn't usable.
+    Refreshes in the background so a slow or unreachable tenant never holds up a page or a reply;
+    wait=True fetches inline (tests and the setup check)."""
+    if not enabled():
+        return None
+    if time.time() - _profile["at"] < CACHE_SECONDS:
+        return _profile["value"]
+    if wait or client is not None:
+        _refresh(client)
+    elif not _profile.get("busy"):
+        _profile["busy"] = True
+        threading.Thread(target=_refresh, daemon=True).start()
     return _profile["value"]
 
 
