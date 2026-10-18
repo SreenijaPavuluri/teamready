@@ -103,6 +103,34 @@ def action_card(pending: dict, answer: dict | None, helper: dict | None) -> dict
             "reject_cta": {"label": "Reject", "selection": {"action": "ub_reject"}}}
 
 
+def system_text(p: dict) -> str:
+    """A pending action in a Lumen system (or the checklist autopilot), shown before anything happens."""
+    if p["type"] == "system_batch":
+        return p["body"]
+    form = "\n".join(f"- {k.replace('_', ' ').capitalize()}: {', '.join(v) if isinstance(v, list) else v}"
+                     for k, v in p["form"].items() if k not in ("why", "with_email"))
+    return (f"**{p['title']}**, in {p['system']}. Here's exactly what I'll do:\n{p['does']}\n\n{form}\n\n"
+            f"Why: {p['form'].get('why', '')}\n\nNothing happens until you reply **approve** (or **reject**).")
+
+
+def system_card(p: dict) -> dict:
+    if p["type"] == "system_batch":
+        mark = {"will_do": "I'll do it", "manager": "Needs your manager", "done": "Already done", "person": "You or a person"}
+        rows = [{"label": mark[x["status"]], "value": x["step"].rstrip(".") + (f": {x['does']}" if x.get("does") else f": {x.get('why', '')}" if x.get("why") else "")}
+                for x in p["plan"]]
+        return {"title": "Your onboarding checklist: I can do these for you", "summary_rows": rows,
+                "approve_cta": {"label": "Approve and do them", "primary": True, "selection": {"action": "ub_approve"}},
+                "reject_cta": {"label": "Not now", "selection": {"action": "ub_reject"}}}
+    rows = [{"label": "System", "value": p["system"]}, {"label": "What I'll do", "value": p["does"]}]
+    rows += [{"label": k.replace("_", " ").capitalize(), "value": ", ".join(v) if isinstance(v, list) else str(v)}
+             for k, v in p["form"].items() if k not in ("why", "with_email")]
+    rows += [{"label": "Source", "value": p["form"].get("why", "")},
+             {"label": "Guardian check", "value": ("Blocked: " + "; ".join(p["guardian"])) if p.get("guardian") else "Clear"}]
+    return {"title": f"Review before I do it: {p['title']}", "summary_rows": rows,
+            "approve_cta": {"label": "Approve and do it", "primary": True, "selection": {"action": "ub_approve"}},
+            "reject_cta": {"label": "Reject", "selection": {"action": "ub_reject"}}}
+
+
 def stop_text(risk: dict, human: dict) -> str:
     return "\n".join([
         f"**This needs a person, not an assistant.** ({risk['category']})",

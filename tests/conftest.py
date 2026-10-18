@@ -32,4 +32,8 @@ def isolated_runtime(tmp_path, monkeypatch):
     monkeypatch.setattr(portal, "PATH", tmp_path / "portal.json")
     from unblock import canary
     monkeypatch.setattr(canary, "PATH", tmp_path / "canary.json")
+    from unblock import autopilot
+    monkeypatch.setattr(autopilot, "PATH", tmp_path / "systems.json")
+    if "web.app" in sys.modules:  # each test gets a fresh per-minute rate limit
+        sys.modules["web.app"]._hits.clear()
     yield

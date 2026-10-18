@@ -9,7 +9,7 @@ import re
 import uuid
 from dataclasses import dataclass
 
-from . import activity, render
+from . import activity, autopilot, render
 from .data import load_people, load_user
 from .llm import ExtractiveLLM, LLMError
 from .risk import assess, check_draft
@@ -38,7 +38,7 @@ INTRO = (
 
 # Card buttons carry distinctive ids ("ub_approve") so a typed sentence can never
 # be mistaken for a click. Typed commands must match a whole short phrase.
-ACTIONS = ("approve", "reject", "wrong_person", "wrong_answer", "ask_helper", "book_1_1")
+ACTIONS = ("approve", "reject", "wrong_person", "wrong_answer", "ask_helper", "book_1_1", "do_it", "autopilot")
 PHRASES = {
     "wrong_person": {"wrong person", "not the right person", "wrong person, try someone else", "someone else please"},
     "wrong_answer": {"this looks wrong", "that looks wrong", "looks wrong", "that's wrong", "thats wrong", "this is wrong", "that's outdated"},
@@ -46,6 +46,8 @@ PHRASES = {
     "book_1_1": {"book a 1:1", "schedule a 1:1", "book a meeting"},
     "friction_map": {"friction map", "show the friction map"},
     "status": {"status", "any update", "any updates"},
+    "do_it": {"do it", "do it for me", "yes do it", "please do it", "yes, do it", "go for it"},
+    "my_actions": {"what have you done", "what have you done for me", "my actions", "done for me", "what did you do"},
 }
 
 
@@ -110,6 +112,10 @@ class Orchestrator:
 
     def _review(self, state: dict, prefix: str = "") -> Reply:
         p = state["pending"]
+        if p["type"] in ("system_action", "system_batch"):
+            if p.get("guardian"):
+                prefix = (prefix + "\n\n" if prefix else "") + render.guardian_text(p["guardian"])
+            return Reply((prefix + "\n\n" + render.system_text(p)).strip(), "review", render.system_card(p))
         if p.get("guardian"):
             prefix = (prefix + "\n\n" if prefix else "") + render.guardian_text(p["guardian"])
         text = render.action_text(p, state.get("answer"), state.get("helper"), state.get("rotation_note", ""))
@@ -144,6 +150,16 @@ class Orchestrator:
         if cmd == "friction_map":
             fmap = await self.s.friction_map()
             return Reply(render.friction_text(fmap) + "\n\nPeople Ops can buy the full report with fix proposals from the Unblock Insights agent.")
+        if cmd == "autopilot" or autopilot.AUTOPILOT.match(text.strip().rstrip(".!")):
+            return self._autopilot(sender, state)
+        if cmd == "my_actions":
+            recs = autopilot.records(sender)
+            if not recs:
+                return Reply("I haven't done anything for you yet. Try **do my checklist**, or ask me to join your Slack channels.")
+            return Reply("Here's what I've done for you:\n" + "\n".join(
+                f"- **{r['id']}** {r['title']} ({r['system']}): {r['status']}" for r in recs[-10:]))
+        if cmd == "do_it" and state.get("offer") and not state.get("pending"):
+            return self._propose(sender, state, state.pop("offer"), "")
         if cmd == "status":
             waiting = state.get("awaiting")
             if waiting:
@@ -154,11 +170,15 @@ class Orchestrator:
         if cmd == "approve" and pending:
             if pending.get("guardian"):
                 return Reply(render.guardian_text(pending["guardian"]) + "\n\nNothing was sent. Reply **edit: <new message>** or **reject**.")
+            if pending["type"] in ("system_action", "system_batch"):
+                return await self._do(sender, state, state.pop("pending"))
             return await self._execute(sender, state)
         if cmd == "reject" and pending:
             state.pop("pending", None)
             self.store.set(sender, state)
             return Reply("Okay, I discarded the draft. Nothing was sent.")
+        if cmd == "edit" and pending and pending["type"] in ("system_action", "system_batch"):
+            return Reply("This is an action, not a message, so there's nothing to edit. Reply **approve** or **reject**.")
         if cmd == "edit" and pending:
             new_body = re.sub(r"^\s*edit:\s*", "", text, flags=re.I).strip()
             if new_body:
@@ -185,10 +205,75 @@ class Orchestrator:
             return self._review(state, note)
         if cmd == "wrong_answer" and state.get("answer"):
             return await self._wrong_answer(sender, state)
-        if cmd in ("approve", "reject", "edit", "wrong_person", "ask_helper", "book_1_1", "wrong_answer"):
+        if cmd in ("approve", "reject", "edit", "wrong_person", "ask_helper", "book_1_1", "wrong_answer", "do_it"):
             return Reply("There's nothing waiting for that right now. Ask me a question to get started.")
 
+        wanted = autopilot.detect(text)
+        if wanted and assess(text).level == "routine":
+            return self._propose(sender, state, wanted, text)
         return await self._new_question(sender, text)
+
+    # ---------- doing things ----------
+    def _propose(self, sender: str, state: dict, action: str, text: str) -> Reply:
+        """Fill the form for one action and show it. Nothing happens until the new hire approves."""
+        user = self._user()
+        if action in autopilot.done_actions(sender) and action != "it_ticket":
+            return Reply(f"Already done: {autopilot.ACTIONS[action]['title'].lower()}. Say **what have you done** to see it.")
+        if autopilot.ACTIONS[action]["gate"] == "manager":
+            return Reply("Analytics access needs your manager's approval first. Say **I need access to the analytics dashboard** "
+                         "and I'll prepare the request; I file the form the moment they approve.")
+        form = autopilot.build(action, user, text)
+        spec = autopilot.ACTIONS[action]
+        p = {"type": "system_action", "action": action, "form": form, "system": spec["system"], "title": spec["title"],
+             "does": autopilot.describe(action, form), "to_name": spec["system"], "to_role": "Lumen system",
+             "subject": spec["title"], "body": autopilot.describe(action, form), "guardian": autopilot.guardian(form)}
+        activity.log("orchestrator", f"Can do this: {spec['title']} ({spec['system']}). Waiting for your approval", kind="check")
+        state = {**state, "pending": p}
+        self.store.set(sender, state)
+        return self._review(state)
+
+    def _autopilot(self, sender: str, state: dict) -> Reply:
+        """Plan the whole onboarding checklist: what Unblock will do now, what needs the manager, what it can't do."""
+        from .portal import checklist
+        plan = autopilot.plan_checklist(checklist(), self._user(), sender)
+        todo = [x for x in plan if x["status"] in ("will_do", "manager")]
+        activity.log("orchestrator", f"Autopilot: {len(todo)} of {len(plan)} checklist steps Unblock can do", kind="step")
+        if not todo:
+            return Reply("Nothing left on your checklist that I can do. " + autopilot.plan_text(plan).split("\n\n")[0])
+        p = {"type": "system_batch", "plan": plan, "to_name": "your checklist", "to_role": "Lumen systems",
+             "subject": "Onboarding checklist autopilot", "body": autopilot.plan_text(plan), "guardian": []}
+        state = {**state, "pending": p}
+        self.store.set(sender, state)
+        return self._review(state)
+
+    async def _do(self, sender: str, state: dict, p: dict) -> Reply:
+        import asyncio
+        user = self._user()
+        if p["type"] == "system_action":
+            rec = await asyncio.to_thread(autopilot.execute, p["action"], p["form"], user, sender)
+            self.store.set(sender, state)
+            if p["action"] == "it_ticket":
+                await self.s.track(rec["id"], sender, "it_ticket", p["form"]["description"][:100], "IT Support", "it-help@lumen.example")
+            return Reply(f"**Done: {rec['id']}.** {rec['detail']}\n\nSay **what have you done** any time to see everything I did for you.")
+        lines, access = [], None
+        for item in p["plan"]:
+            if item["status"] == "will_do":
+                rec = await asyncio.to_thread(autopilot.execute, item["action"], item["form"], user, sender)
+                lines.append(f"- **{rec['id']}** {rec['detail']}")
+            elif item["status"] == "manager":
+                access = item
+        self.store.set(sender, state)
+        text = "**Done.**\n" + "\n".join(lines) if lines else ""
+        if access:
+            manager = dict(load_people()[user["manager_id"]])
+            draft, _ = await self._draft(f"Ask my manager to approve Analytics Workspace access for my work on {', '.join(user['projects'])}.",
+                                         manager, [access["form"]["why"]], "I need access to the analytics dashboard",
+                                         ask=f"Could you approve my analytics access request? I need it for {', '.join(user['projects'])}.")
+            ap = self._pending("access_request", manager, draft)
+            state.update(risk={"category": "analytics access"}, answer={})  # the manager sees the form's reason, not an old answer
+            reply = await self._send_access_request(sender, state, ap)
+            text += ("\n\n" if text else "") + reply.text + " I'll file the go/analytics-access form as soon as they approve."
+        return Reply(text.strip())
 
     async def _new_question(self, sender: str, question: str) -> Reply:
         user = self._user()
@@ -243,11 +328,19 @@ class Orchestrator:
                 state["pending"] = self._pending("doc_owner_note", owner, note_draft)
                 text += (f"\n\nWant me to tell {owner['name']} (the owner) that the old doc is out of date? "
                          "Reply **approve** to send the note I drafted, or **reject**.")
+            offer = "" if stale else autopilot.offer_for(answer)
+            if offer and offer not in autopilot.done_actions(sender):
+                does = autopilot.describe(offer, autopilot.build(offer, user))
+                state["offer"] = offer
+                text += f"\n\n**Want me to do it?** I can {does[0].lower() + does[1:]} Reply **do it** and I'll show you first."
             self.store.set(sender, state)
             await self.s.friction_event(answer["retrieved_doc_ids"][0] if answer.get("retrieved_doc_ids") else "", answer.get("retrieved_doc_ids", [])[:1], True)
             if stale:
                 return Reply(text, "review", render.action_card(state["pending"], answer, helper))
-            return Reply(text, "detail", render.answer_card(answer, helper))
+            card = render.answer_card(answer, helper)
+            if state.get("offer"):
+                card["ctas"].insert(0, {"label": "Do it for me", "primary": True, "selection": {"action": "ub_do_it"}})
+            return Reply(text, "detail", card)
 
         self.store.set(sender, state)
         return await self._route(sender, state)
@@ -270,22 +363,30 @@ class Orchestrator:
 
     async def _execute(self, sender: str, state: dict) -> Reply:
         p = state.pop("pending")
+        if p["type"] == "access_request":
+            return await self._send_access_request(sender, state, p)
+        return await self._send_message(sender, state, p)
+
+    async def _send_access_request(self, sender: str, state: dict, p: dict) -> Reply:
         user = self._user()
         answer = state.get("answer") or {}
-        if p["type"] == "access_request":
-            request_id = "AR-" + uuid.uuid4().hex[:6].upper()
-            evidence = [f"{c['text']} [{c['source_id']}]" for c in answer.get("claims", [])]
-            status = await self.s.request_approval({
-                "request_id": request_id, "category": state.get("risk", {}).get("category", "access"),
-                "requester": {"name": user["name"], "role": user["role"], "team": user["team"], "email": user["email"]},
-                "subject": p["subject"], "body": p["body"], "evidence": evidence, "sender": sender,
-            })
-            state["awaiting"] = {"request_id": request_id, "approver": p["to_name"]}
-            self.store.set(sender, state)
-            self.store.set(f"req:{request_id}", {"sender": sender})
-            await self.s.track(request_id, sender, "access_request", p["subject"], p["to_name"], p["to_email"])
-            return Reply(f"Sent request **{request_id}** to {p['to_name']}'s approval agent. {status}\n"
-                         "Only your manager can approve it. I'll message you here as soon as they decide.")
+        request_id = "AR-" + uuid.uuid4().hex[:6].upper()
+        evidence = [f"{c['text']} [{c['source_id']}]" for c in answer.get("claims", [])]
+        status = await self.s.request_approval({
+            "request_id": request_id, "category": state.get("risk", {}).get("category", "access"),
+            "requester": {"name": user["name"], "role": user["role"], "team": user["team"], "email": user["email"]},
+            "subject": p["subject"], "body": p["body"], "evidence": evidence, "sender": sender,
+        })
+        state["awaiting"] = {"request_id": request_id, "approver": p["to_name"]}
+        self.store.set(sender, state)
+        self.store.set(f"req:{request_id}", {"sender": sender, "category": state.get("risk", {}).get("category", "access")})
+        await self.s.track(request_id, sender, "access_request", p["subject"], p["to_name"], p["to_email"])
+        return Reply(f"Sent request **{request_id}** to {p['to_name']}'s approval agent. {status}\n"
+                     "Only your manager can approve it. I'll message you here as soon as they decide.")
+
+    async def _send_message(self, sender: str, state: dict, p: dict) -> Reply:
+        user = self._user()
+        answer = state.get("answer") or {}
         ics = None
         if p["type"] == "book_1_1":
             from .actions import make_ics, next_slot
@@ -314,6 +415,12 @@ class Orchestrator:
         await self.s.track_resolved(decision["request_id"], decision["decision"])
         if decision["decision"] == "approved":
             text = f"**{decision.get('approver', 'Your manager')} approved request {decision['request_id']}.**"
+            category = (self.store.get(f"req:{decision['request_id']}") or {}).get("category") or state.get("risk", {}).get("category", "")
+            if category == "analytics access" and "analytics_access" not in autopilot.done_actions(sender):
+                import asyncio
+                rec = await asyncio.to_thread(autopilot.execute, "analytics_access", autopilot.build("analytics_access", self._user()),
+                                              self._user(), sender, decision.get("approver", ""))
+                text += f"\n\n**I filed it for you: {rec['id']}.** {rec['detail']}"
             claims = (state.get("answer") or {}).get("claims", [])
             if claims:
                 text += "\n\nWhat happens next, from the docs:\n" + "\n".join(f"- {c['text']}  [{c['source_id']}]" for c in claims)
