@@ -3,9 +3,23 @@
 **Tagline:** An onboarding agent network that does the work for new hires, can't make things up, and tests your docs
 with synthetic new hires before real people start.
 
-**Links** (fill in after deploy): live site `https://LIVE-DOMAIN/` · New Hire Portal `/app` · Canary New Hires `/canary`
-· Agent Activity `/activity` · GitHub `https://github.com/SreenijaPavuluri/unblock` · CREAO run
-https://agent.creao.ai/share/0773babf9c5d456f0fc0446a58d6da2f
+**Tracks:** Workday "Build the Future of Work with AI" · Fetch.ai ASI:One Agent Challenge · CREAO Best Team Empowerment
+
+**Links:** GitHub https://github.com/SreenijaPavuluri/unblock · Demo video VIDEO-LINK · Live site LIVE-LINK (`/workday`,
+`/canary`, `/activity`) · CREAO run https://agent.creao.ai/share/0773babf9c5d456f0fc0446a58d6da2f · ASI:One: message
+`unblock-orchestrator` (addresses in the README)
+
+## Project description (short)
+
+Unblock is a network of seven Fetch.ai agents that onboards new hires. It answers only from approved company docs and
+checks every claim word for word, so it can't make things up. It also does the onboarding work: it joins Slack channels,
+enrolls the new hire in training, books the first 1:1 and files the access request once the manager approves. Every
+action runs only after a person approves it. For People Ops, **Canary New Hires** send synthetic new hires through the
+docs before real people start, find where they get stuck, and have a CREAO agent draft the fix for the doc owner.
+For Workday's challenge, it's an AI teammate for the first 90 days that is transparent, keeps people in control, and
+turns blockers into fixable patterns. For Fetch.ai, it's seven Agentverse agents with the Chat Protocol, usable in
+ASI:One, with a human-approval agent and the Payment Protocol. For CREAO, the Doc Steward agent does the core of the
+doc-fix loop.
 
 ---
 
@@ -60,9 +74,13 @@ to-do list, and (3) stops the same walls from hitting the next person.
   A Weekly Digest agent posts each doc owner's top gap to Notion.
 - **Web app (FastAPI):** a New Hire Portal with the same conversation, a manager tab and a "Done for you" panel; the
   Canary New Hires page; and Agent Activity, a live map of every message between the agents.
-- **Workday:** reads the new hire's name, title, organization and work email from a Workday Build development tenant
-  (only those four fields), with a local fallback.
-- 96 automated tests, a 40-question eval, Docker deploy.
+- **Workday:** a REST connector reads the new hire's name, title, organization and work email from a Workday Build
+  development tenant (only those four fields), and an MCP client is ready for Workday's Agent-Ready tools (time off
+  balances, onboarding tasks, learning; anything that writes needs approval). Our sandbox tenant's token endpoint was
+  returning errors during the event, so the demo runs on a local fallback profile and says so.
+- **Web view (`/workday`):** a Workday-style worker home for three people: Maya (new hire), Jordan (manager), Elena
+  (People Ops).
+- 104 automated tests, a 40-question eval, Docker deploy.
 
 ## Challenges we ran into
 
@@ -106,12 +124,12 @@ sells its full report through the Payment Protocol (FET). Try `unblock-orchestra
 
 **Workday: Build the Future of Work with AI.** A new-hire agent built on Workday's responsible-AI principles: every
 claim cited and verified, approve-before-act on every action, a human manager for access, and high-impact topics handed
-to a person. It reads the new hire's profile from a Workday Build development tenant (four fields only)
-<!-- if the tenant isn't connected by submission, replace with: "with a local fallback profile in the demo" -->. For
-People Ops, the Friction Map and Canary New Hires turn individual blockers into fixable patterns, and doc owners stay in
-control. The `/workday` view puts all of it in a Workday-style worker home built with Workday's open Canvas design
-tokens: Awaiting Your Action, an Onboarding Journey that Unblock completes, Done for You (process history), the manager's
-approval inbox, People Ops onboarding health, and a trust card that answers each "Design for Trust" question.
+to a person. It has a Workday REST connector (four profile fields only) and a client for Workday's Agent-Ready MCP
+tools; the demo uses a local fallback profile because our sandbox tenant was unavailable. For People Ops, the Friction
+Map and Canary New Hires turn individual blockers into fixable patterns, and doc owners stay in control. The `/workday`
+view puts all of it in a Workday-style worker home: Awaiting Your Action, an Onboarding Journey that Unblock completes,
+Done for You (process history), the manager's approval inbox, People Ops onboarding health, and a "How Unblock Works"
+card that answers each "Design for Trust" question.
 
 **CREAO: Best Team Empowerment.** The CREAO Doc Steward (agent ID `b450ed0d-985d-4079-917f-d9f9ee75e812`) does the core
 work of the doc-fix loop. Our backend calls it through the API Trigger, polls the run, and checks its reply quotes the
@@ -119,7 +137,15 @@ doc exactly. The doc owner, a person, approves. A second CREAO agent, the Weekly
 to Notion. Remove the Doc Steward and the docs never get fixed. Run:
 https://agent.creao.ai/share/0773babf9c5d456f0fc0446a58d6da2f
 
-<!-- MLH prizes: add a paragraph only for what is live at submission (e.g. Vultr + GoDaddy domain if deployed). -->
+**Tiger Data (MLH).** The Friction Map stores blocker events in TimescaleDB on Tiger Data with a continuous aggregate,
+and falls back to local files if the database isn't reachable.
+<!-- Add Vultr / GoDaddy only if the site is deployed there at submission. -->
 
-**Team:** Sreenija (integration, autopilot actions, Canary New Hires, go-live), Lux (Fetch.ai agents on Agentverse,
-mailbox launcher, ASI:One fixes), Kusum (CREAO Doc Steward and Weekly Digest). <!-- adjust names and roles -->
+## Built with
+
+Python · Fetch.ai uAgents · Agentverse · ASI:One · Chat Protocol · Payment Protocol · Anthropic Sonnet · CREAO ·
+FastAPI · TimescaleDB (Tiger Data) · Workday REST API · Model Context Protocol · Gmail SMTP · Docker · HTML/CSS/JS
+
+**Team:** Sreenija (integration, autopilot actions, Canary New Hires, web app, go-live), Lux (Fetch.ai agents on
+Agentverse, mailbox launcher, ASI:One fixes), Kusum (CREAO Doc Steward and Weekly Digest), Raj (Workday tenant, Tiger
+Data, email). <!-- adjust names and roles -->

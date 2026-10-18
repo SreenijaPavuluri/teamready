@@ -10,3 +10,4 @@ agent*_data.json
 .venv/
 logs/
 friction.json
+.DS_Store

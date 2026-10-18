@@ -3,7 +3,9 @@
 ![tag:innovationlab](https://img.shields.io/badge/innovationlab-3D8BD3)
 ![tag:hackathon](https://img.shields.io/badge/hackathon-5F43F1)
 
-**A "who do I ask?" agent network for new hires that can't make things up, and Canary New Hires: synthetic new hires who test your onboarding docs before your people do.**
+**An onboarding agent network that does the work for new hires, can't make things up, and tests your docs with Canary New Hires: synthetic new hires who hit the walls before your people do.**
+
+**Demo video:** VIDEO-LINK · **Live:** LIVE-LINK · **Devpost:** DEVPOST-LINK
 Built for LA Hacks AI Hackathon 2026: Workday "Build the Future of Work with AI", the Fetch.ai ASI:One Agent Challenge, and CREAO Best Team Empowerment.
 
 A new hire describes a blocker in ASI:One. Unblock answers only from approved company docs, verifies every claim word for word, finds the right person to ask when the docs fall short, drafts the message, and sends it only after the new hire approves. Access requests go to a human manager. Pay, performance and harassment questions go straight to a person. People Ops gets an anonymous Friction Map of what keeps blocking new hires, and pays for the full report through the Fetch.ai Payment Protocol.
@@ -13,8 +15,8 @@ A new hire describes a blocker in ASI:One. Unblock answers only from approved co
 - **ASI:One** (asi1.ai): message **unblock-orchestrator** with "do my checklist", "What's our deploy process for
   staging?" or "my laptop screen is cracked". Message **unblock-canary** with "run". Addresses are in the agent table below.
 - **Web:** **`/workday`** (Unblock in a Workday-style worker home: Awaiting Your Action, Onboarding Journey, Done for
-  You, the Unblock Assistant, plus Jordan's manager inbox and Elena's onboarding health; colors and type from Workday's
-  open Canvas design tokens), `/app` (New Hire Portal), `/canary` (Canary New Hires), `/activity` (the agents talking, live).
+  You and the Unblock Assistant for Maya; Jordan's approval inbox; Elena's onboarding health), `/app` (New Hire Portal),
+  `/canary` (Canary New Hires), `/activity` (the agents talking, live).
 - **No keys at all:** `UNBLOCK_LLM=extractive python scripts/local_demo.py` and `scripts/local_canary_demo.py`.
 
 ## Unblock does the work, not just answers
@@ -233,7 +235,7 @@ word in the docs. Full table: [`eval/RESULTS_anthropic.md`](eval/RESULTS_anthrop
 pip install -r requirements.txt
 cp .env.example .env          # fill in the keys and your own agent seeds
 python scripts/generate_events.py
-python -m pytest -q           # 88 tests, no network needed
+UNBLOCK_LLM=extractive python -m pytest -q   # 104 tests, no network needed
 python scripts/run_agents.py  # starts the seven agents as separate processes, checks every mailbox (Ctrl+C stops)
 # or: ./scripts/run_all.sh     # same, from a shell (logs in logs/; stop with kill $(cat logs/pids))
 ```
@@ -282,7 +284,7 @@ eval/        40 labeled questions and the eval runner
 scripts/     local end-to-end demos (chat, payment, canaries), event generator, address printer, deploy.sh
 web/         landing page, live demo, Canary New Hires page, Friction Map dashboard, voice tool endpoint (FastAPI)
 docs/        track checklist, ElevenLabs and deploy guides, DEV article draft, local demo transcript
-tests/       88 tests: canaries, verifier, risk gate, retrieval, routing, friction map, payments (FET + Solana), providers, web, conversation flow
+tests/       104 tests: canaries, verifier, risk gate, retrieval, routing, friction map, payments (FET + Solana), providers, web, conversation flow
 Dockerfile, docker-compose.yml   one-server deploy with HTTPS
 ```
 
