@@ -6,7 +6,7 @@ Requirements from the hackathon page, what's ready, and what's left for a person
 | --- | --- | --- |
 | Project description: what it does, the problem, the tracks, how it fits each company challenge | Ready to paste | `docs/devpost.md` → "Project description (short)" and "Sponsor tracks" |
 | Public GitHub repo, well documented | Code and docs ready; secret scan clean; **not pushed yet** | README, `docs/` |
-| Demo video, 2–3 min | Script ready (2:45); **needs recording** | `docs/video_script.md` |
+| Demo video, 2–3 min | Recorded (2:31, narrated, captions): `demo/teamready_demo.mp4` (not in git); **needs uploading** | `docs/video_script.md` |
 | Devpost page: summary, technologies, extra resources | Text ready to paste; **needs filling in on Devpost** | `docs/devpost.md` |
 | Present in person for judging | **Whole team at the table during judging** | — |
 
@@ -14,7 +14,7 @@ Requirements from the hackathon page, what's ready, and what's left for a person
 
 1. **Push the repo public** from the terminal (repo `SreenijaPavuluri/unblock`). Check on GitHub
    afterwards that `.env` is not in the file list.
-2. **Record the video** following `docs/video_script.md`. Upload to YouTube (Unlisted is fine) or Vimeo and copy the link.
+2. **Upload the video** (`demo/teamready_demo.mp4`) to YouTube (Unlisted is fine) or Vimeo and copy the link.
 3. **Fill in Devpost**, section by section, from `docs/devpost.md`:
    - Tagline → **Tagline**
    - "Project description (short)" + "What it does" → **About the project** (Devpost's story field takes the
