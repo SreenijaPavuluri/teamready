@@ -137,13 +137,15 @@ doc exactly. The doc owner, a person, approves. A second CREAO agent, the Weekly
 to Notion. Remove the Doc Steward and the docs never get fixed. Run:
 https://agent.creao.ai/share/0773babf9c5d456f0fc0446a58d6da2f
 
+**ElevenLabs (MLH).** New hires can talk to TeamReady: the ElevenLabs voice agent calls our `/api/voice/ask` webhook, which runs the same risk gate and word-for-word verifier, and reads back only the verified answer. The voice widget is on the Workday view and the portal.
+
 **Tiger Data (MLH).** The Friction Map stores blocker events in TimescaleDB on Tiger Data with a continuous aggregate,
 and falls back to local files if the database isn't reachable.
 <!-- Add Vultr / GoDaddy only if the site is deployed there at submission. -->
 
 ## Built with
 
-Python · Fetch.ai uAgents · Agentverse · ASI:One · Chat Protocol · Payment Protocol · Anthropic Sonnet · CREAO ·
+Python · ElevenLabs Conversational AI · Fetch.ai uAgents · Agentverse · ASI:One · Chat Protocol · Payment Protocol · Anthropic Sonnet · CREAO ·
 FastAPI · TimescaleDB (Tiger Data) · Workday REST API · Model Context Protocol · Gmail SMTP · Docker · HTML/CSS/JS
 
 **Team:** Sreenija (integration, autopilot actions, Canary New Hires, web app, go-live), Lux (Fetch.ai agents on
