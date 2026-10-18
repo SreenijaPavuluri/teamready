@@ -22,6 +22,10 @@ def test_detects_what_the_new_hire_wants_done():
     assert autopilot.detect("schedule my 1:1 with my manager") == "manager_1_1"
     assert autopilot.detect("my laptop screen is cracked") == "it_ticket"
     assert autopilot.detect("Which Slack channels should I join?") == ""  # a question, not a request
+    assert autopilot.detect("My VPN won't connect, what should I do?") == ""
+    assert autopilot.detect("How do I schedule my first 1:1 with my manager?") == ""
+    assert autopilot.detect("I lost my MFA device, my laptop is broken") == ""  # never acts on MFA
+    assert autopilot.detect("Can you schedule my 1:1 with my manager?") == "manager_1_1"
 
 
 def test_answer_offers_to_do_it_and_nothing_happens_before_approve():
@@ -48,7 +52,7 @@ def test_reject_and_edit_do_nothing():
 
 def test_it_ticket_text_goes_through_the_guardian():
     s = session()
-    r = chat(s, "my laptop is broken, my password is hunter22 if IT needs it")
+    r = chat(s, "my laptop is broken, my SSN is 123-45-6789 if IT needs it")
     guard = next(row["value"] for row in r["payload"]["summary_rows"] if row["label"] == "Guardian check")
     assert guard.startswith("Blocked")
     r = chat(s, "approve")
@@ -65,7 +69,13 @@ def test_checklist_autopilot_does_what_it_can_and_the_manager_gates_access():
     r = chat(s, "approve")
     done = {x["action"] for x in autopilot.records(s)}
     assert done == {"slack_channels", "security_training", "manager_1_1"}
+    assert r["kind"] == "review" and r["draft"]["type"] == "access_request"  # the manager message is reviewed first
+    r = chat(s, "approve")
     assert "AR-" in r["text"]
+    again = chat(s, "do my checklist")  # while the request is with the manager, it isn't asked for again
+    assert "With your manager" in again["text"]
+    chat(s, "approve")
+    assert sum(1 for p in client.get("/api/portal/manager").json() if p["status"] == "pending") == 1
     rid = next(p for p in client.get("/api/portal/manager").json() if p["status"] == "pending")["request_id"]
     assert client.post("/api/portal/decide", json={"request_id": rid, "decision": "approved"}).json()["ok"]
     assert "analytics_access" in {x["action"] for x in autopilot.records(s)}

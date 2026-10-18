@@ -169,7 +169,9 @@ class Orchestrator:
         pending = state.get("pending")
         if cmd == "approve" and pending:
             if pending.get("guardian"):
-                return Reply(render.guardian_text(pending["guardian"]) + "\n\nNothing was sent. Reply **edit: <new message>** or **reject**.")
+                fix = ("Reply **reject**, then ask again without that detail." if pending["type"] in ("system_action", "system_batch")
+                       else "Reply **edit: <new message>** or **reject**.")
+                return Reply(render.guardian_text(pending["guardian"]) + f"\n\nNothing was sent. {fix}")
             if pending["type"] in ("system_action", "system_batch"):
                 return await self._do(sender, state, state.pop("pending"))
             return await self._execute(sender, state)
@@ -235,7 +237,7 @@ class Orchestrator:
     def _autopilot(self, sender: str, state: dict) -> Reply:
         """Plan the whole onboarding checklist: what Unblock will do now, what needs the manager, what it can't do."""
         from .portal import checklist
-        plan = autopilot.plan_checklist(checklist(), self._user(), sender)
+        plan = autopilot.plan_checklist(checklist(), self._user(), sender, waiting=bool(state.get("awaiting")))
         todo = [x for x in plan if x["status"] in ("will_do", "manager")]
         activity.log("orchestrator", f"Autopilot: {len(todo)} of {len(plan)} checklist steps Unblock can do", kind="step")
         if not todo:
@@ -256,23 +258,28 @@ class Orchestrator:
                 await self.s.track(rec["id"], sender, "it_ticket", p["form"]["description"][:100], "IT Support", "it-help@lumen.example")
             return Reply(f"**Done: {rec['id']}.** {rec['detail']}\n\nSay **what have you done** any time to see everything I did for you.")
         lines, access = [], None
+        done = autopilot.done_actions(sender)  # the plan may be stale: skip whatever got done since it was shown
         for item in p["plan"]:
+            if item.get("action") in done:
+                continue
             if item["status"] == "will_do":
                 rec = await asyncio.to_thread(autopilot.execute, item["action"], item["form"], user, sender)
                 lines.append(f"- **{rec['id']}** {rec['detail']}")
-            elif item["status"] == "manager":
+            elif item["status"] == "manager" and not state.get("awaiting"):
                 access = item
         self.store.set(sender, state)
-        text = "**Done.**\n" + "\n".join(lines) if lines else ""
+        text = "**Done.**\n" + "\n".join(lines) if lines else "Nothing new to do: it was already done."
         if access:
             manager = dict(load_people()[user["manager_id"]])
             draft, _ = await self._draft(f"Ask my manager to approve Analytics Workspace access for my work on {', '.join(user['projects'])}.",
                                          manager, [access["form"]["why"]], "I need access to the analytics dashboard",
                                          ask=f"Could you approve my analytics access request? I need it for {', '.join(user['projects'])}.")
-            ap = self._pending("access_request", manager, draft)
-            state.update(risk={"category": "analytics access"}, answer={})  # the manager sees the form's reason, not an old answer
-            reply = await self._send_access_request(sender, state, ap)
-            text += ("\n\n" if text else "") + reply.text + " I'll file the go/analytics-access form as soon as they approve."
+            # The manager message is a message, so the new hire reviews it (and the Guardian checks it) before it goes.
+            state.update(risk={"category": "analytics access"}, answer={}, helper=None,
+                         pending=self._pending("access_request", manager, draft))
+            self.store.set(sender, state)
+            return self._review(state, text + "\n\nLast one: analytics access needs your manager. Here's the request; "
+                                       "I file the go/analytics-access form the moment they approve.")
         return Reply(text.strip())
 
     async def _new_question(self, sender: str, question: str) -> Reply:

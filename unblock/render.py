@@ -115,7 +115,8 @@ def system_text(p: dict) -> str:
 
 def system_card(p: dict) -> dict:
     if p["type"] == "system_batch":
-        mark = {"will_do": "I'll do it", "manager": "Needs your manager", "done": "Already done", "person": "You or a person"}
+        mark = {"will_do": "I'll do it", "manager": "Needs your manager", "done": "Already done", "person": "You or a person",
+                "waiting": "With your manager"}
         rows = [{"label": mark[x["status"]], "value": x["step"].rstrip(".") + (f": {x['does']}" if x.get("does") else f": {x.get('why', '')}" if x.get("why") else "")}
                 for x in p["plan"]]
         return {"title": "Your onboarding checklist: I can do these for you", "summary_rows": rows,

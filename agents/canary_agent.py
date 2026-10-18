@@ -11,6 +11,7 @@ Chat (ASI:One): "run", "report", "fixes", "approve F1".
 """
 import asyncio
 import re
+import time
 import uuid
 from datetime import datetime, timezone
 
@@ -64,7 +65,8 @@ async def _run(ctx: Context, trigger: str) -> dict | None:
 
 
 def _allowed(sender: str) -> bool:
-    allowed = [a.strip() for a in env("CANARY_APPROVERS").split(",") if a.strip()]
+    """Who may send a fix to a doc owner: CANARY_APPROVERS, else the locked manager address(es); empty = demo mode."""
+    allowed = [a.strip() for a in (env("CANARY_APPROVERS") or env("MANAGER_ALLOWED_SENDERS")).split(",") if a.strip()]
     return not allowed or sender in allowed
 
 
@@ -80,10 +82,16 @@ def _report_card(run: dict):
     })
 
 
+_STARTED = time.time()
+
+
 @agent.on_interval(period=600.0)
 async def scheduled(ctx: Context):
+    # Never right at startup (that's when people are testing the other agents): the first scheduled run waits a full
+    # interval, or comes INTERVAL after the last run.
     last = canary.latest()
-    if last and (datetime.now(timezone.utc) - datetime.fromisoformat(last["started"])).total_seconds() < INTERVAL_HOURS * 3600:
+    since = (datetime.now(timezone.utc) - datetime.fromisoformat(last["started"])).total_seconds() if last else time.time() - _STARTED
+    if since < INTERVAL_HOURS * 3600:
         return
     await _run(ctx, "scheduled")
 
@@ -101,18 +109,22 @@ async def chat(ctx: Context, sender: str, text: str):
             return "There's no canary run yet. Say **run**."
         out = canary.approve(run["run_id"], m.group(1))
         return ("**Sent.** " if out.get("status") == "sent" else "**Simulated** (email not set up). " if out["ok"] else "") + out["detail"]
-    if action == "fixes" or t in ("fixes", "show fixes", "review the fixes"):
+    # Card clicks routed through the ASI:One planner arrive as sentences mentioning the selection id.
+    if not action and re.search(r"\bub_fixes\b", t):
+        action = "fixes"
+    words = set(re.findall(r"[a-z]+", t))
+    if action == "fixes" or (words & {"fix", "fixes"} and len(words) <= 5):
         run = canary.latest()
         return canary.fixes_text(run) if run else "There's no canary run yet. Say **run**."
-    if t in ("run", "run canaries", "start", "go", "test the docs"):
+    if words & {"run", "start", "go", "test"} and len(words) <= 6:
         await ctx.send(sender, card_message("Starting a canary run: 3 synthetic new hires (a Data Analyst, a Backend Engineer and "
-                                            "a Product Designer in the EU) are walking the onboarding docs now. About a minute.",
+                                            "a Product Designer in the EU) are walking the onboarding docs now. It takes a minute or two.",
                                             "detail", {"title": "Canary run started", "summary_rows": [], "ctas": []}))
         run = await _run(ctx, "chat")
         if not run:
             return "A canary run is already going. Say **report** in a minute."
         return _report_card(run)
-    if t in ("report", "latest", "status", "results"):
+    if words & {"report", "latest", "status", "results"} and len(words) <= 6:
         run = canary.latest()
         if not run:
             return "There's no canary run yet. Say **run**."

@@ -61,9 +61,17 @@ _IT_PROBLEM = re.compile(r"\b(laptop|vpn|badge|device|screen|keyboard|battery|ch
 AUTOPILOT = re.compile(r"^(do|finish|start|run) (my|the) (onboarding )?checklist( for me)?$|^onboard me$|^autopilot$", re.I)
 
 
+_QUESTION = re.compile(r"^(how|what|where|which|who|when|why|is|are|do i|does|can i|could i|should i)\b|\?\s*$", re.I)
+_ASKS_ME = re.compile(r"\b(for me|can you|could you|would you|please)\b", re.I)
+_NEVER = re.compile(r"\b(mfa|2fa|password|multi-factor|authenticator)\b", re.I)
+
+
 def detect(text: str) -> str:
-    """The action the new hire is asking Unblock to do, or ''."""
+    """The action the new hire is asking Unblock to do, or ''. A question gets an answer, not an action,
+    unless it asks Unblock to do it ("can you...", "for me"). Anything about passwords or MFA is never an action."""
     t = text.strip()
+    if _NEVER.search(t) or (_QUESTION.search(t) and not _ASKS_ME.search(t)):
+        return ""
     if _IT_PROBLEM.search(t):
         return "it_ticket"
     if not _DO.search(t):
@@ -216,8 +224,9 @@ def done_actions(owner: str) -> set[str]:
 
 # ---------- autopilot over the checklist ----------
 
-def plan_checklist(steps: list[str], user: dict, owner: str) -> list[dict]:
-    """For each checklist step: what Unblock will do, what it can't (and why), and what's already done."""
+def plan_checklist(steps: list[str], user: dict, owner: str, waiting: bool = False) -> list[dict]:
+    """For each checklist step: what Unblock will do, what it can't (and why), and what's already done.
+    waiting: an access request is already with the manager, so it isn't asked for again."""
     done = done_actions(owner)
     plan = []
     for step in steps:
@@ -225,6 +234,9 @@ def plan_checklist(steps: list[str], user: dict, owner: str) -> list[dict]:
         cant = next((why for prefix, why in CANT.items() if step.lower().startswith(prefix.lower())), "")
         if action and action in done:
             plan.append({"step": step, "status": "done", "action": action})
+        elif action and waiting and ACTIONS[action]["gate"] == "manager":
+            plan.append({"step": step, "status": "waiting", "action": action,
+                         "why": "Your request is with your manager; I file the form when they approve."})
         elif action:
             form = build(action, user)
             plan.append({"step": step, "status": "manager" if ACTIONS[action]["gate"] == "manager" else "will_do",
@@ -235,7 +247,8 @@ def plan_checklist(steps: list[str], user: dict, owner: str) -> list[dict]:
 
 
 def plan_text(plan: list[dict]) -> str:
-    mark = {"will_do": "I'll do it", "manager": "Needs your manager", "done": "Already done", "person": "You or a person"}
+    mark = {"will_do": "I'll do it", "manager": "Needs your manager", "done": "Already done", "person": "You or a person",
+            "waiting": "With your manager"}
     lines = []
     for p in plan:
         what = p.get("does") or p.get("why") or ""
