@@ -114,7 +114,8 @@ def classify(task: str, start_doc: str, risk, answer: dict) -> tuple[str, dict]:
     if risk.level == "approval":
         return "approval", extra
     if answer.get("decision") != "answer":
-        return "dead_end", extra
+        # A checklist step names the task, so if nothing says how, it's circular; a role task with no doc is a dead end.
+        return ("loop" if start_doc else "dead_end"), extra
     if stale:
         return "trap", extra
     if AFFORDANCE.search(task):
@@ -155,12 +156,21 @@ async def walk(c: dict, ask, on_step=None) -> list[dict]:
             if short != step["task"]:
                 q2 = question_for(short)
                 a2 = await ask(q2, user)
-                s2, x2 = classify(short, step["start_doc"], assess(q2), a2)
-                src = docs.get(x2.get("source_doc", ""))
-                pool = [c["text"] for c in a2.get("claims", []) + a2.get("steps", [])] + (src.body.splitlines() if src else [])
-                line = next((x for x in pool if AFFORDANCE.search(x) and set(tokens(short)) & set(tokens(x))), "")
-                if s2 in ("detour", "findable") and line:
-                    status, extra, answer, rephrased = "detour", {**x2, "source_line": x2.get("source_line") or line}, a2, q2
+                # Judge the rephrase the way a person would: is there an actionable how-to in what the search turned up?
+                # (Search is deterministic; the model's yes/no on a loosely worded question isn't.)
+                want = set(tokens(short))
+                found = ""
+                for doc_id in [c["id"] for c in a2.get("citations", [])] + a2.get("retrieved_doc_ids", []):
+                    d = docs.get(doc_id)
+                    if not d or doc_id == step["start_doc"] or _is_stale(d):
+                        continue
+                    line = next((x for x in d.body.splitlines() if AFFORDANCE.search(x) and want & set(tokens(x))), "")
+                    if line:
+                        found = doc_id
+                        break
+                if found and assess(q2).level == "routine":
+                    status, answer, rephrased = "detour", a2, q2
+                    extra = {"stale_doc": "", "source_doc": found, "source_line": line}
         label, minutes, why = STATUS[status]
         rec = {"n": n, "task": step["task"], "from": step["from"], "question": q, "status": status, "label": label,
                "why": why, "minutes": minutes, "start_doc": step["start_doc"], **extra,
@@ -440,7 +450,9 @@ async def run(ask, trigger: str = "manual", run_rec: dict | None = None) -> dict
     cache: dict[tuple, asyncio.Future] = {}
 
     async def cached_ask(q: str, user: dict) -> dict:
-        key = (normalize(q), user["office"])  # same question, same office: same answer
+        # The checklist steps are the same for every canary, so each is asked once and every canary gets the same
+        # verdict (model answers vary run to run). Role tasks are per canary, so their office still applies.
+        key = normalize(q)
         if key not in cache:
             cache[key] = asyncio.ensure_future(ask(q, user))
         return await cache[key]
