@@ -15,6 +15,8 @@ on `/canary`.
 
 The Doc Steward's output still goes through Unblock's exact-quote check, then a People Ops "approve", then the doc owner decides. A human approves every change.
 
+**Status:** Doc Steward live (agent ID `b450ed0d-985d-4079-917f-d9f9ee75e812`, tested against `data/docs/D02.md`/`D01.md`, matches the expected output exactly; [share link to a run](https://agent.creao.ai/share/0773babf9c5d456f0fc0446a58d6da2f)). Weekly Digest agent built (agent ID `add647c2-ebdf-4f6f-858a-a8d5f303b3d9`), Notion connected, test run posted both notes to the ["Onboarding health"](https://app.notion.com/p/Onboarding-health-3fc5a84da8e0815b82f5c42a8d01605a) page. Slack timed out on the first try, so Notion is the live channel. The weekly schedule is set once the domain is live (it needs the real `/api/friction` URL).
+
 **The one rule:** a CREAO agent does the core work. For the doc-fix loop, it does: with `CREAO_APP_ID` set, the drafting happens only on CREAO. Say in the pitch: *"Remove the Doc Steward and the docs never get fixed. Every new hire keeps hitting the same wall."*
 
 ## Setup (about 30 minutes)

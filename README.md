@@ -98,7 +98,7 @@ Full checklist with what each sponsor asks for and the manual steps: [`docs/TRAC
 | --- | --- |
 | Workday | The product: a new-hire agent with visible responsible-AI controls and a People Ops Friction Map. Reads the new hire's profile from a Workday Build development tenant ([setup](docs/WORKDAY.md)) |
 | Fetch.ai | Seven uAgents on Agentverse (one of them sends synthetic new hires through the others), Chat Protocol, ASI:One, Interactive Cards, Payment Protocol (FET) |
-| CREAO (Team Empowerment) | The Doc Steward agent on CREAO drafts every doc fix, from the Friction Map and from the walls Canary New Hires find (API Trigger, async), and a scheduled Weekly Digest agent tells doc owners on Slack ([setup](docs/CREAO.md)). Agent ID: `TODO` · Run: `TODO share link` |
+| CREAO (Team Empowerment) | The Doc Steward agent on CREAO drafts every doc fix, from the Friction Map and from the walls Canary New Hires find (API Trigger, async), and a scheduled Weekly Digest agent tells doc owners on Notion ([setup](docs/CREAO.md)). Agent ID: `b450ed0d-985d-4079-917f-d9f9ee75e812` · Run: [share link](https://agent.creao.ai/share/0773babf9c5d456f0fc0446a58d6da2f) |
 | Gemini | Hybrid retrieval with Gemini embeddings; Gemini as a drop-in reasoning model behind the same verifier |
 | Snowflake | Cortex chat completions REST API as a third reasoning model |
 | Tiger Data | Friction events in a TimescaleDB hypertable, 30-day view from a continuous aggregate |

@@ -192,3 +192,13 @@ def test_payment_commit_must_match_the_request(monkeypatch):
     assert ia._payment_problem(pending, good.copy(update={"funds": Funds(amount="0.01", currency="FET")}))
     assert ia._payment_problem(pending, good.copy(update={"recipient": "fetch1someoneelse"}))
     assert ia._payment_problem({"reference": "FR-1", "expires": time.time() - 1}, good)
+
+
+def test_strip_agent_mentions():
+    from unblock.chat import strip_mentions
+    a = "agent1qvxgega6yer28glv25lyrkrr2j5r4dhky93twt94gjntrk2lcpswud2vcg7"
+    assert strip_mentions(f"@{a} What's our deploy process?") == "What's our deploy process?"
+    assert strip_mentions(f"@{a} pending") == "pending"
+    assert strip_mentions(f"@{a} edit: Hi Wei, thanks") == "edit: Hi Wei, thanks"
+    assert strip_mentions("email me at a@b.com") == "email me at a@b.com"
+    assert strip_mentions('{"action": "approve"}') == '{"action": "approve"}'

@@ -4,6 +4,7 @@ Every card message also carries the full answer as plain text, so the flow still
 works if a client doesn't render cards.
 """
 import json
+import re
 from collections.abc import Awaitable, Callable
 from datetime import datetime, timezone
 from inspect import isawaitable
@@ -61,8 +62,16 @@ def parse_input(text: str) -> dict:
     return {"text": text}
 
 
+_MENTION = re.compile(r"^(?:\s*@agent1[0-9a-z]+[\s,:]*)+")
+
+
+def strip_mentions(text: str) -> str:
+    """ASI:One passes "@agent1q... " mentions through in the text; drop them from the start."""
+    return _MENTION.sub("", text).strip()
+
+
 def message_text(msg: ChatMessage) -> str:
-    return "\n".join(item.text for item in msg.content if isinstance(item, TextContent)).strip()
+    return strip_mentions("\n".join(item.text for item in msg.content if isinstance(item, TextContent)))
 
 
 def create_chat_protocol(label: str, responder: Responder, person: str = "user") -> Protocol:
