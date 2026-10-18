@@ -10,6 +10,8 @@ Requirements from the hackathon page, what's ready, and what's left for a person
 | Devpost page: summary, technologies, extra resources | Text ready to paste; **needs filling in on Devpost** | `docs/devpost.md` |
 | Present in person for judging | **Whole team at the table during judging** | — |
 
+**Fetch.ai also requires the ASI:One Submission Agent** (separate from Devpost), with agent profile URLs and a shared ASI:One chat: everything is in `docs/FETCH_SUBMISSION.md`.
+
 ## Steps for a person
 
 1. **Repo is public:** https://github.com/SreenijaPavuluri/teamready. Check on GitHub
