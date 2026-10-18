@@ -296,6 +296,6 @@ def health():
     llm = get_llm_or_unavailable()
     return JSONResponse({"ok": True, "llm": llm.mode, "model": getattr(llm, "model", ""),
                          "retrieval": "hybrid (Gemini)" if semantic.enabled() else "keyword (BM25)",
-                         "friction_store": "Tiger Data" if timeseries.enabled() else "JSON files",
+                         "friction_store": "Tiger Data" if timeseries.usable() else ("JSON files (Tiger Data unreachable)" if timeseries.enabled() else "JSON files"),
                          "new_hire_profile": (load_user(), workday.status())[1],
                          "doc_fixes": creao.status(), "workday_mcp": workday_mcp.status()})

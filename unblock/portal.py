@@ -20,7 +20,7 @@ from . import activity, autopilot, tracker
 from . import knowledge as knowledge_lib
 from . import routing as routing_lib
 from .actions import send_email
-from .config import DATA_DIR
+from .config import DATA_DIR, today
 from .data import load_docs, load_people, load_user
 from .flow import Orchestrator, Reply
 from .friction import build_map, log_live_event
@@ -208,7 +208,8 @@ def state(session: str, after: int = 0) -> dict:
         "profile": {"name": user["name"], "role": user["role"], "team": user.get("team", ""), "office": user.get("office", ""),
                     "manager": load_people().get(user.get("manager_id", ""), {}).get("name", ""),
                     "source": user.get("profile_source", "Sample profile"), "workday": workday.status(),
-                    "workday_mcp": _workday_mcp_status()},
+                    "workday_mcp": _workday_mcp_status(), "start_date": user.get("start_date", ""),
+                    "today": today().isoformat()},
         "checklist": checklist(),
         # Checklist steps Unblock already did for this session (by index), and everything it did.
         "checklist_done": [i for i, step in enumerate(checklist()) for p in autopilot.plan_checklist([step], user, session)

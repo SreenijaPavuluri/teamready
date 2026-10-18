@@ -32,10 +32,13 @@ def topic_for(doc_id: str) -> str:
 
 
 def log_live_event(doc_id: str, docs_read: list[str], resolved: bool) -> None:
-    if timeseries.enabled():
-        with timeseries.connect() as conn:
-            timeseries.insert(conn, topic_for(doc_id), (docs_read or [None])[0], resolved, today())
-        return
+    if timeseries.usable():
+        try:
+            with timeseries.connect() as conn:
+                timeseries.insert(conn, topic_for(doc_id), (docs_read or [None])[0], resolved, today())
+            return
+        except Exception:  # unreachable from this network: keep the event locally instead of failing the reply
+            timeseries.mark_down()
     LIVE_EVENTS_PATH.parent.mkdir(parents=True, exist_ok=True)
     events = json.loads(LIVE_EVENTS_PATH.read_text()) if LIVE_EVENTS_PATH.exists() else []
     events.append({"id": f"L{len(events) + 1:03d}", "topic": topic_for(doc_id), "docs_read": docs_read,
@@ -53,19 +56,22 @@ def all_events(days: int = 30) -> list[dict]:
 
 def _rows(days: int) -> tuple[list[dict], str]:
     """(topic, start_doc, blockers, resolved) rows for the window, from Tiger Data or JSON."""
-    if timeseries.enabled():
-        with timeseries.connect() as conn:
-            kind = timeseries.backend(conn)
-            rows = timeseries.daily_rows(conn, today() - timedelta(days=days), today())
-        label = "Tiger Data (TimescaleDB continuous aggregate)" if kind == "timescale" else "Postgres view"
-        return rows, label
+    if timeseries.usable():
+        try:
+            with timeseries.connect() as conn:
+                kind = timeseries.backend(conn)
+                rows = timeseries.daily_rows(conn, today() - timedelta(days=days), today())
+            label = "Tiger Data (TimescaleDB continuous aggregate)" if kind == "timescale" else "Postgres view"
+            return rows, label
+        except Exception:
+            timeseries.mark_down()
     grouped: dict[tuple, dict] = {}
     for e in all_events(days):
         key = (e["topic"], (e["docs_read"] or [None])[0])
         row = grouped.setdefault(key, {"topic": key[0], "start_doc": key[1], "blockers": 0, "resolved": 0})
         row["blockers"] += 1
         row["resolved"] += 1 if e["resolved_without_ticket"] else 0
-    return list(grouped.values()), "JSON files"
+    return list(grouped.values()), ("JSON files (Tiger Data not reachable from this network)" if timeseries.enabled() else "JSON files")
 
 
 def build_map(days: int = 30) -> dict:

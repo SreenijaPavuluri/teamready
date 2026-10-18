@@ -42,14 +42,28 @@ FROM friction_events GROUP BY 1, 2, 3
 """
 
 
+_down = {"until": 0.0}
+
+
 def enabled() -> bool:
     return bool(env("TIMESCALE_URL"))
+
+
+def usable() -> bool:
+    """Configured, and not seen unreachable in the last minute (some networks block the database port)."""
+    import time
+    return enabled() and time.time() >= _down["until"]
+
+
+def mark_down() -> None:
+    import time
+    _down["until"] = time.time() + 60
 
 
 def connect():
     import psycopg
 
-    return psycopg.connect(env("TIMESCALE_URL"), autocommit=True, connect_timeout=10, client_encoding="utf8",
+    return psycopg.connect(env("TIMESCALE_URL"), autocommit=True, connect_timeout=4, client_encoding="utf8",
                            options="-c TimeZone=UTC")
 
 

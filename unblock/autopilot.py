@@ -193,7 +193,7 @@ def execute(action: str, form: dict, user: dict, owner: str, approved_by: str = 
         sent = send_email(form["with_email"], f"1:1: {user['name']} (new hire)",
                                 f"Hi! I'd like to set up our first 1:1 to go over {form['agenda'].lower()}.\n\n{user['name']}",
                                 user["email"], ics)
-        detail += " Invite " + {"sent": "emailed.", "simulated": "saved to the outbox (email not set up).", "failed": "failed to send."}[sent["status"]]
+        detail += " Invite " + {"sent": "emailed.", "simulated": "saved to the outbox (not emailed: email is off or unreachable from this network).", "failed": "failed to send."}[sent["status"]]
     elif action == "it_ticket":
         status, detail = "open", f"{detail} IT will reply on the ticket; the Tracker checks back if it goes quiet."
     elif action == "analytics_access":
