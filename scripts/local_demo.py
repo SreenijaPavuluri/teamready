@@ -2,7 +2,7 @@
 with the real agents over uAgents messages and print every reply.
 
     UNBLOCK_LLM=extractive python scripts/local_demo.py   # no API key needed
-    python scripts/local_demo.py                          # uses Sonnet
+    python scripts/local_demo.py                          # uses the Anthropic model
 
 Steps: a verified answer, a stale-doc flag, a question the docs can't answer
 (routed to a person, then "wrong person", then the Guardian blocking a password), a Tracker follow-up when nobody

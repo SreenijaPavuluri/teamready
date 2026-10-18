@@ -34,7 +34,7 @@ from unblock.models import (
     WrongPersonFeedback,
 )
 
-TIMEOUT = 45          # knowledge includes a Sonnet call
+TIMEOUT = 45          # knowledge includes a model call
 ROUTING_TIMEOUT = 15  # routing is pure code
 
 agent = create_agent(

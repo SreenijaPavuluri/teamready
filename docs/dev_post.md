@@ -9,7 +9,7 @@ At LA Hacks AI Hackathon 2026 we built **Unblock**, a team of five agents on Fet
 
 ## The rule: no quote, no claim
 
-The model (Sonnet, or Gemini, or Snowflake Cortex: they're interchangeable) never answers directly. It returns claims, each with a quote and a doc id. Then plain Python decides what the new hire sees. A claim survives only if:
+The model (Anthropic's Sonnet, or Gemini, or Snowflake Cortex: they're interchangeable) never answers directly. It returns claims, each with a quote and a doc id. Then plain Python decides what the new hire sees. A claim survives only if:
 
 - the quote appears word for word in a doc we actually retrieved,
 - the quote isn't cut out of a sentence that says "not",

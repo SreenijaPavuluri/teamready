@@ -90,7 +90,7 @@ def _target():
 
 
 def _check_fix(fix, cluster: dict, doc) -> dict:
-    """Same rules whoever drafted the fix (Sonnet, Gemini or the CREAO Doc Steward): exact quote, non-empty edit."""
+    """Same rules whoever drafted the fix (Anthropic, Gemini or the CREAO Doc Steward): exact quote, non-empty edit."""
     if not isinstance(fix, dict):
         return {"cluster": cluster, "error": "The drafted fix wasn't in the expected format, so I blocked it."}
     before, after = str(fix.get("before_quote") or ""), fix.get("after_text")

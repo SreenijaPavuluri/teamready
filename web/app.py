@@ -138,10 +138,27 @@ async def voice_ask(body: Ask, request: Request, x_unblock_secret: str = Header(
             "sources": [c["title"] for c in result["citations"]], "blocked_claims": len(result["blocked"])}
 
 
+_fmap: dict = {"at": 0.0, "value": None, "busy": False}
+FRICTION_CACHE_SECONDS = 60
+
+
+def _refresh_fmap() -> None:
+    try:
+        _fmap.update(value=build_map(), at=time.time())
+    finally:
+        _fmap["busy"] = False
+
+
 @app.get("/api/friction")
 def api_friction():
+    # A remote database can be slow, so the map is cached for a minute and refreshed in the background.
+    if _fmap["value"] is None:
+        _refresh_fmap()
+    elif time.time() - _fmap["at"] > FRICTION_CACHE_SECONDS and not _fmap["busy"]:
+        _fmap["busy"] = True
+        threading.Thread(target=_refresh_fmap, daemon=True).start()
     # Walls the Canary New Hires found: topics and doc titles only. "predicted" means no real new hire has hit it yet.
-    return {**build_map(), "canary_walls": canary.predicted_for_map()}
+    return {**_fmap["value"], "canary_walls": canary.predicted_for_map()}
 
 
 @app.get("/api/agents")
@@ -294,7 +311,7 @@ def api_activity_replay():
 @app.get("/api/health")
 def health():
     llm = get_llm_or_unavailable()
-    return JSONResponse({"ok": True, "llm": llm.mode, "model": getattr(llm, "model", ""),
+    return JSONResponse({"ok": True, "llm": llm.mode, "model": "Anthropic Sonnet" if llm.mode == "anthropic" else getattr(llm, "model", ""),
                          "retrieval": "hybrid (Gemini)" if semantic.enabled() else "keyword (BM25)",
                          "friction_store": "Tiger Data" if timeseries.usable() else ("JSON files (Tiger Data unreachable)" if timeseries.enabled() else "JSON files"),
                          "new_hire_profile": (load_user(), workday.status())[1],

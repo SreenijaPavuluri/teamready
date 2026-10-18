@@ -1,6 +1,6 @@
 # Unblock eval results
 
-Mode: **anthropic** sonnet-5-5
+Mode: **anthropic** (Sonnet)
 
 | Metric | Result |
 | --- | --- |

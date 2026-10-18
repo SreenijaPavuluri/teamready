@@ -12,7 +12,7 @@ Requirements from the hackathon page, what's ready, and what's left for a person
 
 ## Steps for a person
 
-1. **Push the repo public.** Sonnet can run this once you say so (repo `SreenijaPavuluri/unblock`). Check on GitHub
+1. **Push the repo public** from the terminal (repo `SreenijaPavuluri/unblock`). Check on GitHub
    afterwards that `.env` is not in the file list.
 2. **Record the video** following `docs/video_script.md`. Upload to YouTube (Unlisted is fine) or Vimeo and copy the link.
 3. **Fill in Devpost**, section by section, from `docs/devpost.md`:
@@ -28,7 +28,7 @@ Requirements from the hackathon page, what's ready, and what's left for a person
    - Add teammates to the Devpost project so everyone is listed
    - Image gallery: optional; screenshots of `/workday`, `/canary` and `/activity`
 4. **Replace the placeholders** once you have the links: `VIDEO-LINK`, `LIVE-LINK`, `DEVPOST-LINK` in `README.md` and
-   `docs/devpost.md`. Sonnet can do this and push.
+   `docs/devpost.md`, then commit and push.
 5. **Fetch.ai specifics:** keep the agents running through judging (only one copy with the real seeds). The README's
    innovationlab and hackathon badges and the agent address table are what the Fetch.ai judges look for.
 6. **Submit before 11:30am.** Devpost allows edits until the deadline, so submit early and update the links after.

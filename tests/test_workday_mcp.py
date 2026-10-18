@@ -20,7 +20,7 @@ TOOLS = [
 
 
 class FakeLLM:
-    """Stands in for Sonnet: picks the tool the way the prompt asks and summarizes the result."""
+    """Stands in for the model: picks the tool the way the prompt asks and summarizes the result."""
     mode = "anthropic"
 
     def _json(self, system, prompt, max_tokens=500):

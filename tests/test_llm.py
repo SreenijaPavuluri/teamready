@@ -1,4 +1,4 @@
-"""The Sonnet path, with a fake Anthropic client (no network)."""
+"""The Anthropic path, with a fake Anthropic client (no network)."""
 import json
 from types import SimpleNamespace
 

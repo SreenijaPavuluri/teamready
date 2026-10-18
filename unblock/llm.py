@@ -1,7 +1,7 @@
-"""Model layer. Sonnet does the reasoning; an extractive mode exists for tests and
+"""Model layer. Anthropic's model does the reasoning; an extractive mode exists for tests and
 as a measured baseline in the eval. The mode is always shown to the user.
 
-UNBLOCK_LLM=anthropic      (default) needs ANTHROPIC_API_KEY
+UNBLOCK_LLM=anthropic   (default) needs ANTHROPIC_API_KEY and LLM_MODEL
 UNBLOCK_LLM=extractive  no model: quotes the best passages directly
 """
 import json
@@ -111,7 +111,9 @@ class AnthropicLLM(PromptLLM):
         import anthropic
 
         self.client = anthropic.Anthropic(api_key=key)
-        self.model = model or env("LLM_MODEL", "sonnet-5-5")
+        self.model = model or env("LLM_MODEL")
+        if not self.model:
+            raise LLMError("LLM_MODEL is not set (the Anthropic model ID)")
 
     def _json(self, system: str, prompt: str, max_tokens: int = 1500) -> dict:
         try:
@@ -122,7 +124,7 @@ class AnthropicLLM(PromptLLM):
                 messages=[{"role": "user", "content": prompt}],
             )
         except Exception as exc:  # network, auth, rate limit
-            raise LLMError(f"Sonnet request failed: {exc}") from exc
+            raise LLMError(f"Model request failed: {exc}") from exc
         text = "".join(block.text for block in response.content if getattr(block, "type", "") == "text")
         return _parse_json(text)
 

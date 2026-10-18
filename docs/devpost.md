@@ -68,7 +68,7 @@ to-do list, and (3) stops the same walls from hitting the next person.
   (follow-ups) and `unblock-canary` (Canary New Hires). They exchange typed messages (knowledge, routing, approval and
   tracking requests). Interactive Cards carry the review, approve and reject buttons. If a specialist doesn't answer in
   time, the orchestrator runs the same step locally and says so.
-- **Sonnet (sonnet-5-5)** drafts claims with quotes; **plain Python decides** what's shown (the verifier checks
+- **Anthropic's Sonnet model** drafts claims with quotes; **plain Python decides** what's shown (the verifier checks
   quote presence, negation, word overlap and numbers). Confidence is computed in code from four visible factors.
 - **CREAO:** the Doc Steward agent (API Trigger, async polling) drafts doc fixes for the Friction Map and the canaries.
   A Weekly Digest agent posts each doc owner's top gap to Notion.

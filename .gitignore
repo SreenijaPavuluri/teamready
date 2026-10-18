@@ -11,3 +11,4 @@ agent*_data.json
 logs/
 friction.json
 .DS_Store
+demo/

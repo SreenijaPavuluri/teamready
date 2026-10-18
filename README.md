@@ -212,7 +212,7 @@ It reports behavior accuracy, citation accuracy, helper accuracy, unsupported cl
 
 Baseline with no model (extractive): 34/40 behavior, 27/27 citations, 2/2 helpers, but it "answers" **5 of 5** adversarial questions with irrelevant quotes. Recognizing when the docs don't actually answer the question is exactly the judgment Sonnet adds, and the verifier makes sure that judgment can't turn into an invented fact.
 
-**With Sonnet (sonnet-5-5), Oct 17:**
+**With Anthropic's Sonnet model, Oct 17:**
 
 | Metric | Sonnet | No model (extractive) |
 | --- | --- | --- |

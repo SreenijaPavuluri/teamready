@@ -36,4 +36,5 @@ def isolated_runtime(tmp_path, monkeypatch):
     monkeypatch.setattr(autopilot, "PATH", tmp_path / "systems.json")
     if "web.app" in sys.modules:  # each test gets a fresh per-minute rate limit
         sys.modules["web.app"]._hits.clear()
+        sys.modules["web.app"]._fmap.update(value=None, at=0.0)
     yield

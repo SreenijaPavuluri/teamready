@@ -1,6 +1,6 @@
 """Evaluate Unblock on 40 labeled questions.
 
-    python eval/run_eval.py                 # Sonnet (needs ANTHROPIC_API_KEY)
+    python eval/run_eval.py                 # Anthropic (needs ANTHROPIC_API_KEY, LLM_MODEL)
     python eval/run_eval.py --llm extractive  # no-model baseline
 
 Reports:
