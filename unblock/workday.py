@@ -36,7 +36,7 @@ def access_token(client: httpx.Client) -> str:
         return _token["value"]
     r = client.post(f"{_base()}/ccx/oauth2/{env('WORKDAY_TENANT')}/token",
                     auth=(env("WORKDAY_CLIENT_ID"), env("WORKDAY_CLIENT_SECRET")),
-                    data={"grant_type": "refresh_token", "refresh_token": env("WORKDAY_REFRESH_TOKEN")}, timeout=20)
+                    data={"grant_type": "refresh_token", "refresh_token": env("WORKDAY_REFRESH_TOKEN")}, timeout=8)
     r.raise_for_status()
     data = r.json()
     _token.update(value=data["access_token"], expires=time.time() + int(data.get("expires_in", 3600)))
@@ -48,7 +48,7 @@ def fetch_profile(client: httpx.Client | None = None) -> dict:
     token = access_token(client)
     r = client.get(f"{_base()}/ccx/api/v1/{env('WORKDAY_TENANT')}/workers",
                    params={"search": env("WORKDAY_WORKER_SEARCH", "mcneil"), "limit": 1},
-                   headers={"Authorization": f"Bearer {token}"}, timeout=20)
+                   headers={"Authorization": f"Bearer {token}"}, timeout=8)
     r.raise_for_status()
     items = r.json().get("data") or []
     if not items:

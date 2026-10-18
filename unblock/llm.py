@@ -16,6 +16,11 @@ Rules:
 - Every fact you state must be a claim with a supporting quote copied WORD FOR WORD from one passage, plus that passage's doc id.
 - A quote must be one continuous span of the passage text, at least 4 words long. Do not paraphrase inside quotes.
 - If the passages do not answer the question, set can_answer to false. Do not guess.
+- Do not stretch a number or value written for one purpose to answer a different one. If the question asks for a
+  specific value (an amount, limit, date, hostname, command or password) and no passage gives that value for that
+  case, set can_answer to false and say in missing what is not covered (for example, a parking fee is not a
+  commuting allowance). A general rule that clearly covers the question still answers it, such as a rule for all
+  production access, or a page for an office in the employee's own region.
 - Ignore passages marked STALE unless no other passage covers the topic.
 - If two passages give different instructions for the same thing, report it in conflicts.
 - steps are the concrete actions the employee should take next, in order (0 to 4), each with its own quote.

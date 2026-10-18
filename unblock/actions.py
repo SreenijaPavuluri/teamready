@@ -59,8 +59,14 @@ def send_email(to: str, subject: str, body: str, sender: str, ics: str | None = 
         path.write_bytes(bytes(msg))
         return {"status": "simulated", "to": actual_to, "detail": f"Email is not configured, so nothing was sent. Saved to outbox/{path.name}."}
     try:
-        with smtplib.SMTP(host, int(env("SMTP_PORT", "587")), timeout=20) as server:
-            server.starttls(context=ssl.create_default_context())
+        port = int(env("SMTP_PORT", "587"))
+        if port == 465:  # implicit TLS, for networks that block port 587
+            server_cm = smtplib.SMTP_SSL(host, port, timeout=20, context=ssl.create_default_context())
+        else:
+            server_cm = smtplib.SMTP(host, port, timeout=20)
+        with server_cm as server:
+            if port != 465:
+                server.starttls(context=ssl.create_default_context())
             server.login(env("SMTP_USER"), env("SMTP_PASSWORD"))
             server.send_message(msg)
     except Exception as exc:

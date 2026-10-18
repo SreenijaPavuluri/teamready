@@ -6,6 +6,16 @@ ROOT = Path(__file__).resolve().parent.parent
 if str(ROOT) not in sys.path:
     sys.path.insert(0, str(ROOT))
 
+import asyncio  # noqa: E402
+
+# Python 3.14 no longer creates an event loop on demand, and uagents.Agent()
+# asks for one when it is constructed. Make sure one exists before any agent is
+# built. On Python 3.11-3.13 a loop already exists, so this changes nothing.
+try:
+    asyncio.get_event_loop_policy().get_event_loop()
+except RuntimeError:
+    asyncio.set_event_loop(asyncio.new_event_loop())
+
 from uagents import Agent  # noqa: E402
 from uagents.crypto import Identity  # noqa: E402
 
