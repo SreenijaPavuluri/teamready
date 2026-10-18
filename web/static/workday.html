@@ -4,328 +4,398 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>Unblock for Workday</title>
-<meta name="description" content="Unblock in a Workday-style worker home: an onboarding agent that does the work, with a human approving every action.">
+<meta name="description" content="Unblock in a Workday-style worker home: onboarding work done for the new hire, with a person approving every action.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&family=Roboto+Mono:wght@400;500&display=swap" rel="stylesheet">
 <style>
-/* Colors and type follow Workday's open Canvas design tokens (@workday/canvas-tokens-web): blueberry, soap,
-   licorice, cinnamon, cantaloupe, green apple; Roboto. This page is a prototype, not a Workday product. */
+/* Colors and type follow Workday's open Canvas design tokens (@workday/canvas-tokens-web).
+   Prototype for the Workday challenge; not a Workday product. */
 :root {
-  --blueberry-100: #D7EAFC; --blueberry-200: #A6D2FF; --blueberry-400: #0875E1; --blueberry-500: #005cb9; --blueberry-600: #004387;
-  --soap-100: #f6f7f8; --soap-200: #F0F1F2; --soap-300: #e8ebed; --soap-400: #DFE2E6; --soap-500: #ced3d9;
-  --licorice-100: #A1AAB3; --licorice-300: #5E6A75; --licorice-500: #333d47; --black-pepper: #1e1e1e; --white: #ffffff;
-  --cinnamon-100: #ffefee; --cinnamon-500: #de2e21; --cinnamon-600: #a31b12;
-  --cantaloupe-100: #ffeed9; --cantaloupe-400: #ffa126; --cantaloupe-600: #c06c00;
-  --green-100: #ebfff0; --green-500: #319c4c; --green-600: #217a37; --plum-100: #e6f1ff; --plum-500: #3166ab;
-  --bg: var(--soap-100); --card: var(--white); --ink: var(--black-pepper); --muted: var(--licorice-300); --line: var(--soap-400);
-  --nav: var(--white); --chip: var(--soap-200); --input: var(--white);
-  --depth-1: 0 1px 4px rgba(31, 38, 46, 0.12), 0 2px 8px rgba(31, 38, 46, 0.08);
-  --depth-2: 0 2px 8px rgba(31, 38, 46, 0.12), 0 4px 16px rgba(31, 38, 46, 0.08);
+  --bg: #f6f7f8; --surface: #ffffff; --surface-2: #f6f7f8; --border: #dfe2e6; --border-strong: #ced3d9;
+  --text: #333333; --text-strong: #1e1e1e; --muted: #5e6a75; --subtle: #7b858f;
+  --brand: #0875e1; --brand-hover: #005cb9; --brand-soft: #d7eafc; --brand-text: #005cb9;
+  --ok: #217a37; --ok-dot: #319c4c; --warn: #c06c00; --warn-dot: #ffa126; --bad: #a31b12; --bad-dot: #de2e21;
+  --neutral-dot: #a1aab3; --bar: #e8ebed; --row-hover: #f6f7f8; --focus: 0 0 0 2px #fff, 0 0 0 4px #0875e1;
+  --shadow: 0 1px 2px rgba(31, 38, 46, 0.06), 0 2px 6px rgba(31, 38, 46, 0.06);
+  --panel-w: 400px;
   --font: "Roboto", system-ui, -apple-system, "Segoe UI", sans-serif; --mono: "Roboto Mono", ui-monospace, Menlo, monospace;
 }
 @media (prefers-color-scheme: dark) {
   :root:not([data-theme="light"]) {
-    --bg: #121820; --card: #1b232d; --ink: #e9edf1; --muted: #a1aab3; --line: #2c3743; --nav: #1b232d; --chip: #26313d; --input: #121820;
-    --blueberry-100: #13304f; --green-100: #12301c; --cantaloupe-100: #3a2a14; --cinnamon-100: #3d1e1c; --plum-100: #1a2740;
-    --blueberry-500: #6db3ff; --green-600: #6fd08a; --cantaloupe-600: #ffb75a; --cinnamon-600: #ff8b80; --plum-500: #8fb2ea;
-    color-scheme: dark;
+    --bg: #11161c; --surface: #191f27; --surface-2: #202833; --border: #2a333e; --border-strong: #38424e;
+    --text: #d8dde3; --text-strong: #f1f3f5; --muted: #9aa4af; --subtle: #808b96;
+    --brand: #3d93ea; --brand-hover: #64a9f0; --brand-soft: #18314d; --brand-text: #8cc0f5;
+    --ok: #6fcf8a; --warn: #f4b35e; --bad: #f0877d; --bar: #2a333e; --row-hover: #1e252e;
+    --focus: 0 0 0 2px #191f27, 0 0 0 4px #3d93ea; color-scheme: dark;
   }
 }
 :root[data-theme="dark"] {
-  --bg: #121820; --card: #1b232d; --ink: #e9edf1; --muted: #a1aab3; --line: #2c3743; --nav: #1b232d; --chip: #26313d; --input: #121820;
-  --blueberry-100: #13304f; --green-100: #12301c; --cantaloupe-100: #3a2a14; --cinnamon-100: #3d1e1c; --plum-100: #1a2740;
-  --blueberry-500: #6db3ff; --green-600: #6fd08a; --cantaloupe-600: #ffb75a; --cinnamon-600: #ff8b80; --plum-500: #8fb2ea;
-  color-scheme: dark;
+  --bg: #11161c; --surface: #191f27; --surface-2: #202833; --border: #2a333e; --border-strong: #38424e;
+  --text: #d8dde3; --text-strong: #f1f3f5; --muted: #9aa4af; --subtle: #808b96;
+  --brand: #3d93ea; --brand-hover: #64a9f0; --brand-soft: #18314d; --brand-text: #8cc0f5;
+  --ok: #6fcf8a; --warn: #f4b35e; --bad: #f0877d; --bar: #2a333e; --row-hover: #1e252e;
+  --focus: 0 0 0 2px #191f27, 0 0 0 4px #3d93ea; color-scheme: dark;
 }
 * { box-sizing: border-box; }
 [hidden] { display: none !important; }
 html, body { margin: 0; }
-body { background: var(--bg); color: var(--ink); font: 400 14px/1.5 var(--font); overflow-wrap: anywhere; }
-button, input, textarea, select { font: inherit; color: inherit; }
-a { color: var(--blueberry-500); }
+body { background: var(--bg); color: var(--text); font: 400 14px/20px var(--font); overflow-wrap: anywhere; -webkit-font-smoothing: antialiased; }
+button, input, textarea { font: inherit; color: inherit; }
+button { cursor: pointer; }
+a { color: var(--brand-text); text-decoration: none; }
+a:hover { text-decoration: underline; }
+:focus-visible { outline: none; box-shadow: var(--focus); border-radius: 4px; }
+svg.i { width: 20px; height: 20px; flex: none; stroke: currentColor; fill: none; stroke-width: 1.75; stroke-linecap: round; stroke-linejoin: round; }
 
-/* top navigation */
-.nav { position: sticky; top: 0; z-index: 10; background: var(--nav); box-shadow: var(--depth-2); }
-.nav-in { max-width: 1320px; margin: 0 auto; height: 64px; display: flex; align-items: center; gap: 16px;
-  padding: 0 max(16px, env(safe-area-inset-right, 0px)) 0 max(16px, env(safe-area-inset-left, 0px)); }
-.mark { display: flex; align-items: center; gap: 10px; text-decoration: none; color: var(--ink); flex: none; }
-.mark i { width: 34px; height: 34px; border-radius: 50%; background: var(--blueberry-400); color: #fff; display: grid; place-items: center;
-  font: 700 17px var(--font); font-style: normal; }
-.mark b { font-weight: 500; font-size: 16px; }
-.mark span { color: var(--muted); font-size: 13px; }
-.search { flex: 1; max-width: 560px; position: relative; }
-.search input { width: 100%; height: 40px; border-radius: 999px; border: 1px solid var(--line); background: var(--chip); padding: 0 16px 0 40px; }
-.search input:focus { outline: 2px solid var(--blueberry-400); outline-offset: 1px; background: var(--input); }
-.search svg { position: absolute; left: 14px; top: 12px; width: 16px; height: 16px; color: var(--muted); }
-.navr { margin-left: auto; display: flex; align-items: center; gap: 8px; flex: none; }
-.iconbtn { position: relative; width: 40px; height: 40px; border-radius: 50%; border: 0; background: transparent; display: grid; place-items: center; cursor: pointer; color: var(--muted); }
-.iconbtn:hover { background: var(--chip); }
-.iconbtn svg { width: 20px; height: 20px; }
-.badge { position: absolute; top: 4px; right: 3px; min-width: 18px; height: 18px; border-radius: 9px; background: var(--cinnamon-500); color: #fff; font: 700 11px/18px var(--font); text-align: center; padding: 0 4px; }
-.roles { display: flex; background: var(--chip); border-radius: 999px; padding: 3px; gap: 2px; }
-.roles button { border: 0; background: transparent; border-radius: 999px; padding: 6px 12px; font-weight: 500; font-size: 13px; color: var(--muted); cursor: pointer; white-space: nowrap; }
-.roles button[aria-pressed="true"] { background: var(--card); color: var(--ink); box-shadow: var(--depth-1); }
-.avatar { width: 34px; height: 34px; border-radius: 50%; background: var(--plum-100); color: var(--plum-500); display: grid; place-items: center; font-weight: 700; font-size: 13px; flex: none; }
+/* ---------- global header ---------- */
+.top { position: sticky; top: 0; z-index: 30; height: 64px; background: var(--surface); border-bottom: 1px solid var(--border); }
+.top-in { height: 100%; display: flex; align-items: center; gap: 20px; padding: 0 max(20px, env(safe-area-inset-right, 0px)) 0 max(20px, env(safe-area-inset-left, 0px)); }
+.logo { display: flex; align-items: center; gap: 10px; color: var(--text-strong); flex: none; }
+.logo:hover { text-decoration: none; }
+.logo b { width: 32px; height: 32px; border-radius: 50%; background: var(--brand); color: #fff; display: grid; place-items: center; font: 700 16px var(--font); }
+.logo span { font-size: 16px; font-weight: 500; }
+.logo small { color: var(--muted); font-size: 13px; border-left: 1px solid var(--border); padding-left: 10px; margin-left: 2px; }
+.search { flex: 1; max-width: 520px; position: relative; margin: 0 auto 0 12px; }
+.search svg { position: absolute; left: 14px; top: 10px; color: var(--muted); }
+.search input { width: 100%; height: 40px; border: 1px solid transparent; border-radius: 999px; background: var(--surface-2); padding: 0 16px 0 44px; }
+.search input:hover { border-color: var(--border-strong); }
+.search input:focus { outline: none; background: var(--surface); border-color: var(--brand); box-shadow: 0 0 0 1px var(--brand); }
+.actions { display: flex; align-items: center; gap: 4px; flex: none; }
+.ibtn { position: relative; width: 40px; height: 40px; border: 0; border-radius: 50%; background: transparent; color: var(--muted); display: grid; place-items: center; }
+.ibtn:hover { background: var(--surface-2); color: var(--text-strong); }
+.count { position: absolute; top: 4px; right: 3px; min-width: 16px; height: 16px; padding: 0 4px; border-radius: 8px; background: var(--bad-dot); color: #fff; font: 700 10px/16px var(--font); text-align: center; box-shadow: 0 0 0 2px var(--surface); }
+.ask { display: inline-flex; align-items: center; gap: 8px; height: 40px; padding: 0 16px; border-radius: 999px; border: 1px solid var(--border-strong); background: var(--surface); color: var(--text-strong); font-weight: 500; margin-right: 6px; }
+.ask:hover { border-color: var(--text-strong); }
+.ask[aria-pressed="true"] { background: var(--brand-soft); border-color: transparent; color: var(--brand-text); }
+.avatar { width: 32px; height: 32px; border-radius: 50%; background: #e6f1ff; color: #3166ab; display: grid; place-items: center; font: 500 13px var(--font); margin-left: 6px; flex: none; }
 
-/* page */
-.wrap { max-width: 1320px; margin: 0 auto; padding: 0 max(16px, env(safe-area-inset-right, 0px)) 48px max(16px, env(safe-area-inset-left, 0px)); }
-.hero { margin: 20px 0; border-radius: 16px; padding: 24px 28px; color: #fff; background: linear-gradient(110deg, #004387 0%, #0875E1 62%, #3c9cf5 100%);
-  display: flex; flex-wrap: wrap; gap: 16px 32px; align-items: center; justify-content: space-between; box-shadow: var(--depth-1); }
-.hero h1 { margin: 0 0 4px; font: 500 26px/1.2 var(--font); }
-.hero p { margin: 0; opacity: 0.9; }
-.meter { min-width: 240px; }
-.meter .lbl { display: flex; justify-content: space-between; font-size: 13px; opacity: 0.92; margin-bottom: 6px; }
-.meter .bar { height: 8px; background: rgba(255,255,255,0.28); border-radius: 4px; overflow: hidden; }
-.meter .bar div { height: 100%; background: #fff; width: 0; transition: width 0.4s; }
-.grid { display: grid; grid-template-columns: minmax(0, 1fr) minmax(360px, 420px); gap: 20px; align-items: start; }
-.col { display: grid; gap: 20px; min-width: 0; }
-.two { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 20px; }
-.card { background: var(--card); border-radius: 12px; box-shadow: var(--depth-1); min-width: 0; }
-.card > header { display: flex; align-items: center; justify-content: space-between; gap: 8px; padding: 16px 20px 12px; border-bottom: 1px solid var(--line); }
-.card > header h2 { margin: 0; font: 500 16px var(--font); }
-.card > header .sub { color: var(--muted); font-size: 13px; }
-.card .body { padding: 12px 20px 16px; }
-.empty { color: var(--muted); padding: 6px 0; margin: 0; }
-.btn { border: 1px solid var(--licorice-100); background: var(--card); border-radius: 999px; padding: 7px 16px; font-weight: 500; cursor: pointer; white-space: nowrap; }
-.btn:hover { border-color: var(--licorice-300); }
-.btn.primary { background: var(--blueberry-400); border-color: var(--blueberry-400); color: #fff; }
-.btn.primary:hover { background: var(--blueberry-500); }
-.btn.danger { color: var(--cinnamon-600); border-color: var(--cinnamon-500); }
-.btn.sm { padding: 4px 12px; font-size: 13px; }
-.btn:disabled { opacity: 0.5; cursor: default; }
-.pill { display: inline-flex; align-items: center; gap: 6px; font: 500 12px var(--font); padding: 2px 10px; border-radius: 999px; white-space: nowrap; }
-.pill.done { background: var(--green-100); color: var(--green-600); }
-.pill.wait { background: var(--cantaloupe-100); color: var(--cantaloupe-600); }
-.pill.todo { background: var(--blueberry-100); color: var(--blueberry-500); }
-.pill.you { background: var(--chip); color: var(--muted); }
-.pill.bad { background: var(--cinnamon-100); color: var(--cinnamon-600); }
-.pill.ai { background: var(--plum-100); color: var(--plum-500); }
+/* ---------- page ---------- */
+.page { transition: padding-right 0.2s; }
+.page.with-panel { padding-right: var(--panel-w); }
+.content { max-width: 1240px; margin: 0 auto; padding: 28px max(20px, env(safe-area-inset-right, 0px)) 56px max(20px, env(safe-area-inset-left, 0px)); }
+.phead { display: flex; flex-wrap: wrap; gap: 12px 24px; align-items: flex-end; justify-content: space-between; margin-bottom: 24px; }
+.phead h1 { margin: 0; font: 400 28px/36px var(--font); color: var(--text-strong); letter-spacing: -0.01em; }
+.phead p { margin: 4px 0 0; color: var(--muted); }
+.viewas { display: flex; align-items: center; gap: 10px; color: var(--muted); font-size: 13px; }
+.seg { display: inline-flex; border: 1px solid var(--border-strong); border-radius: 999px; padding: 2px; background: var(--surface); }
+.seg button { border: 0; background: transparent; border-radius: 999px; padding: 5px 14px; font-size: 13px; font-weight: 500; color: var(--muted); }
+.seg button[aria-pressed="true"] { background: var(--text-strong); color: var(--surface); }
+.grid { display: grid; grid-template-columns: minmax(0, 2fr) minmax(280px, 1fr); gap: 24px; align-items: start; }
+.col { display: grid; gap: 24px; min-width: 0; }
 
-/* inbox */
-.inbox { list-style: none; margin: 0; padding: 0; }
-.inbox li { display: grid; grid-template-columns: 36px minmax(0, 1fr) auto; gap: 12px; align-items: center; padding: 12px 0; border-top: 1px solid var(--line); }
-.inbox li:first-child { border-top: 0; }
-.inbox .ic { width: 36px; height: 36px; border-radius: 50%; background: var(--blueberry-100); color: var(--blueberry-500); display: grid; place-items: center; }
-.inbox .ic.warn { background: var(--cantaloupe-100); color: var(--cantaloupe-600); }
-.inbox .ic svg { width: 18px; height: 18px; }
-.inbox b { font-weight: 500; display: block; }
-.inbox small { color: var(--muted); display: block; }
-.inbox .acts { display: flex; gap: 6px; flex-wrap: wrap; justify-content: flex-end; }
+.card { background: var(--surface); border: 1px solid var(--border); border-radius: 8px; box-shadow: var(--shadow); min-width: 0; }
+.card-h { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 8px 12px; padding: 16px 20px; }
+.card-h h2 { margin: 0; font: 500 16px/24px var(--font); color: var(--text-strong); }
+.card-h .meta { color: var(--muted); font-size: 13px; white-space: nowrap; }
+.card-b { padding: 0 20px 16px; }
+.empty { color: var(--muted); padding: 4px 0 8px; margin: 0; }
+.btn { display: inline-flex; align-items: center; gap: 6px; height: 32px; padding: 0 16px; border-radius: 999px; border: 1px solid var(--border-strong); background: var(--surface); color: var(--text-strong); font-weight: 500; font-size: 13px; white-space: nowrap; }
+.btn:hover { border-color: var(--text-strong); }
+.btn.primary { background: var(--brand); border-color: var(--brand); color: #fff; }
+.btn.primary:hover { background: var(--brand-hover); border-color: var(--brand-hover); }
+.btn.danger { color: var(--bad); }
+.btn.link { border: 0; background: none; padding: 0; height: auto; color: var(--brand-text); }
+.btn.link:hover { text-decoration: underline; }
+.btn:disabled { opacity: 0.45; cursor: default; }
 
-/* journey */
-.journey { list-style: none; margin: 0; padding: 0; position: relative; }
-.journey li { display: grid; grid-template-columns: 28px minmax(0, 1fr) auto; gap: 12px; align-items: center; padding: 10px 0; position: relative; }
-.journey li::before { content: ""; position: absolute; left: 13px; top: 38px; bottom: -10px; width: 2px; background: var(--line); }
-.journey li:last-child::before { display: none; }
-.journey .dot { width: 28px; height: 28px; border-radius: 50%; border: 2px solid var(--soap-500); background: var(--card); display: grid; place-items: center; font-size: 12px; font-weight: 700; color: var(--muted); position: relative; z-index: 1; }
-.journey li.done .dot { background: var(--green-500); border-color: var(--green-500); color: #fff; }
-.journey li.wait .dot { border-color: var(--cantaloupe-400); color: var(--cantaloupe-600); }
-.journey li.todo .dot { border-color: var(--blueberry-400); color: var(--blueberry-500); }
-.journey .t { font-weight: 500; }
-.journey small { display: block; color: var(--muted); }
+/* status: a dot and a word, the way Workday shows business process status */
+.st { display: inline-flex; align-items: center; gap: 6px; font-size: 13px; color: var(--text); white-space: nowrap; }
+.st::before { content: ""; width: 8px; height: 8px; border-radius: 50%; background: var(--neutral-dot); flex: none; }
+.st.ok::before { background: var(--ok-dot); } .st.warn::before { background: var(--warn-dot); }
+.st.bad::before { background: var(--bad-dot); } .st.info::before { background: var(--brand); }
 
-/* lists */
-.rows { list-style: none; margin: 0; padding: 0; }
-.rows li { padding: 10px 0; border-top: 1px solid var(--line); display: grid; gap: 2px; }
-.rows li:first-child { border-top: 0; }
-.rows li.empty, .inbox li.empty { display: block; }
-.rows .top { display: flex; justify-content: space-between; gap: 8px; align-items: baseline; }
-.rows b { font-weight: 500; }
-.rows small { color: var(--muted); }
-.rows code { font: 500 12px var(--mono); color: var(--muted); }
+/* lists and tables */
+.list { list-style: none; margin: 0; padding: 0; }
+.list > li { display: grid; grid-template-columns: 36px minmax(0, 1fr) auto; gap: 14px; align-items: center; padding: 12px 0; border-top: 1px solid var(--border); }
+.list > li:first-child { border-top: 0; }
+.list .ico { width: 36px; height: 36px; border-radius: 8px; background: var(--surface-2); color: var(--muted); display: grid; place-items: center; }
+.list .ico.hot { background: var(--brand-soft); color: var(--brand-text); }
+.list b { display: block; font-weight: 500; color: var(--text-strong); }
+.list small { display: block; color: var(--muted); font-size: 13px; line-height: 18px; }
+.list .go { display: flex; gap: 8px; flex-wrap: wrap; justify-content: flex-end; }
+.list > li.empty { display: block; }
+table.t { width: 100%; border-collapse: collapse; font-size: 14px; }
+.t th { text-align: left; font-weight: 500; font-size: 12px; letter-spacing: 0.02em; text-transform: uppercase; color: var(--muted); padding: 8px 12px 8px 0; border-bottom: 1px solid var(--border); white-space: nowrap; }
+.t td { padding: 12px 12px 12px 0; border-bottom: 1px solid var(--border); vertical-align: top; }
+.t tr:last-child td { border-bottom: 0; }
+.t td.empty, .t td.empty:last-child { text-align: left; color: var(--muted); }
+.t td.owner { white-space: nowrap; color: var(--muted); }
+.t td:last-child, .t th:last-child { padding-right: 0; text-align: right; }
+.t .name { color: var(--text-strong); font-weight: 500; }
+.t .sub { display: block; color: var(--muted); font-size: 13px; line-height: 18px; margin-top: 2px; font-weight: 400; }
+.t code, .ref { font: 400 12.5px var(--mono); color: var(--muted); }
+.t .detail td { background: var(--surface-2); padding: 12px 16px; text-align: left; }
+.scroll { overflow-x: auto; }
 
-/* trust */
-.trust { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 2px 20px; margin: 0; }
-.trust dt { font-weight: 500; margin-top: 10px; }
-.trust dd { margin: 0; color: var(--muted); }
-.trust div { min-width: 0; }
+/* onboarding progress */
+.prog { display: flex; align-items: center; gap: 10px; color: var(--muted); font-size: 13px; white-space: nowrap; }
+.prog .bar { width: 120px; height: 6px; background: var(--bar); border-radius: 3px; overflow: hidden; }
+.prog .bar div { height: 100%; width: 0; background: var(--ok-dot); transition: width 0.4s; }
+.stepno { width: 24px; height: 24px; border-radius: 50%; border: 1.5px solid var(--border-strong); display: inline-grid; place-items: center; font-size: 12px; color: var(--muted); margin-right: 12px; flex: none; }
+.stepno.ok { background: var(--ok-dot); border-color: var(--ok-dot); color: #fff; }
+.stepcell { display: flex; align-items: flex-start; }
 
-/* assistant */
-.assist { position: sticky; top: 84px; display: flex; flex-direction: column; height: calc(100vh - 104px); min-height: 520px; }
-.assist > header .ai { display: flex; align-items: center; gap: 10px; }
-.assist > header .ai i { width: 30px; height: 30px; border-radius: 50%; background: linear-gradient(135deg, #0875E1, #3166ab); color: #fff; display: grid; place-items: center; font-style: normal; font-weight: 700; }
-.log { flex: 1; overflow-y: auto; padding: 16px 16px 8px; display: grid; gap: 12px; align-content: start; }
-.msg { display: flex; gap: 8px; max-width: 100%; }
-.msg.me { justify-content: flex-end; }
-.bub { border-radius: 14px; padding: 10px 12px; max-width: 92%; background: var(--chip); }
-.msg.me .bub { background: var(--blueberry-400); color: #fff; border-bottom-right-radius: 4px; }
-.msg.bot .bub { border-bottom-left-radius: 4px; }
-.bub p { margin: 0 0 6px; } .bub p:last-child { margin: 0; }
-.bub ul { margin: 4px 0 6px; padding-left: 18px; }
-.bub code { font: 12px var(--mono); }
-.acard { margin-top: 8px; background: var(--card); border: 1px solid var(--line); border-radius: 10px; padding: 10px 12px; }
-.acard h3 { margin: 0 0 6px; font: 500 14px var(--font); }
-.acard dl { margin: 0; display: grid; grid-template-columns: max-content minmax(0, 1fr); gap: 4px 10px; font-size: 13px; }
-.acard dt { color: var(--muted); }
-.acard dd { margin: 0; white-space: pre-wrap; }
-.acard details summary { cursor: pointer; color: var(--blueberry-500); font-size: 13px; margin-bottom: 6px; }
-.acard .acts { display: flex; gap: 6px; flex-wrap: wrap; margin-top: 10px; }
-.acard textarea { width: 100%; min-height: 110px; border: 1px solid var(--licorice-100); border-radius: 8px; padding: 8px; background: var(--input); }
-.guard { margin-top: 8px; font-size: 13px; padding: 6px 10px; border-radius: 8px; background: var(--green-100); color: var(--green-600); }
-.guard.bad { background: var(--cinnamon-100); color: var(--cinnamon-600); }
-.chips { display: flex; gap: 6px; flex-wrap: wrap; padding: 8px 16px 0; }
-.chips button { border: 1px solid var(--line); background: var(--card); border-radius: 999px; padding: 4px 10px; font-size: 12.5px; color: var(--muted); cursor: pointer; }
-.chips button:hover { color: var(--ink); border-color: var(--licorice-300); }
-.composer { display: flex; gap: 8px; padding: 12px 16px 16px; }
-.composer input { flex: 1; min-width: 0; height: 40px; border-radius: 999px; border: 1px solid var(--licorice-100); background: var(--input); padding: 0 16px; }
-.composer input:focus { outline: 2px solid var(--blueberry-400); outline-offset: 1px; }
-.foot { color: var(--muted); font-size: 12px; padding: 0 16px 12px; margin: 0; }
+/* profile and worklets */
+.prof { display: flex; gap: 14px; align-items: center; padding: 4px 0 14px; }
+.prof .big { width: 56px; height: 56px; border-radius: 50%; background: #e6f1ff; color: #3166ab; display: grid; place-items: center; font: 500 20px var(--font); flex: none; }
+.prof b { display: block; font: 500 16px/22px var(--font); color: var(--text-strong); }
+.prof span { color: var(--muted); font-size: 13px; }
+dl.kv { margin: 0; display: grid; grid-template-columns: max-content minmax(0, 1fr); gap: 8px 16px; font-size: 13px; padding-top: 12px; border-top: 1px solid var(--border); }
+dl.kv dt { color: var(--muted); } dl.kv dd { margin: 0; color: var(--text-strong); }
+.src { margin-top: 12px; font-size: 12px; color: var(--subtle); }
+.apps { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; }
+.app { display: grid; justify-items: center; gap: 8px; padding: 14px 6px 12px; border: 1px solid var(--border); border-radius: 8px; background: var(--surface); font-size: 12.5px; line-height: 16px; color: var(--text-strong); text-align: center; }
+.app:hover { border-color: var(--brand); color: var(--brand-text); }
+.app .ai { width: 36px; height: 36px; border-radius: 10px; display: grid; place-items: center; background: var(--surface-2); color: var(--muted); }
+.app:hover .ai { background: var(--brand-soft); color: var(--brand-text); }
+
+/* how it works */
+.how { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 18px 28px; padding: 4px 20px 20px; margin: 0; }
+.how div { min-width: 0; }
+.how dt { font-weight: 500; color: var(--text-strong); margin-bottom: 2px; }
+.how dd { margin: 0; color: var(--muted); font-size: 13px; line-height: 18px; }
+.legal { color: var(--subtle); font-size: 12px; margin: 16px 0 0; }
+
+/* people ops */
+.kpis { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); border-top: 1px solid var(--border); border-bottom: 1px solid var(--border); margin: 0 0 16px; }
+.kpis div { padding: 14px 16px 14px 0; }
+.kpis div + div { border-left: 1px solid var(--border); padding-left: 16px; }
+.kpis b { display: block; font: 400 28px/34px var(--font); color: var(--text-strong); font-variant-numeric: tabular-nums; }
+.kpis span { color: var(--muted); font-size: 13px; }
+.hbars { display: grid; gap: 10px; }
+.hbar { display: grid; grid-template-columns: minmax(130px, 200px) minmax(0, 1fr) 36px; gap: 12px; align-items: center; font-size: 13px; }
+.hbar .tr { height: 8px; background: var(--bar); border-radius: 4px; overflow: hidden; }
+.hbar .fl { height: 100%; background: var(--brand); border-radius: 4px; }
+.hbar .fl.gap { background: var(--warn-dot); }
+.hbar span:last-child { text-align: right; color: var(--muted); font-variant-numeric: tabular-nums; }
+.caption { color: var(--subtle); font-size: 12px; margin: 12px 0 0; }
+
+/* ---------- assistant panel ---------- */
+.panel { position: fixed; top: 64px; right: 0; bottom: 0; width: var(--panel-w); z-index: 20; background: var(--surface); border-left: 1px solid var(--border);
+  display: flex; flex-direction: column; transform: translateX(100%); transition: transform 0.2s; }
+.panel.open { transform: none; }
+.panel-h { display: flex; align-items: center; gap: 10px; padding: 14px 16px; border-bottom: 1px solid var(--border); }
+.panel-h b { width: 28px; height: 28px; border-radius: 50%; background: var(--brand); color: #fff; display: grid; place-items: center; font: 700 13px var(--font); }
+.panel-h h2 { margin: 0; font: 500 15px/20px var(--font); color: var(--text-strong); }
+.panel-h small { display: block; color: var(--muted); font-size: 12px; line-height: 16px; }
+.panel-h .ibtn { margin-left: auto; }
+.log { flex: 1; overflow-y: auto; padding: 16px; display: grid; gap: 14px; align-content: start; }
+.msg { max-width: 100%; }
+.msg.me { justify-self: end; max-width: 85%; background: var(--brand-soft); color: var(--text-strong); padding: 8px 12px; border-radius: 12px 12px 2px 12px; }
+.msg.bot { color: var(--text); }
+.msg.bot .who { font-size: 12px; color: var(--muted); margin-bottom: 4px; font-weight: 500; }
+.msg p { margin: 0 0 8px; } .msg p:last-child { margin: 0; }
+.msg ul { margin: 4px 0 8px; padding-left: 18px; } .msg li { margin: 2px 0; }
+.msg code { font: 12.5px var(--mono); }
+.tag { font: 500 11px var(--mono); color: var(--brand-text); background: var(--brand-soft); padding: 1px 4px; border-radius: 3px; }
 .typing { color: var(--muted); font-size: 13px; }
+.box { margin-top: 10px; border: 1px solid var(--border); border-radius: 8px; overflow: hidden; background: var(--surface); }
+.box h3 { margin: 0; font: 500 13px/18px var(--font); padding: 10px 12px; background: var(--surface-2); border-bottom: 1px solid var(--border); color: var(--text-strong); }
+.box dl { margin: 0; padding: 10px 12px; display: grid; grid-template-columns: max-content minmax(0, 1fr); gap: 6px 12px; font-size: 13px; }
+.box dt { color: var(--muted); } .box dd { margin: 0; white-space: pre-wrap; color: var(--text-strong); }
+.box details { padding: 0; }
+.box details summary { cursor: pointer; padding: 10px 12px; font-size: 13px; color: var(--brand-text); list-style: none; }
+.box details summary::-webkit-details-marker { display: none; }
+.box details[open] summary { border-bottom: 1px solid var(--border); }
+.box .bar2 { display: flex; gap: 8px; flex-wrap: wrap; padding: 10px 12px; border-top: 1px solid var(--border); }
+.box textarea { width: 100%; min-height: 120px; border: 1px solid var(--border-strong); border-radius: 6px; padding: 8px; background: var(--surface); }
+.guard { margin: 0 12px 10px; font-size: 12.5px; display: flex; align-items: center; gap: 6px; color: var(--ok); }
+.guard::before { content: ""; width: 8px; height: 8px; border-radius: 50%; background: var(--ok-dot); }
+.guard.bad { color: var(--bad); } .guard.bad::before { background: var(--bad-dot); }
+.try { padding: 8px 16px 0; display: flex; flex-wrap: wrap; gap: 6px 10px; font-size: 13px; color: var(--muted); }
+.try button { border: 0; background: none; padding: 0; color: var(--brand-text); font-size: 13px; }
+.try button:hover { text-decoration: underline; }
+.composer { display: flex; gap: 8px; padding: 12px 16px; }
+.composer input { flex: 1; min-width: 0; height: 40px; border-radius: 999px; border: 1px solid var(--border-strong); background: var(--surface); padding: 0 16px; }
+.composer input:focus { outline: none; border-color: var(--brand); box-shadow: 0 0 0 1px var(--brand); }
+.composer .btn { height: 40px; }
+.foot { margin: 0; padding: 0 16px 14px; color: var(--subtle); font-size: 12px; }
+.inline-key { display: flex; gap: 8px; margin-top: 12px; }
+.inline-key input { flex: 1; height: 32px; border-radius: 999px; border: 1px solid var(--border-strong); padding: 0 14px; background: var(--surface); }
 
-/* ops */
-.bars { display: grid; gap: 10px; }
-.barrow { display: grid; grid-template-columns: minmax(120px, 190px) minmax(0, 1fr) 40px; gap: 10px; align-items: center; font-size: 13px; }
-.barrow .track { height: 10px; background: var(--soap-300); border-radius: 5px; overflow: hidden; }
-.barrow .fill { height: 100%; background: var(--blueberry-400); border-radius: 5px; }
-.barrow .fill.gap { background: var(--cantaloupe-400); }
-.barrow span:last-child { text-align: right; font-variant-numeric: tabular-nums; color: var(--muted); }
-.stat3 { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px; margin-bottom: 14px; }
-.stat3 div { background: var(--soap-200); border-radius: 10px; padding: 10px 12px; }
-.stat3 b { display: block; font: 500 24px var(--font); font-variant-numeric: tabular-nums; }
-.stat3 small { color: var(--muted); }
-.note { color: var(--muted); font-size: 12px; margin: 10px 0 0; }
-
-@media (max-width: 1040px) {
-  .grid { grid-template-columns: minmax(0, 1fr); }
-  .assist { position: static; height: 640px; }
+@media (max-width: 1100px) {
+  .grid { grid-template-columns: minmax(0, 1fr) !important; }
+  .seg .long { display: none; }
+  .page.with-panel { padding-right: 0; }
+  .panel { width: min(var(--panel-w), 100vw); box-shadow: -8px 0 24px rgba(0,0,0,0.12); }
+  .how { grid-template-columns: repeat(2, minmax(0, 1fr)); }
 }
-@media (max-width: 720px) {
-  .two, .trust { grid-template-columns: minmax(0, 1fr); }
-  .search, .mark span, .mark b, .roles .long, #avatar { display: none; }
-  .nav-in { gap: 6px; }
-  .roles button { padding: 6px 10px; }
-  .hero { padding: 18px; }
-  .stat3 { grid-template-columns: minmax(0, 1fr); }
-  .inbox li { grid-template-columns: 36px minmax(0, 1fr); }
-  .inbox .acts { grid-column: 2; justify-content: flex-start; }
+@media (max-width: 680px) {
+  .search, .logo small, .ask span, .seg .long, .viewas > span { display: none; }
+  .top-in { gap: 8px; }
+  .ask { padding: 0 12px; margin-right: 0; }
+  .phead h1 { font-size: 24px; line-height: 30px; }
+  .how, .kpis { grid-template-columns: minmax(0, 1fr); }
+  .kpis div + div { border-left: 0; border-top: 1px solid var(--border); padding-left: 0; }
+  .list > li { grid-template-columns: 36px minmax(0, 1fr); }
+  .list .go { grid-column: 2; justify-content: flex-start; }
+  .t .hide-sm { display: none; }
+  .prog .bar { width: 72px; }
+  .hbar { grid-template-columns: minmax(100px, 130px) minmax(0, 1fr) 30px; }
+  .panel { width: 100vw; }
 }
 </style>
 </head>
 <body>
-<nav class="nav">
-  <div class="nav-in">
-    <a class="mark" href="/"><i>U</i><b>Unblock</b><span>Lumen Labs</span></a>
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <symbol id="i-search" viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></symbol>
+  <symbol id="i-inbox" viewBox="0 0 24 24"><path d="M4 13h4l2 3h4l2-3h4"/><path d="M5.5 5h13L20 13v6H4v-6z"/></symbol>
+  <symbol id="i-chat" viewBox="0 0 24 24"><path d="M5 5h14v10H9l-4 4z"/></symbol>
+  <symbol id="i-x" viewBox="0 0 24 24"><path d="M6 6l12 12M18 6 6 18"/></symbol>
+  <symbol id="i-check" viewBox="0 0 24 24"><path d="m5 12 4.5 4.5L19 7"/></symbol>
+  <symbol id="i-clock" viewBox="0 0 24 24"><circle cx="12" cy="12" r="8"/><path d="M12 8v4l3 2"/></symbol>
+  <symbol id="i-doc" viewBox="0 0 24 24"><path d="M7 3h7l4 4v14H7z"/><path d="M14 3v4h4"/></symbol>
+  <symbol id="i-key" viewBox="0 0 24 24"><circle cx="8" cy="15" r="4"/><path d="m11 12 8-8M16 7l2 2"/></symbol>
+  <symbol id="i-hash" viewBox="0 0 24 24"><path d="M5 9h14M5 15h14M10 4 8 20M16 4l-2 16"/></symbol>
+  <symbol id="i-cap" viewBox="0 0 24 24"><path d="m3 9 9-4 9 4-9 4z"/><path d="M7 11v4c0 1.5 2.2 3 5 3s5-1.5 5-3v-4"/></symbol>
+  <symbol id="i-cal" viewBox="0 0 24 24"><rect x="4" y="5" width="16" height="15" rx="2"/><path d="M4 10h16M9 3v4M15 3v4"/></symbol>
+  <symbol id="i-laptop" viewBox="0 0 24 24"><rect x="5" y="5" width="14" height="10" rx="1.5"/><path d="M3 19h18"/></symbol>
+  <symbol id="i-lock" viewBox="0 0 24 24"><rect x="5" y="10" width="14" height="10" rx="2"/><path d="M8 10V7a4 4 0 0 1 8 0v3"/></symbol>
+  <symbol id="i-sun" viewBox="0 0 24 24"><circle cx="12" cy="12" r="4"/><path d="M12 3v2M12 19v2M3 12h2M19 12h2M5.6 5.6 7 7M17 17l1.4 1.4M5.6 18.4 7 17M17 7l1.4-1.4"/></symbol>
+</svg>
+
+<header class="top">
+  <div class="top-in">
+    <a class="logo" href="/"><b>U</b><span>Unblock</span><small>Lumen Labs</small></a>
     <form class="search" id="search" role="search">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
-      <input id="searchIn" placeholder="Search or ask Unblock: &quot;do my checklist&quot;, &quot;how do I deploy to staging?&quot;" aria-label="Search or ask Unblock">
+      <svg class="i"><use href="#i-search"/></svg>
+      <input id="searchIn" placeholder="Search or ask a question" aria-label="Search or ask a question">
     </form>
-    <div class="navr">
-      <div class="roles" role="group" aria-label="View as">
-        <button id="rHire" aria-pressed="true">Maya<span class="long"> · new hire</span></button>
-        <button id="rMgr" aria-pressed="false">Jordan<span class="long"> · manager</span></button>
-        <button id="rOps" aria-pressed="false">Elena<span class="long"> · People Ops</span></button>
-      </div>
-      <button class="iconbtn" id="inboxBtn" aria-label="Inbox">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M4 13h4l2 3h4l2-3h4"/><path d="M5 5h14l1 8v6H4v-6z"/></svg>
-        <span class="badge" id="badge" hidden>0</span>
-      </button>
-      <div class="avatar" id="avatar">MC</div>
+    <div class="actions">
+      <button class="ask" id="askBtn" aria-pressed="false"><svg class="i"><use href="#i-chat"/></svg><span>Ask Unblock</span></button>
+      <button class="ibtn" id="inboxBtn" aria-label="Inbox"><svg class="i"><use href="#i-inbox"/></svg><span class="count" id="badge" hidden>0</span></button>
+      <div class="avatar" id="avatar" title="Maya Chen">MC</div>
     </div>
   </div>
-</nav>
+</header>
 
-<div class="wrap">
-  <section class="hero" id="hero">
-    <div><h1 id="hello">Welcome, Maya</h1><p id="heroSub">Data Analyst · Growth Insights · week 2</p></div>
-    <div class="meter" id="meter"><div class="lbl"><span>Onboarding journey</span><span id="meterTxt">0 of 6</span></div><div class="bar"><div id="meterBar"></div></div></div>
-  </section>
+<div class="page" id="page">
+  <main class="content" id="main">
+    <div class="phead">
+      <div><h1 id="hello">Good evening, Maya</h1><p id="heroSub">Data Analyst · Growth Insights</p></div>
+      <div class="viewas"><span>View as</span><div class="seg" role="group" aria-label="View as">
+        <button id="rHire" aria-pressed="true">Maya<span class="long"> (new hire)</span></button>
+        <button id="rMgr" aria-pressed="false">Jordan<span class="long"> (manager)</span></button>
+        <button id="rOps" aria-pressed="false">Elena<span class="long"> (People Ops)</span></button>
+      </div></div>
+    </div>
 
-  <div class="grid">
-    <main class="col" id="main">
-      <!-- new hire -->
-      <section class="card" data-role="hire" id="inboxCard">
-        <header><h2>Awaiting Your Action</h2><span class="sub">Unblock never acts until you approve</span></header>
-        <div class="body"><ul class="inbox" id="hireInbox"></ul></div>
-      </section>
-      <div class="two" data-role="hire">
-        <section class="card">
-          <header><h2>Onboarding Journey</h2><button class="btn sm primary" id="autoBtn">Do my checklist</button></header>
-          <div class="body"><ol class="journey" id="journey"></ol></div>
+    <!-- new hire -->
+    <div class="grid" data-role="hire">
+      <div class="col">
+        <section class="card" id="inboxCard">
+          <div class="card-h"><h2>Awaiting Your Action</h2><span class="meta" id="inboxMeta"></span></div>
+          <div class="card-b"><ul class="list" id="hireInbox"></ul></div>
         </section>
         <section class="card">
-          <header><h2>Done for You</h2><span class="sub">business process history</span></header>
-          <div class="body"><ul class="rows" id="history"><li class="empty">Nothing yet. Ask Unblock to do something, or press <b>Do my checklist</b>.</li></ul></div>
-        </section>
-      </div>
-      <div class="two" data-role="hire">
-        <section class="card">
-          <header><h2>Waiting on Others</h2><span class="sub">the Tracker follows up</span></header>
-          <div class="body"><ul class="rows" id="waiting"><li class="empty">Nothing waiting. Requests and messages you approve show up here.</li></ul></div>
+          <div class="card-h"><h2>Onboarding</h2><div style="display:flex;align-items:center;gap:16px;flex-wrap:wrap"><div class="prog"><span id="meterTxt">0 of 6 complete</span><div class="bar"><div id="meterBar"></div></div></div><button class="btn" id="autoBtn">Complete with Unblock</button></div></div>
+          <div class="card-b scroll"><table class="t"><thead><tr><th>Task</th><th class="hide-sm">Owner</th><th>Status</th><th></th></tr></thead><tbody id="journey"></tbody></table></div>
         </section>
         <section class="card">
-          <header><h2>My Profile</h2><span style="display:flex;gap:6px;flex-wrap:wrap"><span class="pill you" id="profSrc">Sample profile</span><span class="pill you" id="mcpSrc" title="Workday Agent-Ready MCP tools">Workday MCP: not connected</span></span></header>
-          <div class="body"><dl class="acard" style="border:0;padding:0;margin:0" id="profile"></dl></div>
+          <div class="card-h"><h2>Completed by Unblock</h2><span class="meta">after your approval</span></div>
+          <div class="card-b scroll"><table class="t"><thead><tr><th>Task</th><th class="hide-sm">System</th><th class="hide-sm">Reference</th><th>Status</th></tr></thead>
+            <tbody id="history"><tr><td colspan="4" class="empty">Nothing yet. Ask Unblock to do a task, or start with your onboarding checklist.</td></tr></tbody></table></div>
         </section>
       </div>
+      <div class="col">
+        <section class="card">
+          <div class="card-b" style="padding-top:20px">
+            <div class="prof"><div class="big" id="profInit">MC</div><div><b id="profName">Maya Chen</b><span id="profRole">Data Analyst</span></div></div>
+            <dl class="kv" id="profile"></dl>
+            <p class="src" id="profSrc">Profile source: sample data</p>
+          </div>
+        </section>
+        <section class="card">
+          <div class="card-h"><h2>Quick Actions</h2></div>
+          <div class="card-b"><div class="apps" id="apps">
+            <button class="app" data-q="Do my checklist"><span class="ai"><svg class="i"><use href="#i-check"/></svg></span>Onboarding checklist</button>
+            <button class="app" data-q="Can you join the Slack channels for me?"><span class="ai"><svg class="i"><use href="#i-hash"/></svg></span>Slack channels</button>
+            <button class="app" data-q="Sign me up for security awareness training"><span class="ai"><svg class="i"><use href="#i-cap"/></svg></span>Required training</button>
+            <button class="app" data-q="Can you schedule my 1:1 with my manager?"><span class="ai"><svg class="i"><use href="#i-cal"/></svg></span>Book manager 1:1</button>
+            <button class="app" data-q="My laptop screen is cracked"><span class="ai"><svg class="i"><use href="#i-laptop"/></svg></span>IT help</button>
+            <button class="app" data-q="I need access to the analytics dashboard"><span class="ai"><svg class="i"><use href="#i-lock"/></svg></span>Request access</button>
+          </div></div>
+        </section>
+        <section class="card">
+          <div class="card-h"><h2>Waiting on Others</h2></div>
+          <div class="card-b"><ul class="list" id="waiting"><li class="empty">Nothing pending. When Unblock sends something for you, it's tracked here and followed up if there's no reply.</li></ul></div>
+        </section>
+      </div>
+    </div>
 
-      <!-- manager -->
-      <section class="card" data-role="mgr" hidden>
-        <header><h2>Awaiting Your Action</h2><span class="sub">only you can approve access for your team</span></header>
-        <div class="body"><ul class="inbox" id="mgrInbox"></ul><div id="mgrKeyRow" hidden style="display:flex;gap:8px;margin-top:8px">
-          <input id="mgrKey" type="password" placeholder="Manager key" aria-label="Manager key" style="flex:1;height:36px;border-radius:999px;border:1px solid var(--licorice-100);padding:0 14px;background:var(--input)">
-          <button class="btn primary" id="mgrKeyGo">Unlock</button></div></div>
-      </section>
-      <section class="card" data-role="mgr" hidden>
-        <header><h2>My Team's New Hires</h2></header>
-        <div class="body"><ul class="rows" id="team"></ul></div>
-      </section>
-      <section class="card" data-role="mgr" hidden>
-        <header><h2>Decided</h2><span class="sub">your approval history</span></header>
-        <div class="body"><ul class="rows" id="mgrHistory"><li class="empty">No decisions yet.</li></ul></div>
-      </section>
-
-      <!-- people ops -->
-      <section class="card" data-role="ops" hidden>
-        <header><h2>Onboarding Health</h2><span class="sub" id="fmSub">last 30 days</span></header>
-        <div class="body"><div class="stat3" id="fmStats"></div><div class="bars" id="fmBars"></div>
-          <p class="note">Anonymous: topics and doc paths only, groups of 5+. Orange = a process gap with a fixable doc.</p></div>
-      </section>
-      <section class="card" data-role="ops" hidden>
-        <header><h2>Canary New Hires</h2><div style="display:flex;gap:8px"><a class="btn sm" href="/canary">Watch the walk</a><button class="btn sm primary" id="canaryRun">Run canaries</button></div></header>
-        <div class="body"><p class="empty" id="canarySub">Synthetic new hires walk the docs before real people start.</p><ul class="rows" id="walls"></ul></div>
-      </section>
-      <section class="card" data-role="ops" hidden>
-        <header><h2>Doc Fixes Awaiting Your Approval</h2><span class="sub">drafted by the CREAO Doc Steward</span></header>
-        <div class="body"><ul class="rows" id="fixes"><li class="empty">Run the canaries to draft fixes.</li></ul></div>
-      </section>
-
-      <!-- everyone -->
+    <!-- manager -->
+    <div class="col" data-role="mgr" hidden>
       <section class="card">
-        <header><h2>How Unblock Earns Your Trust</h2><span class="pill ai">Responsible AI</span></header>
-        <div class="body"><dl class="trust">
-          <div><dt>What the AI is doing</dt><dd>Every step is logged live on <a href="/activity" target="_blank" rel="noopener">Agent Activity</a>: which agent, which check, which stop.</dd></div>
-          <div><dt>Why it recommended this</dt><dd>Every claim quotes an approved doc word for word, with its date and owner. Unsupported claims are blocked before you see them.</dd></div>
-          <div><dt>What data it used</dt><dd>Your name, role, team and office from your profile, and the question. Never private messages, reviews or pay.</dd></div>
-          <div><dt>What it wants to do</dt><dd>Each action shows the system, the exact form fields and the source doc before anything happens.</dd></div>
-          <div><dt>Where you decide</dt><dd>Approve, edit or reject every message and action. Access also needs your manager.</dd></div>
-          <div><dt>What it will never do</dt><dd>Touch passwords or MFA, approve its own requests, or decide pay, performance, benefits or anyone's job.</dd></div>
-          <div><dt>When a person steps in</dt><dd>High-impact questions stop before any search and name the right person. Gated access goes to your manager.</dd></div>
-          <div><dt>When it's unsure</dt><dd>Below 60/100 confidence, or when docs disagree, it doesn't guess: it finds who to ask and drafts the message.</dd></div>
-          <div><dt>How to challenge it</dt><dd>Say "this looks wrong" (the doc owner is asked) or "wrong person" (routing learns). Fairness rotation spreads questions across qualified people.</dd></div>
-        </dl></div>
+        <div class="card-h"><h2>Awaiting Your Action</h2><span class="meta">approvals for your team</span></div>
+        <div class="card-b scroll">
+          <table class="t"><thead><tr><th>Request</th><th class="hide-sm">Requested by</th><th class="hide-sm">Received</th><th></th></tr></thead><tbody id="mgrInbox"></tbody></table>
+          <div class="inline-key" id="mgrKeyRow" hidden><input id="mgrKey" type="password" placeholder="Manager key" aria-label="Manager key"><button class="btn primary" id="mgrKeyGo">Unlock</button></div>
+        </div>
       </section>
-      <p class="note">Prototype for the Workday "Build the Future of Work with AI" challenge. Fictional company and people. Colors and type from Workday's open Canvas design tokens; not a Workday product.</p>
-    </main>
-
-    <aside class="card assist" aria-label="Unblock Assistant">
-      <header><div class="ai"><i>U</i><div><h2 style="margin:0;font:500 16px var(--font)">Unblock Assistant</h2><span class="sub">answers from approved docs · acts only with your OK</span></div></div></header>
-      <div class="log" id="log" aria-live="polite"></div>
-      <div class="chips" id="chips">
-        <button>Do my checklist</button><button>How do I deploy to staging?</button><button>Which Slack channels should I join?</button>
-        <button>My laptop screen is cracked</button><button>I need access to the analytics dashboard</button><button>How many vacation days do I get?</button>
+      <div class="grid" style="grid-template-columns:minmax(0,1fr) minmax(0,1fr)">
+        <section class="card">
+          <div class="card-h"><h2>My Team</h2><span class="meta">new hires</span></div>
+          <div class="card-b scroll"><table class="t"><thead><tr><th>Name</th><th>Onboarding</th></tr></thead><tbody id="team"></tbody></table></div>
+        </section>
+        <section class="card">
+          <div class="card-h"><h2>Recently Decided</h2></div>
+          <div class="card-b scroll"><table class="t"><thead><tr><th>Request</th><th>Decision</th></tr></thead><tbody id="mgrHistory"><tr><td colspan="2" class="empty">No decisions yet.</td></tr></tbody></table></div>
+        </section>
       </div>
-      <form class="composer" id="composer"><input id="q" autocomplete="off" placeholder="What's blocking you?" aria-label="Message Unblock"><button class="btn primary" type="submit">Send</button></form>
-      <p class="foot">The same agents run in ASI:One. Nothing is sent or done until you approve.</p>
-    </aside>
-  </div>
+    </div>
+
+    <!-- people ops -->
+    <div class="col" data-role="ops" hidden>
+      <section class="card">
+        <div class="card-h"><h2>Onboarding Health</h2><span class="meta" id="fmSub">Last 30 days</span></div>
+        <div class="card-b"><div class="kpis" id="fmStats"></div><div class="hbars" id="fmBars"></div>
+          <p class="caption">Anonymous blockers by topic: topics and doc paths only, groups of 5 or more. Orange marks a gap with a fixable doc.</p></div>
+      </section>
+      <section class="card">
+        <div class="card-h"><h2>Canary New Hires</h2><div style="display:flex;gap:8px"><a class="btn" href="/canary">View walkthrough</a><button class="btn primary" id="canaryRun">Run now</button></div></div>
+        <div class="card-b scroll"><p class="empty" id="canarySub">Synthetic new hires walk the onboarding docs before real people start.</p>
+          <table class="t"><thead><tr><th>Finding</th><th class="hide-sm">Type</th><th>Real new hires</th></tr></thead><tbody id="walls"></tbody></table></div>
+      </section>
+      <section class="card">
+        <div class="card-h"><h2>Doc Fixes to Review</h2><span class="meta">drafted by the CREAO Doc Steward</span></div>
+        <div class="card-b scroll"><table class="t"><thead><tr><th>Fix</th><th class="hide-sm">Owner</th><th>Status</th><th></th></tr></thead><tbody id="fixes"><tr><td colspan="4" class="empty">Run the canaries to draft fixes.</td></tr></tbody></table></div>
+      </section>
+    </div>
+
+    <section class="card" style="margin-top:24px">
+      <div class="card-h"><h2>How Unblock Works</h2><a class="meta" href="/activity" target="_blank" rel="noopener">View agent activity</a></div>
+      <dl class="how">
+        <div><dt>What it's doing</dt><dd>Every step by every agent is logged live on Agent Activity: which check ran and what it stopped.</dd></div>
+        <div><dt>Why it says what it says</dt><dd>Each statement quotes an approved doc word for word, with the doc's date and owner. Anything it can't quote is removed first.</dd></div>
+        <div><dt>What data it uses</dt><dd>Your name, role, team and office, and your question. Never private messages, reviews or pay.</dd></div>
+        <div><dt>Before it acts</dt><dd>It shows the system, the exact fields and the source doc. Nothing happens until you approve.</dd></div>
+        <div><dt>Where people decide</dt><dd>You approve, edit or reject every message and task. Access also needs your manager.</dd></div>
+        <div><dt>What it won't do</dt><dd>Touch passwords or MFA, approve its own requests, or decide pay, performance, benefits or anyone's job.</dd></div>
+        <div><dt>When a person steps in</dt><dd>Questions about pay, performance or HR stop before any search, and it names who to talk to.</dd></div>
+        <div><dt>When it isn't sure</dt><dd>Under 60/100 confidence, or when docs disagree, it doesn't guess. It finds who to ask and drafts the message.</dd></div>
+        <div><dt>How to correct it</dt><dd>Say "this looks wrong" to ask the doc's owner, or "wrong person" and routing learns. Questions rotate across qualified people.</dd></div>
+      </dl>
+    </section>
+    <p class="legal">Prototype for the Workday "Build the Future of Work with AI" challenge. Lumen Labs and its people are fictional. Colors and type from Workday's open Canvas design tokens; not a Workday product.</p>
+  </main>
 </div>
+
+<aside class="panel" id="panel" aria-label="Unblock">
+  <div class="panel-h"><b>U</b><div><h2>Unblock</h2><small>Answers from approved docs. Acts only with your approval.</small></div>
+    <button class="ibtn" id="closePanel" aria-label="Close"><svg class="i"><use href="#i-x"/></svg></button></div>
+  <div class="log" id="log" aria-live="polite"></div>
+  <div class="try" id="chips"><span>Try:</span><button>Do my checklist</button><button>How do I deploy to staging?</button><button>How many vacation days do I get?</button></div>
+  <form class="composer" id="composer"><input id="q" autocomplete="off" placeholder="Ask a question or describe a task" aria-label="Message Unblock"><button class="btn primary" type="submit">Send</button></form>
+  <p class="foot">The same agents run in ASI:One.</p>
+</aside>
 
 <script>
 (() => {
   const $ = id => document.getElementById(id);
   const h = (tag, cls, text) => { const e = document.createElement(tag); if (cls) e.className = cls; if (text != null) e.textContent = text; return e; };
   const esc = s => String(s == null ? "" : s).replace(/[&<>"']/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
+  const icon = name => `<svg class="i"><use href="#i-${name}"/></svg>`;
   const store = {
     get(k, d) { try { const v = localStorage.getItem(k); return v === null ? d : JSON.parse(v); } catch (e) { return d; } },
     set(k, v) { try { localStorage.setItem(k, JSON.stringify(v)); } catch (e) {} },
@@ -333,69 +403,75 @@ a { color: var(--blueberry-500); }
   let session = store.get("ub.session", null), after = store.get("ub.wd.after", 0), role = store.get("ub.wd.role", "hire");
   let mgrKey = ""; try { mgrKey = sessionStorage.getItem("ub.mkey") || ""; } catch (e) {}
   let last = null, busy = false;
-  const ICON = {
-    check: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m5 12 5 5 9-10"/></svg>',
-    clock: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="8"/><path d="M12 8v4l3 2"/></svg>',
-    doc: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M7 3h7l4 4v14H7z"/><path d="M14 3v4h4M10 12h5M10 16h5"/></svg>',
-    key: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="8" cy="15" r="4"/><path d="m11 12 8-8M16 7l2 2"/></svg>',
-  };
+  const greet = () => { const hr = new Date().getHours(); return hr < 12 ? "Good morning" : hr < 18 ? "Good afternoon" : "Good evening"; };
+  const ago = t => { if (!t) return ""; const s = Math.max(0, Date.now() / 1000 - t); return s < 60 ? "just now" : s < 3600 ? `${Math.round(s / 60)} min ago` : `${Math.round(s / 3600)} h ago`; };
 
-  // ---------- markdown-lite for assistant text ----------
+  // ---------- panel ----------
+  function setPanel(open) {
+    $("panel").classList.toggle("open", open); $("page").classList.toggle("with-panel", open && innerWidth > 1100);
+    $("askBtn").setAttribute("aria-pressed", String(open)); store.set("ub.wd.panel", open);
+    if (open) setTimeout(() => $("q").focus({ preventScroll: true }), 50);
+  }
+  $("askBtn").onclick = () => setPanel(!$("panel").classList.contains("open"));
+  $("closePanel").onclick = () => setPanel(false);
+  addEventListener("resize", () => $("page").classList.toggle("with-panel", $("panel").classList.contains("open") && innerWidth > 1100));
+
+  // ---------- assistant ----------
   function md(text) {
     const lines = esc(text).split("\n"); let out = "", inList = false;
     for (const raw of lines) {
-      const line = raw.replace(/\*\*(.+?)\*\*/g, "<b>$1</b>").replace(/`([^`]+)`/g, "<code>$1</code>").replace(/_(Mode:[^_]+)_/g, "<i>$1</i>");
+      const line = raw.replace(/\*\*(.+?)\*\*/g, "<b>$1</b>").replace(/`([^`]+)`/g, "<code>$1</code>").replace(/_(Mode:[^_]+)_/g, "<i>$1</i>")
+                      .replace(/\[(D\d{2})\]/g, '<span class="tag">$1</span>');
       if (/^\s*[-•]\s+/.test(line)) { if (!inList) { out += "<ul>"; inList = true; } out += "<li>" + line.replace(/^\s*[-•]\s+/, "") + "</li>"; continue; }
       if (inList) { out += "</ul>"; inList = false; }
       if (line.trim()) out += "<p>" + line + "</p>";
     }
     return out + (inList ? "</ul>" : "");
   }
-
-  // ---------- assistant ----------
   const log = $("log");
   function bubble(who, html, extra) {
-    const m = h("div", "msg " + who); const b = h("div", "bub");
-    if (html) b.innerHTML = html;
-    if (extra) b.appendChild(extra);
-    m.appendChild(b); log.appendChild(m); log.scrollTop = log.scrollHeight; return b;
+    const m = h("div", "msg " + who);
+    if (who === "bot") m.appendChild(h("div", "who", "Unblock"));
+    const b = h("div"); if (html) b.innerHTML = html; m.appendChild(b);
+    if (extra) m.appendChild(extra);
+    log.appendChild(m); log.scrollTop = log.scrollHeight; return m;
   }
   function disable(el) { el.querySelectorAll("button, textarea").forEach(x => x.disabled = true); }
   function cardEl(payload, kind, live) {
-    const c = h("div", "acard"); c.appendChild(h("h3", "", payload.title || ""));
+    const c = h("div", "box"); c.appendChild(h("h3", "", payload.title || ""));
     if (payload.summary_rows && payload.summary_rows.length) {
       const d = h("details"); if (payload.approve_cta) d.open = true;
-      d.appendChild(h("summary", "", kind === "detail" ? "Why you can trust this" : "Details"));
+      d.appendChild(h("summary", "", kind === "detail" ? "Sources and confidence" : "Details"));
       const dl = h("dl"); for (const r of payload.summary_rows) dl.append(h("dt", "", r.label), h("dd", "", r.value)); d.appendChild(dl); c.appendChild(d);
     }
     const ctas = [payload.approve_cta, ...(payload.ctas || []), payload.reject_cta].filter(x => x && x.selection);
     if (ctas.length && live) {
-      const a = h("div", "acts");
-      for (const x of ctas) { const btn = h("button", "btn sm" + (x.primary ? " primary" : ""), x.label); btn.onclick = () => { disable(c); send("", x.selection, x.label); }; a.appendChild(btn); }
+      const a = h("div", "bar2");
+      for (const x of ctas) { const btn = h("button", "btn" + (x.primary ? " primary" : ""), x.label); btn.onclick = () => { disable(c); send("", x.selection, x.label); }; a.appendChild(btn); }
       c.appendChild(a);
     }
     return c;
   }
   function draftEl(d, live) {
-    const c = h("div", "acard");
-    const label = { message_helper: "Message", book_1_1: "1:1 invite", access_request: "Access request to your manager", doc_owner_note: "Note to the doc owner" }[d.type] || "Message";
-    c.appendChild(h("h3", "", "Review before it's sent · " + label));
-    const dl = h("dl"); dl.append(h("dt", "", "To"), h("dd", "", d.to_name + (d.to_role ? " · " + d.to_role : "")), h("dt", "", "Subject"), h("dd", "", d.subject));
+    const c = h("div", "box");
+    const label = { message_helper: "Message", book_1_1: "1:1 invite", access_request: "Request to your manager", doc_owner_note: "Note to the doc owner" }[d.type] || "Message";
+    c.appendChild(h("h3", "", "Review before sending · " + label));
+    const dl = h("dl"); dl.append(h("dt", "", "To"), h("dd", "", d.to_name + (d.to_role ? ", " + d.to_role : "")), h("dt", "", "Subject"), h("dd", "", d.subject));
     const body = h("dd", "", d.body); dl.append(h("dt", "", "Message"), body); c.appendChild(dl);
     const bad = d.guardian && d.guardian.length;
-    c.appendChild(h("div", "guard" + (bad ? " bad" : ""), bad ? "Guardian blocked: " + d.guardian.join("; ") + ". Edit to remove it." : "Guardian: clear. No secrets, personal data, pay, performance or health details."));
+    c.appendChild(h("div", "guard" + (bad ? " bad" : ""), bad ? "Blocked: " + d.guardian.join("; ") + ". Edit it to remove that." : "Checked: no passwords, IDs, pay, performance or health details."));
     if (live) {
-      const a = h("div", "acts");
-      const ok = h("button", "btn sm primary", "Approve and send"); ok.disabled = !!bad;
-      const ed = h("button", "btn sm", "Edit"), no = h("button", "btn sm danger", "Reject");
+      const a = h("div", "bar2");
+      const ok = h("button", "btn primary", "Approve and send"); ok.disabled = !!bad;
+      const ed = h("button", "btn", "Edit"), no = h("button", "btn danger", "Reject");
       ok.onclick = () => { disable(c); send("", { action: "ub_approve" }, "Approve"); };
       no.onclick = () => { disable(c); send("", { action: "ub_reject" }, "Reject"); };
       ed.onclick = () => {
-        const ta = h("textarea"); ta.value = d.body; body.replaceWith(ta); ta.focus(); ok.disabled = true; ed.textContent = "Save edit";
+        const ta = h("textarea"); ta.value = d.body; body.replaceWith(ta); ta.focus(); ok.disabled = true; ed.textContent = "Save";
         ed.onclick = () => { const v = ta.value.trim(); if (v) { disable(c); send("edit: " + v, null, "Edited the message"); } };
       };
       a.append(ok, ed, no);
-      if (d.type === "message_helper") { const wp = h("button", "btn sm", "Wrong person"); wp.onclick = () => { disable(c); send("", { action: "ub_wrong_person" }, "Wrong person"); }; a.append(wp); }
+      if (d.type === "message_helper") { const wp = h("button", "btn", "Wrong person"); wp.onclick = () => { disable(c); send("", { action: "ub_wrong_person" }, "Wrong person"); }; a.append(wp); }
       c.appendChild(a);
     }
     return c;
@@ -403,7 +479,8 @@ a { color: var(--blueberry-500); }
   function renderBot(r) {
     let text = r.text || "";
     if (r.draft) { const cut = text.search(/\n\s*I drafted this /); if (cut > 0) text = text.slice(0, cut); text = text.replace(/\*\*Guardian stopped this draft:\*\*[^\n]*\n?/, ""); }
-    text = text.replace(/\n*Reply \*\*approve\*\*[^\n]*$/, "").replace(/\n*Nothing happens until you reply \*\*approve\*\* \(or \*\*reject\*\*\)\.?/, "");
+    text = text.replace(/\n*Reply \*\*approve\*\*[^\n]*$/, "").replace(/\n*Nothing happens until you reply \*\*approve\*\* \(or \*\*reject\*\*\)\.?/, "")
+               .replace(/\n*_Mode: extractive[^\n]*_/, "");
     const extra = r.draft ? draftEl(r.draft, true) : r.payload ? cardEl(r.payload, r.kind, true) : null;
     bubble("bot", md(text), extra);
   }
@@ -414,27 +491,28 @@ a { color: var(--blueberry-500); }
   async function send(text, selection, shown) {
     if (busy) return; busy = true;
     if (role !== "hire") setRole("hire");
+    setPanel(true);
     bubble("me", esc(shown || text));
-    const t = bubble("bot", '<span class="typing">Unblock is checking the docs…</span>');
+    const t = bubble("bot", '<span class="typing">Checking the docs…</span>');
     try {
       await ensureSession();
       const res = await fetch("/api/portal/chat", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ session, text, selection }) });
-      t.parentElement.remove();
+      t.remove();
       if (!res.ok) { const e = await res.json().catch(() => ({})); bubble("bot", md(e.detail || "Something went wrong. Nothing was sent.")); }
       else renderBot(await res.json());
-    } catch (e) { t.parentElement.remove(); bubble("bot", md("I couldn't reach Unblock. Nothing was sent.")); }
+    } catch (e) { t.remove(); bubble("bot", md("Unblock isn't reachable right now. Nothing was sent.")); }
     busy = false; poll();
   }
   async function remind(itemId, doSend) {
-    if (role !== "hire") setRole("hire");
+    setPanel(true);
     const res = await fetch("/api/portal/remind", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ session, item_id: itemId, send: doSend }) });
     const r = await res.json();
     if (!r.draft) { bubble("bot", md(r.text)); poll(); return; }
-    const c = h("div", "acard"); c.appendChild(h("h3", "", "Review before it's sent · Reminder"));
+    const c = h("div", "box"); c.appendChild(h("h3", "", "Review before sending · Reminder"));
     const dl = h("dl"); dl.append(h("dt", "", "To"), h("dd", "", r.draft.to_name), h("dt", "", "Subject"), h("dd", "", r.draft.subject), h("dt", "", "Message"), h("dd", "", r.draft.body)); c.appendChild(dl);
     const bad = r.draft.guardian && r.draft.guardian.length;
-    c.appendChild(h("div", "guard" + (bad ? " bad" : ""), bad ? "Guardian blocked: " + r.draft.guardian.join("; ") : "Guardian: clear."));
-    const a = h("div", "acts"); const ok = h("button", "btn sm primary", "Approve and send"); ok.disabled = !!bad; const no = h("button", "btn sm", "Not now");
+    c.appendChild(h("div", "guard" + (bad ? " bad" : ""), bad ? "Blocked: " + r.draft.guardian.join("; ") : "Checked: nothing sensitive."));
+    const a = h("div", "bar2"); const ok = h("button", "btn primary", "Approve and send"); ok.disabled = !!bad; const no = h("button", "btn", "Not now");
     ok.onclick = () => { disable(c); bubble("me", "Approve"); remind(itemId, true); }; no.onclick = () => disable(c);
     a.append(ok, no); c.appendChild(a); bubble("bot", md(r.text), c);
   }
@@ -442,85 +520,86 @@ a { color: var(--blueberry-500); }
   $("search").onsubmit = e => { e.preventDefault(); const v = $("searchIn").value.trim(); if (v) { $("searchIn").value = ""; send(v); } };
   $("chips").onclick = e => { if (e.target.tagName === "BUTTON") send(e.target.textContent); };
   $("autoBtn").onclick = () => send("Do my checklist");
+  $("apps").onclick = e => { const b = e.target.closest(".app"); if (b) send(b.dataset.q, null, b.dataset.q); };
 
-  // ---------- new hire home ----------
-  function inboxItem(icon, warn, title, sub, buttons) {
-    const li = h("li"); const ic = h("div", "ic" + (warn ? " warn" : "")); ic.innerHTML = ICON[icon]; li.appendChild(ic);
+  // ---------- new hire ----------
+  function inboxItem(ic, hot, title, sub, buttons) {
+    const li = h("li"); const i = h("div", "ico" + (hot ? " hot" : "")); i.innerHTML = icon(ic); li.appendChild(i);
     const t = h("div"); t.append(h("b", "", title), h("small", "", sub)); li.appendChild(t);
-    const a = h("div", "acts"); for (const b of buttons) a.appendChild(b); li.appendChild(a); return li;
+    const a = h("div", "go"); for (const b of buttons) a.appendChild(b); li.appendChild(a); return li;
   }
+  function btn(label, cls, fn) { const b = h("button", "btn" + (cls ? " " + cls : ""), label); b.onclick = fn; return b; }
   function renderHire(s) {
     last = s;
-    const p = s.profile;
-    $("hello").textContent = `Welcome, ${p.name.split(" ")[0]}`;
-    $("heroSub").textContent = [p.role, p.team, p.office ? p.office + " office" : ""].filter(Boolean).join(" · ");
+    const p = s.profile, first = p.name.split(" ")[0];
+    $("hello").textContent = `${greet()}, ${first}`;
+    $("heroSub").textContent = [new Date().toLocaleDateString([], { weekday: "long", month: "long", day: "numeric" }), [p.role, p.team].filter(Boolean).join(", ")].join(" · ");
     const done = s.checklist_done || [], waiting = s.checklist_waiting || [], doable = s.checklist_doable || [];
-    $("meterTxt").textContent = `${done.length} of ${s.checklist.length} done`;
+    $("meterTxt").textContent = `${done.length} of ${s.checklist.length} complete`;
     $("meterBar").style.width = (s.checklist.length ? 100 * done.length / s.checklist.length : 0) + "%";
 
-    // Awaiting your action: the pending review, reminders from the Tracker, and the next doable step
     const inbox = $("hireInbox"); inbox.replaceChildren(); let count = 0;
     if (s.awaiting_you) {
       const a = s.awaiting_you; count++;
-      const what = { system_action: "Action ready for your approval", system_batch: "Checklist plan ready for your approval", access_request: "Access request ready to send to your manager",
-                     message_helper: "Message ready for your approval", book_1_1: "1:1 invite ready for your approval", doc_owner_note: "Note to a doc owner ready" }[a.type] || "Ready for your approval";
-      const ok = h("button", "btn sm primary", "Approve"); ok.disabled = a.blocked; ok.onclick = () => send("", { action: "ub_approve" }, "Approve");
-      const no = h("button", "btn sm", "Reject"); no.onclick = () => send("", { action: "ub_reject" }, "Reject");
-      inbox.appendChild(inboxItem("check", a.blocked, what, (a.title || "") + (a.to ? " · " + a.to : "") + (a.blocked ? " · Guardian blocked it" : ""), [ok, no]));
+      const what = { system_action: "Approve a task", system_batch: "Approve your onboarding plan", access_request: "Review a request to your manager",
+                     message_helper: "Review a message", book_1_1: "Review a 1:1 invite", doc_owner_note: "Review a note to a doc owner", workday_action: "Approve a Workday task" }[a.type] || "Review";
+      inbox.appendChild(inboxItem("check", true, what, (a.title || "") + (a.to ? " · " + a.to : "") + (a.blocked ? " · blocked: remove the sensitive detail" : ""),
+        [btn("Review", "", () => setPanel(true)), Object.assign(btn("Approve", "primary", () => send("", { action: "ub_approve" }, "Approve")), { disabled: a.blocked })]));
     }
     for (const f of s.followups.filter(f => f.nudged && f.status === "waiting")) {
       count++;
-      const b = h("button", "btn sm", "Show reminder"); b.onclick = () => remind(f.id, false);
-      inbox.appendChild(inboxItem("clock", true, `No reply yet from ${f.to}`, `${f.kind} · sent ${f.age} ago · the Tracker drafted a reminder`, [b]));
+      inbox.appendChild(inboxItem("clock", false, `No reply from ${f.to}`, `${f.kind} · sent ${f.age} ago`, [btn("Send a reminder", "", () => remind(f.id, false))]));
     }
     const nextIdx = doable.find(i => !waiting.includes(i));
     if (nextIdx != null && !s.awaiting_you) {
       count++;
-      const b = h("button", "btn sm primary", "Do it for me"); b.onclick = () => send("Do my checklist");
-      inbox.appendChild(inboxItem("doc", false, "Onboarding step Unblock can do for you", s.checklist[nextIdx].replace(/\.$/, ""), [b]));
+      inbox.appendChild(inboxItem("doc", false, "Onboarding tasks Unblock can complete", s.checklist[nextIdx].replace(/\.$/, "") + (doable.length > 1 ? ` and ${doable.length - 1} more` : ""),
+        [btn("Start", "primary", () => send("Do my checklist"))]));
     }
     if (!inbox.children.length) inbox.appendChild(h("li", "empty", "You're all caught up."));
+    $("inboxMeta").textContent = count ? `${count} item${count > 1 ? "s" : ""}` : "";
     const badge = $("badge"); badge.hidden = !count; badge.textContent = count;
 
-    // Journey
     const j = $("journey"); j.replaceChildren();
     s.checklist.forEach((step, i) => {
       const st = done.includes(i) ? "done" : waiting.includes(i) ? "wait" : doable.includes(i) ? "todo" : "you";
-      const li = h("li", st); const dot = h("div", "dot", st === "done" ? "✓" : String(i + 1));
-      const t = h("div"); t.append(h("div", "t", step.replace(/\.$/, "")),
-        h("small", "", { done: "Done by Unblock", wait: "With your manager", todo: "Unblock can do this", you: /multi-factor/i.test(step) ? "You: Unblock never touches MFA" : "You, with IT on day one" }[st]));
-      const pill = h("span", "pill " + st, { done: "Done", wait: "Waiting", todo: "Ready", you: "Yours" }[st]);
-      li.append(dot, t, pill); j.appendChild(li);
+      const tr = h("tr");
+      const td1 = h("td"); const cell = h("div", "stepcell"); const no = h("span", "stepno" + (st === "done" ? " ok" : ""), st === "done" ? "✓" : String(i + 1));
+      const tx = h("div"); tx.appendChild(h("span", "name", step.replace(/\.$/, "")));
+      if (st === "you") tx.appendChild(h("span", "sub", /multi-factor/i.test(step) ? "Unblock never handles passwords or MFA" : "Done with IT in person"));
+      cell.append(no, tx); td1.appendChild(cell);
+      const owner = h("td", "hide-sm owner", { done: "Unblock", wait: "Jordan Lee", todo: "Unblock", you: /multi-factor/i.test(step) ? "You" : "IT" }[st]);
+      const status = h("td"); status.appendChild(h("span", "st " + { done: "ok", wait: "warn", todo: "info", you: "" }[st], { done: "Completed", wait: "Waiting for approval", todo: "Ready", you: "Not started" }[st]));
+      const act = h("td");
+      if (st === "todo") act.appendChild(btn("Complete", "link", () => send("Do my checklist")));
+      else if (st === "you") act.appendChild(btn("How to", "link", () => send("How do I " + step.charAt(0).toLowerCase() + step.slice(1).replace(/\.$/, "") + "?")));
+      tr.append(td1, owner, status, act); j.appendChild(tr);
     });
 
-    // History
     const hist = $("history");
     if ((s.done_for_you || []).length) hist.replaceChildren(...s.done_for_you.map(r => {
-      const li = h("li"); const top = h("div", "top"); top.append(h("b", "", r.title), h("span", "pill " + (r.status === "done" ? "done" : "wait"), r.status));
-      li.append(top, h("small", "", r.detail)); const c = h("code", "", `${r.id} · ${r.system}`); li.appendChild(c); return li;
+      const tr = h("tr"); const td = h("td"); td.appendChild(h("span", "name", r.title)); td.appendChild(h("span", "sub", r.detail));
+      const st = h("td"); st.appendChild(h("span", "st " + (r.status === "done" ? "ok" : "warn"), { done: "Completed", processing: "In progress", open: "Open", submitted: "Submitted" }[r.status] || r.status));
+      tr.append(td, h("td", "hide-sm", r.system), Object.assign(h("td", "hide-sm"), { innerHTML: `<code>${esc(r.id)}</code>` }), st); return tr;
     }));
 
-    // Waiting on others
     const items = [];
-    for (const r of s.requests) items.push([`${r.request_id}: ${r.category}`, `To your manager · ${r.subject || ""}`, r.status === "pending" ? "waiting" : r.status]);
-    for (const f of s.followups) if (!f.id.startsWith("AR-")) items.push([`${f.kind} to ${f.to}`, `"${f.summary}" · ${f.age} ago${f.nudged ? " · reminder offered" : ""}`, f.status]);
-    if (items.length) $("waiting").replaceChildren(...items.map(([t, sub, st]) => {
-      const li = h("li"); const top = h("div", "top"); top.append(h("b", "", t), h("span", "pill " + (/approved|done|answered/.test(st) ? "done" : /rejected/.test(st) ? "bad" : "wait"), st));
-      li.append(top, h("small", "", sub)); return li;
+    for (const r of s.requests) items.push(["key", `${r.category} request`, `${r.request_id} · to your manager`, r.status === "pending" ? ["warn", "Pending"] : r.status === "approved" ? ["ok", "Approved"] : ["bad", "Denied"]]);
+    for (const f of s.followups) if (!f.id.startsWith("AR-")) items.push(["clock", `${f.kind.replace(/^your /, "").replace(/^./, c => c.toUpperCase())} to ${f.to}`, `"${f.summary}" · ${f.age} ago`, f.status === "waiting" ? ["warn", f.nudged ? "Reminder offered" : "Waiting"] : ["ok", "Answered"]]);
+    if (items.length) $("waiting").replaceChildren(...items.map(([ic, t, sub, [cls, label]]) => {
+      const li = h("li"); const i = h("div", "ico"); i.innerHTML = icon(ic); const tx = h("div"); tx.append(h("b", "", t), h("small", "", sub));
+      const g = h("div", "go"); g.appendChild(h("span", "st " + cls, label)); li.append(i, tx, g); return li;
     }));
 
-    // Profile
+    $("profInit").textContent = $("avatar").textContent = p.name.split(" ").map(x => x[0]).join("").slice(0, 2);
+    $("profName").textContent = p.name; $("profRole").textContent = p.role;
     const prof = $("profile"); prof.replaceChildren();
-    for (const [k, v] of [["Name", p.name], ["Job title", p.role], ["Team", p.team], ["Manager", p.manager], ["Office", p.office]]) if (v) prof.append(h("dt", "", k), h("dd", "", v));
-    $("profSrc").textContent = p.source === "Workday" ? "From Workday" : "Sample profile";
-    $("profSrc").className = "pill " + (p.source === "Workday" ? "done" : "you");
-    const mcp = p.workday_mcp || "not connected";
-    $("mcpSrc").textContent = "Workday MCP: " + mcp; $("mcpSrc").className = "pill " + (/^connected/.test(mcp) ? "done" : "you");
+    for (const [k, v] of [["Team", p.team], ["Manager", p.manager], ["Location", p.office ? p.office + " office" : ""]]) if (v) prof.append(h("dt", "", k), h("dd", "", v));
+    $("profSrc").textContent = `Profile source: ${p.source === "Workday" ? "Workday" : "sample data"} · Workday tools: ${p.workday_mcp || "not connected"}`;
 
-    // Messages from the manager or the Tracker arrive in the assistant
     for (const m of s.inbox || []) {
       after = Math.max(after, m.id);
-      bubble("bot", md((m.from === "manager" ? "**From your manager's approval agent:** " : m.from === "tracker" ? "**Tracker:** " : "") + m.text));
+      bubble("bot", md((m.from === "manager" ? "**Update from your manager's approval:** " : m.from === "tracker" ? "**Follow-up:** " : "") + m.text));
     }
     store.set("ub.wd.after", after);
   }
@@ -531,45 +610,46 @@ a { color: var(--blueberry-500); }
     try { res = await fetch("/api/portal/manager", { headers: { "X-Manager-Key": mgrKey } }); } catch (e) { return; }
     $("mgrKeyRow").hidden = res.status !== 403;
     const inbox = $("mgrInbox"); inbox.replaceChildren();
-    if (res.status === 403) { inbox.appendChild(h("li", "empty", "Enter the manager key to see your team's requests.")); return; }
+    if (res.status === 403) { inbox.appendChild(Object.assign(h("tr"), { innerHTML: '<td colspan="4" class="empty">Enter the manager key to see your team\'s requests.</td>' })); return; }
     const list = await res.json();
     const pending = list.filter(r => r.status === "pending"), decided = list.filter(r => r.status !== "pending");
     $("badge").hidden = !pending.length; $("badge").textContent = pending.length;
-    if (!pending.length) inbox.appendChild(h("li", "empty", "Nothing is waiting for you."));
+    if (!pending.length) inbox.appendChild(Object.assign(h("tr"), { innerHTML: '<td colspan="4" class="empty">Nothing is waiting for you.</td>' }));
     for (const r of pending) {
-      const li = h("li"); li.style.alignItems = "start";
-      const ic = h("div", "ic"); ic.innerHTML = ICON.key; li.appendChild(ic);
-      const t = h("div"); t.append(h("b", "", `${r.request_id}: ${r.category} for ${r.requester ? r.requester.name : "a new hire"}`),
-        h("small", "", r.subject || ""));
-      if (r.body) { const d = h("details"); d.append(h("summary", "", "Message and evidence")); d.append(h("p", "", r.body));
-        if ((r.evidence || []).length) { const ul = h("ul"); for (const e of r.evidence) ul.appendChild(h("li", "", e)); d.appendChild(ul); } t.appendChild(d); }
+      const tr = h("tr"); const td = h("td"); td.appendChild(h("span", "name", `${r.category.replace(/^./, c => c.toUpperCase())} request`));
+      td.appendChild(h("span", "sub", `${r.request_id} · ${r.subject || ""}`));
+      const toggle = btn("Details", "link", () => { detail.hidden = !detail.hidden; }); toggle.style.marginTop = "4px"; td.appendChild(toggle);
+      const act = h("td"); act.style.whiteSpace = "nowrap";
+      const detail = h("tr", "detail"); detail.hidden = true;
+      const dtd = h("td"); dtd.colSpan = 4;
+      dtd.appendChild(h("p", "", r.body || "")); dtd.lastChild.style.margin = "0 0 8px"; dtd.lastChild.style.whiteSpace = "pre-wrap";
+      if ((r.evidence || []).length) { dtd.appendChild(h("div", "sub", "From the approved docs:")); const ul = h("ul"); ul.style.margin = "4px 0 8px"; for (const e of r.evidence) ul.appendChild(h("li", "", e)); dtd.appendChild(ul); }
       const note = h("input"); note.placeholder = "Comment (optional)"; note.setAttribute("aria-label", "Comment");
-      note.style.cssText = "width:100%;margin-top:8px;height:32px;border-radius:999px;border:1px solid var(--licorice-100);padding:0 12px;background:var(--input)";
-      t.appendChild(note); li.appendChild(t);
-      const a = h("div", "acts");
-      for (const [label, decision, cls] of [["Approve", "approved", "btn sm primary"], ["Deny", "rejected", "btn sm danger"]]) {
-        const b = h("button", cls, label);
-        b.onclick = async () => {
-          a.querySelectorAll("button").forEach(x => x.disabled = true);
+      note.style.cssText = "width:100%;max-width:520px;height:32px;border-radius:999px;border:1px solid var(--border-strong);padding:0 14px;background:var(--surface)";
+      dtd.appendChild(note); detail.appendChild(dtd);
+      for (const [label, decision, cls] of [["Approve", "approved", "primary"], ["Deny", "rejected", "danger"]]) {
+        const b = btn(label, cls, async () => {
+          act.querySelectorAll("button").forEach(x => x.disabled = true);
           await fetch("/api/portal/decide", { method: "POST", headers: { "Content-Type": "application/json", "X-Manager-Key": mgrKey },
             body: JSON.stringify({ request_id: r.request_id, decision, note: note.value.trim() }) });
           renderMgr();
-        };
-        a.appendChild(b);
+        });
+        b.style.marginLeft = "8px"; act.appendChild(b);
       }
-      li.appendChild(a); inbox.appendChild(li);
+      tr.append(td, h("td", "hide-sm owner", r.requester ? r.requester.name : ""), h("td", "hide-sm owner", ago(r.created)), act);
+      inbox.append(tr, detail);
     }
-    $("mgrHistory").replaceChildren(...(decided.length ? decided.map(r => {
-      const li = h("li"); const top = h("div", "top"); top.append(h("b", "", `${r.request_id}: ${r.category}`), h("span", "pill " + (r.status === "approved" ? "done" : "bad"), r.status));
-      li.append(top, h("small", "", (r.requester ? r.requester.name + " · " : "") + (r.note ? `"${r.note}"` : "no comment")));
-      if (r.status === "approved" && /analytics/.test(r.category)) li.appendChild(h("small", "", "Unblock filed the go/analytics-access form automatically after your approval."));
-      return li;
-    }) : [h("li", "empty", "No decisions yet.")]));
+    $("mgrHistory").replaceChildren(...(decided.length ? decided.slice(0, 6).map(r => {
+      const tr = h("tr"); const td = h("td"); td.appendChild(h("span", "name", `${r.category.replace(/^./, c => c.toUpperCase())} · ${r.requester ? r.requester.name : ""}`));
+      td.appendChild(h("span", "sub", r.request_id + (r.status === "approved" && /analytics/.test(r.category) ? " · form filed by Unblock" : "")));
+      const st = h("td"); st.appendChild(h("span", "st " + (r.status === "approved" ? "ok" : "bad"), r.status === "approved" ? "Approved" : "Denied"));
+      tr.append(td, st); return tr;
+    }) : [Object.assign(h("tr"), { innerHTML: '<td colspan="2" class="empty">No decisions yet.</td>' })]));
     if (last) {
-      const done = (last.checklist_done || []).length;
-      $("team").replaceChildren((() => { const li = h("li"); const top = h("div", "top");
-        top.append(h("b", "", `${last.profile.name} · ${last.profile.role}`), h("span", "pill todo", `${done} of ${last.checklist.length} steps`));
-        li.append(top, h("small", "", `${(last.done_for_you || []).length} tasks done by Unblock · ${pending.length} waiting for you`)); return li; })());
+      const done = (last.checklist_done || []).length, tr = h("tr"), td = h("td");
+      td.appendChild(h("span", "name", last.profile.name)); td.appendChild(h("span", "sub", `${last.profile.role} · ${(last.done_for_you || []).length} tasks completed by Unblock`));
+      const pg = h("td"); pg.innerHTML = `<span class="st ${done === last.checklist.length ? "ok" : "info"}">${done} of ${last.checklist.length}</span>`;
+      tr.append(td, pg); $("team").replaceChildren(tr);
     }
   }
   $("mgrKeyGo").onclick = () => { mgrKey = $("mgrKey").value; try { sessionStorage.setItem("ub.mkey", mgrKey); } catch (e) {} renderMgr(); };
@@ -578,43 +658,39 @@ a { color: var(--blueberry-500); }
   async function renderOps() {
     try {
       const fm = await (await fetch("/api/friction")).json();
-      $("fmSub").textContent = `last ${fm.window_days} days · ${fm.storage}`;
-      $("fmStats").replaceChildren(...[[fm.total_blockers, "blockers"], [Math.round(fm.resolved_without_ticket_share * 100) + "%", "resolved without a ticket"], [fm.process_gaps, "process gaps"]]
-        .map(([v, l]) => { const d = h("div"); d.append(h("b", "", v), h("small", "", l)); return d; }));
+      $("fmSub").textContent = `Last ${fm.window_days} days · ${/Tiger/.test(fm.storage) ? "Tiger Data" : "local data"}`;
+      $("fmStats").replaceChildren(...[[fm.total_blockers, "Blockers reported"], [Math.round(fm.resolved_without_ticket_share * 100) + "%", "Resolved without a ticket"], [fm.process_gaps, "Process gaps found"]]
+        .map(([v, l]) => { const d = h("div"); d.append(h("b", "", v), h("span", "", l)); return d; }));
       const max = Math.max(1, ...fm.clusters.map(c => c.count));
       $("fmBars").replaceChildren(...fm.clusters.slice(0, 7).map(c => {
-        const row = h("div", "barrow"); row.title = c.pattern || "";
-        const tr = h("div", "track"); const f = h("div", "fill" + (c.fixable ? " gap" : "")); f.style.width = (100 * c.count / max) + "%"; tr.appendChild(f);
-        row.append(h("span", "", c.topic), tr, h("span", "", c.count)); return row;
+        const row = h("div", "hbar"); row.title = c.pattern || "";
+        const tr = h("div", "tr"); const f = h("div", "fl" + (c.fixable ? " gap" : "")); f.style.width = (100 * c.count / max) + "%"; tr.appendChild(f);
+        row.append(h("span", "", c.topic.replace(/^./, x => x.toUpperCase())), tr, h("span", "", c.count)); return row;
       }));
       const run = await (await fetch("/api/canary/latest")).json();
       if (run.status === "none") { $("canarySub").textContent = "No run yet. Synthetic new hires walk the docs before real people start."; return; }
       const sm = run.summary || {};
-      $("canarySub").textContent = run.status === "running" ? "The canaries are walking the docs now…"
-        : `${run.run_id}: ${sm.walls} walls · ${sm.confirmed} already hit by real hires · ${sm.predicted} predicted · about ${(sm.minutes_saved_per_cohort / 60).toFixed(1)} hours saved per 3-person cohort (estimate)`;
+      $("canarySub").textContent = run.status === "running" ? "Running now…"
+        : `Last run ${run.run_id}: ${sm.walls} findings from 3 synthetic new hires. Estimated time saved for a 3-person cohort: ${(sm.minutes_saved_per_cohort / 60).toFixed(1)} hours.`;
       $("walls").replaceChildren(...(run.walls || []).map(w => {
-        const li = h("li"); const top = h("div", "top"); top.append(h("b", "", w.label), h("span", "pill " + (w.predicted ? "wait" : "todo"), w.predicted ? "Predicted" : `Confirmed · ${w.humans_hit} real blockers`));
-        li.append(top, h("small", "", w.headline)); return li;
+        const tr = h("tr"); const td = h("td"); td.appendChild(h("span", "name", w.headline)); td.appendChild(h("span", "sub", "Found by " + w.canaries.join(", ")));
+        const rh = h("td"); rh.appendChild(h("span", "st " + (w.predicted ? "warn" : "info"), w.predicted ? "Not reported yet" : `${w.humans_hit} reported`));
+        tr.append(td, h("td", "hide-sm owner", w.label), rh); return tr;
       }));
       if ((run.fixes || []).length) $("fixes").replaceChildren(...run.fixes.map(f => {
-        const li = h("li"); const top = h("div", "top");
-        top.append(h("b", "", `${f.id} · ${{ edit: "One-line edit", archive: "Archive note", write: "Writing request" }[f.kind]} → ${f.to.name}`),
-          h("span", "pill " + (f.status === "sent" ? "done" : f.status === "ready" ? "todo" : "wait"), f.status));
-        li.appendChild(top);
-        if (f.doc_title) li.appendChild(h("small", "", f.doc_title));
-        if (f.after) li.appendChild(h("small", "", (f.before ? "Adds: " : "") + f.after));
-        if (f.status === "ready") {
-          const b = h("button", "btn sm primary", "Send to " + f.to.name.split(" ")[0]); b.style.justifySelf = "start"; b.style.marginTop = "6px";
-          b.onclick = async () => {
-            b.disabled = true;
-            const go = () => fetch("/api/canary/approve", { method: "POST", headers: { "Content-Type": "application/json", "X-Manager-Key": mgrKey }, body: JSON.stringify({ run_id: run.run_id, fix_id: f.id }) });
-            let r = await go();
-            if (r.status === 403) { mgrKey = prompt("People Ops key (the portal's manager key):") || ""; try { sessionStorage.setItem("ub.mkey", mgrKey); } catch (e) {} r = await go(); }
-            renderOps();
-          };
-          li.appendChild(b);
-        }
-        return li;
+        const tr = h("tr"); const td = h("td");
+        td.appendChild(h("span", "name", `${f.id} · ${{ edit: "Edit", archive: "Archive note", write: "Writing request" }[f.kind]}${f.doc_title ? " · " + f.doc_title : ""}`));
+        if (f.after) td.appendChild(h("span", "sub", f.after));
+        const st = h("td"); st.appendChild(h("span", "st " + (f.status === "sent" ? "ok" : f.status === "ready" ? "info" : "warn"), { sent: "Sent", ready: "Ready to send", drafting: "Drafting", blocked: "Blocked" }[f.status] || f.status));
+        const act = h("td");
+        if (f.status === "ready") act.appendChild(btn("Send", "primary", async ev => {
+          ev.target.disabled = true;
+          const go = () => fetch("/api/canary/approve", { method: "POST", headers: { "Content-Type": "application/json", "X-Manager-Key": mgrKey }, body: JSON.stringify({ run_id: run.run_id, fix_id: f.id }) });
+          let r = await go();
+          if (r.status === 403) { mgrKey = prompt("People Ops key:") || ""; try { sessionStorage.setItem("ub.mkey", mgrKey); } catch (e) {} r = await go(); }
+          renderOps();
+        }));
+        tr.append(td, h("td", "hide-sm owner", f.to.name), st, act); return tr;
       }));
       if (run.status === "running") setTimeout(renderOps, 1500);
     } catch (e) {}
@@ -626,31 +702,30 @@ a { color: var(--blueberry-500); }
     $("canaryRun").disabled = false; renderOps();
   };
 
-  // ---------- roles ----------
-  const ROLES = { hire: ["rHire", "MC", "Maya"], mgr: ["rMgr", "JL", "Jordan"], ops: ["rOps", "EG", "Elena"] };
+  // ---------- views ----------
+  const ROLES = { hire: ["rHire", "MC"], mgr: ["rMgr", "JL"], ops: ["rOps", "EG"] };
   function setRole(r) {
     role = r; store.set("ub.wd.role", r);
     for (const [k, [id]] of Object.entries(ROLES)) $(id).setAttribute("aria-pressed", String(k === r));
     document.querySelectorAll("[data-role]").forEach(el => el.hidden = el.dataset.role !== r);
     $("avatar").textContent = ROLES[r][1];
-    $("meter").hidden = r !== "hire";
-    if (r === "mgr") { $("hello").textContent = "Welcome, Jordan"; $("heroSub").textContent = "Analytics Manager · Growth Insights · 1 new hire ramping"; renderMgr(); }
-    if (r === "ops") { $("hello").textContent = "Welcome, Elena"; $("heroSub").textContent = "People Operations Partner · onboarding health for Lumen Labs"; renderOps(); }
+    if (r === "mgr") { $("hello").textContent = `${greet()}, Jordan`; $("heroSub").textContent = "Analytics Manager, Growth Insights · 1 new hire onboarding"; renderMgr(); }
+    if (r === "ops") { $("hello").textContent = `${greet()}, Elena`; $("heroSub").textContent = "People Operations Partner · Onboarding across Lumen Labs"; renderOps(); }
     if (r === "hire") poll();
   }
   $("rHire").onclick = () => setRole("hire"); $("rMgr").onclick = () => setRole("mgr"); $("rOps").onclick = () => setRole("ops");
-  $("inboxBtn").onclick = () => (document.querySelector(`[data-role="${role}"]`) || $("main")).scrollIntoView({ behavior: "smooth", block: "start" });
+  $("inboxBtn").onclick = () => { window.scrollTo({ top: 0, behavior: "smooth" }); };
 
   async function poll() {
     if (!session) await ensureSession();
     try {
       const r = await fetch(`/api/portal/state?session=${encodeURIComponent(session)}&after=${after}`);
-      if (r.ok) { const s = await r.json(); renderHireIfShown(s); }
+      if (r.ok) { const s = await r.json(); if (role === "hire") renderHire(s); else last = s; }
     } catch (e) {}
   }
-  function renderHireIfShown(s) { if (role === "hire") renderHire(s); else last = s; }
 
-  bubble("bot", md("Hi, I'm **Unblock**, your onboarding buddy. I answer only from approved Lumen Labs docs and show my sources, and I can **do** onboarding tasks for you: join your Slack channels, enroll you in training, book your 1:1, open IT tickets. I always show you first and act only when you approve.\n\nTry **Do my checklist**."));
+  bubble("bot", md("Hi, I'm Unblock. I answer from Lumen Labs' approved docs and show where each answer comes from. I can also complete onboarding tasks for you, like joining your Slack channels or booking your first 1:1. I'll always show you what I'm about to do first."));
+  setPanel(store.get("ub.wd.panel", innerWidth > 1100));
   setRole(role);
   setInterval(() => { if (role === "hire") poll(); else if (role === "mgr") renderMgr(); }, 4000);
 })();

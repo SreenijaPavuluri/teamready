@@ -34,13 +34,13 @@ def shot(target, name, full=False):
 FOCUS_ON = """(keep) => {
   const msgs = [...document.querySelectorAll('#log .msg')];
   msgs.forEach((m, i) => { m.dataset.hid = m.style.display; if (i < msgs.length - keep) m.style.display = 'none'; });
-  const a = document.querySelector('aside.assist'); a.dataset.css = a.getAttribute('style') || '';
+  const a = document.querySelector('aside.panel'); a.dataset.css = a.getAttribute('style') || '';
   a.style.height = 'auto'; a.style.position = 'static'; document.getElementById('log').style.overflow = 'visible';
   document.getElementById('chips').style.display = 'none';
 }"""
 FOCUS_OFF = """() => {
   document.querySelectorAll('#log .msg').forEach(m => m.style.display = m.dataset.hid || '');
-  const a = document.querySelector('aside.assist'); a.setAttribute('style', a.dataset.css);
+  const a = document.querySelector('aside.panel'); a.setAttribute('style', a.dataset.css);
   document.getElementById('log').style.overflow = ''; document.getElementById('chips').style.display = '';
 }"""
 
@@ -49,7 +49,7 @@ def chat_shot(page, name, keep=2):
     """The latest exchange in full (the question and the whole reply), not a cropped scroll window."""
     page.evaluate(FOCUS_ON, keep)
     page.wait_for_timeout(300)
-    page.locator("aside.assist").screenshot(path=str(OUT / f"{name}.png"))
+    page.locator("aside.panel").screenshot(path=str(OUT / f"{name}.png"))
     page.evaluate(FOCUS_OFF)
     print("saved", name + ".png", flush=True)
 
@@ -79,7 +79,7 @@ with sync_playwright() as p:
     browser = p.chromium.launch(channel="chrome", headless=True)
     ctx = browser.new_context(viewport={"width": 1440, "height": 900}, device_scale_factor=2, color_scheme="light")
     page = ctx.new_page()
-    assist = page.locator("aside.assist")
+    assist = page.locator("aside.panel")
 
     page.goto(BASE + "/")
     page.wait_for_timeout(1500)
@@ -139,7 +139,7 @@ with sync_playwright() as p:
     say(page, "Can the AI decide whether I deserve a promotion?")
     chat_shot(page, "13_high_impact_stopped_person_named")
 
-    trust = page.locator("section.card", has_text="How Unblock Earns Your Trust")
+    trust = page.locator("section.card", has_text="How Unblock Works")
     trust.scroll_into_view_if_needed()
     shot(trust, "14_trust_card")
 
