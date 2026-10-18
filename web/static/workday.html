@@ -4,405 +4,410 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>Unblock for Workday</title>
-<meta name="description" content="A new hire's first 90 days in a Workday-style home: Unblock does the onboarding work, and a person approves every action.">
+<meta name="description" content="A new hire's onboarding home: Unblock does the onboarding work, and a person approves every action.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&family=Roboto+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
 <style>
-/* Layout: a navy band carrying the new hire's 90-day track, then one white working sheet (what needs you, the
-   checklist, what Unblock finished) beside a quiet rail (profile, things to ask for, what's pending with others).
-   Colors and type follow Workday's open Canvas tokens. Prototype; not a Workday product. */
 :root {
-  --paper: #f3f5f8; --sheet: #ffffff; --rule: #e1e5ea; --rule-2: #cfd6dd;
-  --ink: #1f262e; --ink-2: #4a5561; --ink-3: #7a8591;
-  --brand: #0875e1; --brand-hover: #005cb9; --brand-tint: #e8f2fd; --brand-ink: #005cb9;
-  --band: #0b2d55; --band-ink: #ffffff; --band-2: rgba(255, 255, 255, 0.72); --band-3: rgba(255, 255, 255, 0.22);
-  --ok: #217a37; --ok-dot: #319c4c; --warn: #9a5700; --warn-dot: #f0a12c;
-  --bad: #a31b12; --bad-dot: #de2e21; --bar: #e6eaee; --avatar: #dbe8f8; --avatar-ink: #1c4f8a;
-  --shadow: 0 1px 2px rgba(15, 35, 60, 0.05), 0 4px 16px rgba(15, 35, 60, 0.06);
-  --focus: 0 0 0 2px var(--sheet), 0 0 0 4px var(--brand);
-  --font: "Roboto", system-ui, -apple-system, "Segoe UI", sans-serif; --mono: "Roboto Mono", ui-monospace, Menlo, monospace;
-  --panel-w: 400px;
+  --bg: #f3f5f9; --card: #ffffff; --line: #e5e9f0; --line-2: #d4dae4; --soft: #f1f4f8; --soft-2: #e9edf3;
+  --ink: #0f1a2c; --ink-2: #4a586e; --ink-3: #7c889d;
+  --blue: #0b5bd3; --blue-h: #094cb2; --blue-tint: #ebf3ff; --blue-tint-2: #dbe9ff; --blue-ink: #0b5bd3;
+  --green: #17864a; --green-dot: #22a35a; --green-tint: #e5f6ec;
+  --amber: #9a5a00; --amber-dot: #f0a020; --amber-tint: #fff4e0;
+  --red: #c5281c; --red-dot: #e5484d; --red-tint: #fdecea;
+  --nav: #13213a; --nav-2: #1f2f4c; --nav-3: #2a3d5e; --nav-mute: rgba(255, 255, 255, 0.62);
+  --logo: #f6b600; --logo-ink: #13213a;
+  --shadow: 0 1px 2px rgba(16, 30, 54, 0.04), 0 8px 24px rgba(16, 30, 54, 0.05);
+  --shadow-hi: 0 2px 4px rgba(16, 30, 54, 0.05), 0 14px 32px rgba(16, 30, 54, 0.09);
+  --font: "Plus Jakarta Sans", ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
+  --mono: "JetBrains Mono", ui-monospace, Menlo, monospace;
 }
 @media (prefers-color-scheme: dark) {
   :root:not([data-theme="light"]) {
-    --paper: #0f141a; --sheet: #171d25; --rule: #273039; --rule-2: #36404b;
-    --ink: #eef1f4; --ink-2: #b3bcc6; --ink-3: #8691a0;
-    --brand: #3d93ea; --brand-hover: #64a9f0; --brand-tint: #16304d; --brand-ink: #8cc0f5;
-    --band: #0a2240; --ok: #74d18f; --warn: #f2b664; --bad: #f28b81; --bar: #273039; --avatar: #1d3756; --avatar-ink: #a9cdf5;
-    --shadow: 0 1px 2px rgba(0, 0, 0, 0.3), 0 4px 16px rgba(0, 0, 0, 0.25); color-scheme: dark;
+    --bg: #0a0f18; --card: #121925; --line: #212b3a; --line-2: #2e3a4d; --soft: #19212f; --soft-2: #212b3b;
+    --ink: #e9eef6; --ink-2: #aab5c7; --ink-3: #7d899e;
+    --blue: #3a7cf0; --blue-h: #5b93f5; --blue-tint: #14233f; --blue-tint-2: #1b2f54; --blue-ink: #8db4ff;
+    --green: #5cc98a; --green-tint: #11291c; --amber: #f2b85e; --amber-tint: #2e230f; --red: #ff8a80; --red-tint: #361614;
+    --nav: #0b1322; --nav-2: #18243a; --nav-3: #23324d;
+    --shadow: 0 1px 2px rgba(0, 0, 0, 0.3), 0 8px 24px rgba(0, 0, 0, 0.25); --shadow-hi: 0 2px 4px rgba(0, 0, 0, 0.35), 0 14px 32px rgba(0, 0, 0, 0.35);
+    color-scheme: dark;
   }
 }
 :root[data-theme="dark"] {
-  --paper: #0f141a; --sheet: #171d25; --rule: #273039; --rule-2: #36404b;
-  --ink: #eef1f4; --ink-2: #b3bcc6; --ink-3: #8691a0;
-  --brand: #3d93ea; --brand-hover: #64a9f0; --brand-tint: #16304d; --brand-ink: #8cc0f5;
-  --band: #0a2240; --ok: #74d18f; --warn: #f2b664; --bad: #f28b81; --bar: #273039; --avatar: #1d3756; --avatar-ink: #a9cdf5;
-  --shadow: 0 1px 2px rgba(0, 0, 0, 0.3), 0 4px 16px rgba(0, 0, 0, 0.25); color-scheme: dark;
+  --bg: #0a0f18; --card: #121925; --line: #212b3a; --line-2: #2e3a4d; --soft: #19212f; --soft-2: #212b3b;
+  --ink: #e9eef6; --ink-2: #aab5c7; --ink-3: #7d899e;
+  --blue: #3a7cf0; --blue-h: #5b93f5; --blue-tint: #14233f; --blue-tint-2: #1b2f54; --blue-ink: #8db4ff;
+  --green: #5cc98a; --green-tint: #11291c; --amber: #f2b85e; --amber-tint: #2e230f; --red: #ff8a80; --red-tint: #361614;
+  --nav: #0b1322; --nav-2: #18243a; --nav-3: #23324d;
+  --shadow: 0 1px 2px rgba(0, 0, 0, 0.3), 0 8px 24px rgba(0, 0, 0, 0.25); --shadow-hi: 0 2px 4px rgba(0, 0, 0, 0.35), 0 14px 32px rgba(0, 0, 0, 0.35);
+  color-scheme: dark;
 }
 * { box-sizing: border-box; }
 [hidden] { display: none !important; }
 html, body { margin: 0; }
-body { background: var(--paper); color: var(--ink); font: 400 14px/20px var(--font); overflow-wrap: anywhere; -webkit-font-smoothing: antialiased; }
+body { background: var(--bg); color: var(--ink); font: 400 14px/1.5 var(--font); -webkit-font-smoothing: antialiased; overflow-wrap: anywhere; }
 button, input, textarea { font: inherit; color: inherit; }
 button { cursor: pointer; }
-a { color: var(--brand-ink); text-decoration: none; }
+a { color: var(--blue-ink); text-decoration: none; }
 a:hover { text-decoration: underline; }
-:focus-visible { outline: none; box-shadow: var(--focus); border-radius: 6px; }
-svg.i { width: 20px; height: 20px; flex: none; stroke: currentColor; fill: none; stroke-width: 1.75; stroke-linecap: round; stroke-linejoin: round; }
-@media (prefers-reduced-motion: reduce) { * { transition: none !important; } }
-.wrap { max-width: 1200px; margin: 0 auto; padding-left: max(24px, env(safe-area-inset-left, 0px)); padding-right: max(24px, env(safe-area-inset-right, 0px)); }
+:focus-visible { outline: 2px solid var(--blue); outline-offset: 2px; }
+svg.i { width: 18px; height: 18px; flex: none; stroke: currentColor; fill: none; stroke-width: 1.9; stroke-linecap: round; stroke-linejoin: round; }
+@media (prefers-reduced-motion: reduce) { * { transition: none !important; scroll-behavior: auto !important; } }
+.wrap { max-width: 1320px; margin: 0 auto; padding-left: max(24px, env(safe-area-inset-left, 0px)); padding-right: max(24px, env(safe-area-inset-right, 0px)); }
 
-/* header */
-.top { position: sticky; top: env(safe-area-inset-top, 0px); z-index: 30; background: var(--sheet); border-bottom: 1px solid var(--rule); }
-.top .wrap { max-width: none; height: 60px; display: flex; align-items: center; gap: 18px; }
-.logo { display: flex; align-items: center; gap: 10px; color: var(--ink); flex: none; }
+/* ---------- top bar ---------- */
+.top { position: sticky; top: env(safe-area-inset-top, 0px); z-index: 30; background: var(--nav); color: #fff; }
+.top .wrap { height: 64px; display: flex; align-items: center; gap: 20px; }
+.logo { display: flex; align-items: center; gap: 10px; color: #fff; flex: none; }
 .logo:hover { text-decoration: none; }
-.logo b { width: 30px; height: 30px; border-radius: 50%; background: var(--brand); color: #fff; display: grid; place-items: center; font: 700 15px var(--font); }
-.logo span { font-size: 16px; font-weight: 500; }
-.logo small { color: var(--ink-3); font-size: 13px; padding-left: 10px; border-left: 1px solid var(--rule); }
-.search { flex: 1; max-width: 480px; position: relative; margin-left: 8px; }
-.search svg { position: absolute; left: 14px; top: 10px; color: var(--ink-3); }
-.search input { width: 100%; height: 40px; border: 1px solid transparent; border-radius: 999px; background: var(--paper); padding: 0 16px 0 44px; }
-.search input:focus { outline: none; background: var(--sheet); border-color: var(--brand); }
-.tools { margin-left: auto; display: flex; align-items: center; gap: 4px; }
-.ask { display: inline-flex; align-items: center; gap: 8px; height: 36px; padding: 0 14px; border-radius: 999px; border: 0; background: var(--brand); color: #fff; font-weight: 500; margin-right: 8px; }
-.ask:hover { background: var(--brand-hover); }
-.ask[aria-pressed="true"] { background: var(--brand-tint); color: var(--brand-ink); }
-.ibtn { position: relative; width: 40px; height: 40px; border: 0; border-radius: 50%; background: transparent; color: var(--ink-2); display: grid; place-items: center; }
-.ibtn:hover { background: var(--paper); color: var(--ink); }
-.count { position: absolute; top: 4px; right: 3px; min-width: 16px; height: 16px; padding: 0 4px; border-radius: 8px; background: var(--bad-dot); color: #fff; font: 700 10px/16px var(--font); text-align: center; box-shadow: 0 0 0 2px var(--sheet); }
-.me { width: 32px; height: 32px; border-radius: 50%; background: var(--avatar); color: var(--avatar-ink); display: grid; place-items: center; font: 500 13px var(--font); margin-left: 4px; }
+.logo b { width: 34px; height: 34px; border-radius: 10px; background: var(--logo); color: var(--logo-ink); display: grid; place-items: center; font: 800 17px var(--font); }
+.logo span { font: 700 17px/1 var(--font); letter-spacing: -0.01em; }
+.logo small { display: block; font: 500 12px/1 var(--font); color: var(--nav-mute); margin-top: 4px; }
+.search { flex: 1; max-width: 460px; position: relative; }
+.search svg { position: absolute; left: 14px; top: 11px; color: var(--nav-mute); }
+.search input { width: 100%; height: 40px; border: 1px solid transparent; border-radius: 12px; background: var(--nav-2); color: #fff; padding: 0 14px 0 42px; }
+.search input::placeholder { color: var(--nav-mute); }
+.search input:focus { outline: none; border-color: rgba(255, 255, 255, 0.35); background: var(--nav-3); }
+.right { margin-left: auto; display: flex; align-items: center; gap: 12px; }
+.roles { display: inline-flex; padding: 4px; border-radius: 12px; background: var(--nav-2); }
+.roles button { border: 0; background: transparent; border-radius: 9px; padding: 7px 12px; font-size: 13px; font-weight: 600; color: var(--nav-mute); white-space: nowrap; }
+.roles button:hover { color: #fff; }
+.roles button span { font-weight: 500; opacity: 0.8; }
+.roles button[aria-pressed="true"] { background: #fff; color: var(--nav); box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2); }
+.askb { display: none; }
+.mebtn { position: relative; width: 38px; height: 38px; border-radius: 50%; border: 0; background: var(--blue); color: #fff; display: grid; place-items: center; font: 700 13px var(--font); }
+.count { position: absolute; top: -3px; right: -3px; min-width: 18px; height: 18px; padding: 0 5px; border-radius: 9px; background: var(--red-dot); color: #fff; font: 700 10.5px/18px var(--font); text-align: center; box-shadow: 0 0 0 2px var(--nav); }
 
-.page { transition: padding-right 0.2s; }
-.page.with-panel { padding-right: var(--panel-w); }
+/* ---------- layout ---------- */
+.shell { display: grid; grid-template-columns: minmax(0, 1fr) 390px; gap: 24px; align-items: start; padding-block: 24px 40px; }
+.shell.solo { grid-template-columns: minmax(0, 1fr); }
+.main { display: grid; gap: 20px; min-width: 0; }
+.stack { display: grid; gap: 20px; min-width: 0; }
+.duo { display: grid; grid-template-columns: minmax(0, 1.25fr) minmax(0, 1fr); gap: 20px; align-items: start; }
+.duo > * { min-width: 0; }
 
-/* band: the one bold element */
-.band { background: var(--band); color: var(--band-ink); }
-.band .wrap { padding-block: 28px 64px; }
-.band-top { display: flex; flex-wrap: wrap; gap: 12px 24px; align-items: flex-start; justify-content: space-between; }
-.band h1 { margin: 0; font: 400 30px/38px var(--font); letter-spacing: -0.01em; text-wrap: balance; }
-.band p { margin: 4px 0 0; color: var(--band-2); }
-.viewas { display: flex; align-items: center; gap: 10px; color: var(--band-2); font-size: 13px; }
-.seg { display: inline-flex; border-radius: 999px; padding: 3px; background: rgba(255, 255, 255, 0.1); }
-.seg button { border: 0; background: transparent; border-radius: 999px; padding: 5px 14px; font-size: 13px; font-weight: 500; color: var(--band-2); }
-.seg button[aria-pressed="true"] { background: #fff; color: #0b2d55; }
-.track { margin-top: 26px; padding-top: 30px; }
-.track .line { position: relative; height: 4px; border-radius: 2px; background: var(--band-3); }
-.track .fill { position: absolute; left: 0; top: 0; bottom: 0; border-radius: 2px; background: #fff; }
-.track .today { position: absolute; top: -28px; transform: translateX(-50%); white-space: nowrap; font: 500 12px/16px var(--font); }
-.track .today::after { content: ""; position: absolute; left: 50%; top: 22px; width: 12px; height: 12px; margin-left: -6px; border-radius: 50%; background: #fff; box-shadow: 0 0 0 4px rgba(255, 255, 255, 0.25); }
-.track .ticks { position: relative; height: 34px; margin-top: 14px; }
-.track .tick { position: absolute; transform: translateX(-50%); text-align: center; font-size: 12px; line-height: 16px; color: var(--band-2); white-space: nowrap; }
-.track .tick b { display: block; color: #fff; font-weight: 500; }
-.track .tick.first { transform: none; text-align: left; }
-.track .tick.last { transform: translateX(-100%); text-align: right; }
-.track .tick.due b { color: #ffd38a; }
-.kpis { margin-top: 24px; display: flex; flex-wrap: wrap; row-gap: 12px; }
-.kpis div { padding-right: 32px; margin-right: 32px; border-right: 1px solid var(--band-3); }
-.kpis div:last-child { border-right: 0; }
-.kpis b { display: block; font: 400 32px/38px var(--font); font-variant-numeric: tabular-nums; }
-.kpis span { color: var(--band-2); font-size: 13px; }
+/* ---------- hero ---------- */
+.hero { position: relative; overflow: hidden; border-radius: 24px; color: #fff; padding: 32px 36px;
+  background: linear-gradient(118deg, #0a4fc4 0%, #0d63e0 48%, #22a3ec 100%); box-shadow: 0 10px 30px rgba(11, 91, 211, 0.22); }
+.hero::before, .hero::after { content: ""; position: absolute; border-radius: 50%; pointer-events: none; }
+.hero::before { width: 380px; height: 380px; right: -90px; top: -150px; background: rgba(255, 255, 255, 0.09); }
+.hero::after { width: 240px; height: 240px; right: 140px; bottom: -150px; background: rgba(255, 255, 255, 0.07); }
+.hero-in { position: relative; z-index: 1; display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 24px 40px; align-items: end; }
+.hero .eyebrow { font-size: 14px; font-weight: 500; color: rgba(255, 255, 255, 0.82); margin: 0; }
+.hero h1 { margin: 6px 0 0; font: 800 40px/1.1 var(--font); letter-spacing: -0.025em; text-wrap: balance; }
+.hero .sub { margin: 8px 0 0; font-size: 16px; color: rgba(255, 255, 255, 0.86); }
+.meter { margin-top: 26px; max-width: 560px; }
+.meter .lbl { display: flex; justify-content: space-between; gap: 12px; font-size: 13.5px; font-weight: 600; }
+.meter .lbl span:last-child { color: rgba(255, 255, 255, 0.82); font-weight: 500; }
+.meter .tr { margin-top: 10px; height: 10px; border-radius: 999px; background: rgba(255, 255, 255, 0.22); overflow: hidden; }
+.meter .fl { height: 100%; width: 0; border-radius: 999px; background: #fff; transition: width 0.5s ease; }
+.glass { min-width: 260px; padding: 16px 18px; border-radius: 16px; background: rgba(255, 255, 255, 0.13); border: 1px solid rgba(255, 255, 255, 0.2); backdrop-filter: blur(6px); }
+.glass dl { margin: 0; display: grid; grid-template-columns: max-content minmax(0, 1fr); gap: 8px 18px; font-size: 13px; }
+.glass dt { color: rgba(255, 255, 255, 0.72); }
+.glass dd { margin: 0; font-weight: 600; }
+.glass p { margin: 10px 0 0; padding-top: 10px; border-top: 1px solid rgba(255, 255, 255, 0.16); font-size: 11.5px; color: rgba(255, 255, 255, 0.7); }
+.kpis { position: relative; z-index: 1; margin-top: 26px; display: flex; flex-wrap: wrap; gap: 12px; }
+.kpis div { min-width: 150px; padding: 14px 18px; border-radius: 16px; background: rgba(255, 255, 255, 0.13); border: 1px solid rgba(255, 255, 255, 0.18); }
+.kpis b { display: block; font: 800 28px/1.1 var(--font); letter-spacing: -0.02em; font-variant-numeric: tabular-nums; }
+.kpis span { font-size: 12.5px; color: rgba(255, 255, 255, 0.8); }
 
-/* body */
-.body { display: grid; grid-template-columns: minmax(0, 1fr) 320px; gap: 28px; align-items: start; padding-block: 0 28px; margin-top: -40px; }
-.sheet { background: var(--sheet); border-radius: 10px; box-shadow: var(--shadow); min-width: 0; }
-.sec { padding: 24px 28px; }
-.sec + .sec { border-top: 1px solid var(--rule); }
-.sec-h { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 6px 16px; margin-bottom: 14px; }
-.sec-h h2 { margin: 0; font: 500 18px/24px var(--font); }
-.sec-h .meta { color: var(--ink-3); font-size: 13px; }
-.rail { display: grid; gap: 28px; min-width: 0; padding-top: 52px; }
-.rail h3 { margin: 0 0 10px; font: 500 12px/16px var(--font); letter-spacing: 0.06em; text-transform: uppercase; color: var(--ink-3); }
-.empty { color: var(--ink-3); margin: 0; padding: 4px 0; }
-.btn { display: inline-flex; align-items: center; gap: 6px; height: 32px; padding: 0 16px; border-radius: 999px; border: 1px solid var(--rule-2); background: var(--sheet); color: var(--ink); font-weight: 500; font-size: 13px; white-space: nowrap; }
-.btn:hover { border-color: var(--ink); }
-.btn.primary { background: var(--brand); border-color: var(--brand); color: #fff; }
-.btn.primary:hover { background: var(--brand-hover); border-color: var(--brand-hover); }
-.btn.danger { color: var(--bad); }
-.btn.link { border: 0; background: none; padding: 0; height: auto; color: var(--brand-ink); }
+/* ---------- cards ---------- */
+.card { background: var(--card); border: 1px solid var(--line); border-radius: 20px; box-shadow: var(--shadow); padding: 24px 26px; min-width: 0; }
+.card-h { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 8px 16px; margin-bottom: 18px; }
+.card-h h2 { margin: 0; font: 700 19px/1.25 var(--font); letter-spacing: -0.015em; }
+.card-h .meta { color: var(--ink-3); font-size: 13px; }
+.card-h .end { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+.btn { display: inline-flex; align-items: center; justify-content: center; gap: 6px; height: 38px; padding: 0 18px; border-radius: 999px; border: 1px solid var(--line-2); background: var(--card); color: var(--ink); font-weight: 600; font-size: 13.5px; white-space: nowrap; transition: background 0.15s, border-color 0.15s, color 0.15s; }
+.btn:hover { border-color: var(--ink-3); }
+.btn.primary { background: var(--blue); border-color: var(--blue); color: #fff; box-shadow: 0 2px 6px rgba(11, 91, 211, 0.25); }
+.btn.primary:hover { background: var(--blue-h); border-color: var(--blue-h); }
+.btn.tint { background: var(--blue-tint); border-color: transparent; color: var(--blue-ink); }
+.btn.tint:hover { background: var(--blue-tint-2); }
+.btn.danger { color: var(--red); }
+.btn.sm { height: 32px; padding: 0 14px; font-size: 13px; }
+.btn.link { border: 0; background: none; padding: 0; height: auto; color: var(--blue-ink); box-shadow: none; }
 .btn.link:hover { text-decoration: underline; }
 .btn:disabled { opacity: 0.45; cursor: default; }
+.empty-box { border: 1.5px dashed var(--line-2); border-radius: 14px; padding: 22px; text-align: center; color: var(--ink-3); font-size: 13.5px; }
+.empty-box b { display: block; color: var(--ink-2); font-weight: 600; margin-bottom: 2px; }
+.muted { color: var(--ink-3); margin: 0; }
+.pill { display: inline-flex; align-items: center; gap: 6px; height: 26px; padding: 0 11px; border-radius: 999px; font-size: 12px; font-weight: 600; white-space: nowrap; background: var(--soft-2); color: var(--ink-2); }
+.pill.blue { background: var(--blue-tint); color: var(--blue-ink); }
+.pill.green { background: var(--green-tint); color: var(--green); }
+.pill.amber { background: var(--amber-tint); color: var(--amber); }
+.pill.red { background: var(--red-tint); color: var(--red); }
 
-.need { list-style: none; margin: 0; padding: 0; display: grid; gap: 10px; }
-.need li { display: grid; grid-template-columns: 40px minmax(0, 1fr) auto; gap: 14px; align-items: center; padding: 14px 16px; border-radius: 8px; background: var(--brand-tint); }
-.need li.calm { background: var(--paper); }
-.need .ico { width: 40px; height: 40px; border-radius: 50%; background: var(--sheet); color: var(--brand-ink); display: grid; place-items: center; }
-.need b { display: block; font-weight: 500; }
-.need small { display: block; color: var(--ink-2); font-size: 13px; line-height: 18px; }
-.need .go { display: flex; gap: 8px; flex-wrap: wrap; justify-content: flex-end; }
-.need li.done { background: none; padding: 4px 0; display: block; color: var(--ink-3); }
+/* awaiting tiles */
+.tiles { list-style: none; margin: 0; padding: 0; display: grid; gap: 12px; }
+.tile { position: relative; padding: 18px 20px 18px 24px; border-radius: 14px; background: var(--blue-tint); overflow: hidden; }
+.tile::before { content: ""; position: absolute; left: 0; top: 0; bottom: 0; width: 4px; background: var(--blue); }
+.tile.calm { background: var(--soft); }
+.tile.calm::before { background: var(--amber-dot); }
+.tile .ey { font-size: 11.5px; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; color: var(--blue-ink); }
+.tile.calm .ey { color: var(--amber); }
+.tile h3 { margin: 6px 0 0; font: 700 17px/1.35 var(--font); letter-spacing: -0.01em; text-wrap: pretty; }
+.tile .sub { margin: 4px 0 0; color: var(--ink-2); font-size: 13.5px; }
+.tile .foot { margin-top: 14px; display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 12px; }
+.tile .go { display: flex; flex-wrap: wrap; gap: 8px; margin-left: auto; }
+.guard { display: inline-flex; align-items: center; gap: 8px; font-size: 13px; color: var(--ink-2); }
+.guard::before { content: ""; width: 8px; height: 8px; border-radius: 50%; background: var(--green-dot); box-shadow: 0 0 0 3px var(--green-tint); flex: none; }
+.guard.bad { color: var(--red); } .guard.bad::before { background: var(--red-dot); box-shadow: 0 0 0 3px var(--red-tint); }
+.tile .detail { margin-top: 14px; padding: 14px; border-radius: 12px; background: var(--card); font-size: 13.5px; }
+.tile .detail p { margin: 0 0 10px; white-space: pre-wrap; }
+.tile .detail ul { margin: 4px 0 10px; padding-left: 18px; color: var(--ink-2); }
+.tile .detail input { width: 100%; height: 38px; border-radius: 10px; border: 1px solid var(--line-2); padding: 0 12px; background: var(--card); }
+.inline-key { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 12px; }
+.inline-key input { flex: 1; min-width: 0; max-width: 320px; height: 38px; border-radius: 999px; border: 1px solid var(--line-2); padding: 0 16px; background: var(--card); }
 
-.steps { list-style: none; margin: 0; padding: 0; }
-.steps li { display: grid; grid-template-columns: 28px minmax(0, 1fr) 28px 140px; gap: 14px; align-items: center; padding: 12px 0; border-top: 1px solid var(--rule); }
-.steps li:first-child { border-top: 0; }
-.mark { width: 28px; height: 28px; border-radius: 50%; display: grid; place-items: center; border: 1.5px solid var(--rule-2); color: var(--ink-3); font: 500 12px var(--font); }
-.mark.ok { background: var(--ok-dot); border-color: var(--ok-dot); color: #fff; }
-.mark.wait { border-color: var(--warn-dot); color: var(--warn); }
-.mark.todo { border-color: var(--brand); color: var(--brand-ink); }
-.mark svg { width: 14px; height: 14px; stroke-width: 2.5; }
-.steps .txt b { font-weight: 500; display: block; }
-.steps .txt small { color: var(--ink-3); font-size: 13px; }
+/* journey */
+.steps { list-style: none; margin: 0 -12px; padding: 0; }
+.steps li { position: relative; display: grid; grid-template-columns: 36px minmax(0, 1fr) auto; gap: 16px; align-items: center; padding: 14px 12px; border-radius: 14px; transition: background 0.15s; }
+.steps li + li::before { content: ""; position: absolute; left: 12px; right: 12px; top: 0; height: 1px; background: var(--line); }
+.steps li:hover { background: var(--soft); }
+.steps li:hover::before, .steps li:hover + li::before { opacity: 0; }
+.num { width: 36px; height: 36px; border-radius: 50%; display: grid; place-items: center; background: var(--soft-2); color: var(--ink-2); font: 700 14px var(--font); }
+.num.ok { background: var(--green-dot); color: #fff; }
+.num.wait { background: var(--amber-tint); color: var(--amber); }
+.num.todo { background: var(--blue-tint); color: var(--blue-ink); }
+.num svg { width: 16px; height: 16px; stroke-width: 2.6; }
+.steps .txt b { display: block; font-weight: 700; font-size: 15px; letter-spacing: -0.005em; }
+.steps .txt small { display: block; margin-top: 2px; color: var(--ink-3); font-size: 13px; }
 .steps li.isdone .txt b { color: var(--ink-2); }
-.who { width: 28px; height: 28px; border-radius: 50%; display: grid; place-items: center; font: 500 11px var(--font); background: var(--paper); color: var(--ink-2); }
-.who.ub { background: var(--brand-tint); color: var(--brand-ink); }
-.state { display: flex; align-items: center; justify-content: flex-end; gap: 12px; white-space: nowrap; }
-.st { display: inline-flex; align-items: center; gap: 6px; font-size: 13px; white-space: nowrap; color: var(--ink-2); }
-.st::before { content: ""; width: 8px; height: 8px; border-radius: 50%; background: var(--rule-2); flex: none; }
-.st.ok { color: var(--ok); } .st.ok::before { background: var(--ok-dot); }
-.st.warn { color: var(--warn); } .st.warn::before { background: var(--warn-dot); }
-.st.bad { color: var(--bad); } .st.bad::before { background: var(--bad-dot); }
-.st.info { color: var(--brand-ink); } .st.info::before { background: var(--brand); }
+.steps .end { display: flex; align-items: center; gap: 12px; justify-content: flex-end; }
 
-.done-list, .find { list-style: none; margin: 0; padding: 0; }
-.done-list li, .find li { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 4px 16px; padding: 12px 0; border-top: 1px solid var(--rule); }
-.done-list li:first-child, .find li:first-child { border-top: 0; }
-.done-list li.empty, .find li.empty { display: block; }
-.done-list b, .find b { font-weight: 500; }
-.done-list small, .find small { grid-column: 1; color: var(--ink-2); font-size: 13px; line-height: 18px; }
-.done-list code { grid-column: 1; font: 12px var(--mono); color: var(--ink-3); }
-.done-list .st { grid-column: 2; grid-row: 1; }
-.find .r { grid-column: 2; grid-row: 1 / span 2; display: flex; flex-direction: column; align-items: flex-end; gap: 8px; }
-.find .chip { font-size: 12px; color: var(--ink-3); }
+/* lists */
+.rows { list-style: none; margin: 0; padding: 0; display: grid; gap: 4px; }
+.rows > li { display: grid; grid-template-columns: auto minmax(0, 1fr) auto; gap: 4px 14px; align-items: center; padding: 12px 0; }
+.rows > li + li { border-top: 1px solid var(--line); }
+.rows .ic { width: 36px; height: 36px; border-radius: 10px; display: grid; place-items: center; background: var(--green-tint); color: var(--green); grid-row: span 2; align-self: start; }
+.rows .ic.amber { background: var(--amber-tint); color: var(--amber); }
+.rows .ic.blue { background: var(--blue-tint); color: var(--blue-ink); }
+.rows .ic.red { background: var(--red-tint); color: var(--red); }
+.rows b { font-weight: 700; font-size: 14px; }
+.rows small { grid-column: 2 / span 2; color: var(--ink-2); font-size: 13px; line-height: 1.45; }
+.rows code { grid-column: 2 / span 2; font: 11.5px var(--mono); color: var(--ink-3); }
+.rows .r { display: flex; align-items: center; gap: 8px; justify-content: flex-end; }
+.rows > li.plain { display: block; padding: 0; border: 0; }
 
-.prof { display: flex; gap: 12px; align-items: center; }
-.prof .av { width: 48px; height: 48px; border-radius: 50%; background: var(--avatar); color: var(--avatar-ink); display: grid; place-items: center; font: 500 17px var(--font); flex: none; }
-.prof b { display: block; font: 500 15px/20px var(--font); }
-.prof span { color: var(--ink-2); font-size: 13px; }
-dl.kv { margin: 14px 0 0; display: grid; grid-template-columns: max-content minmax(0, 1fr); gap: 6px 14px; font-size: 13px; }
-dl.kv dt { color: var(--ink-3); } dl.kv dd { margin: 0; }
-.src { margin: 10px 0 0; font-size: 12px; color: var(--ink-3); }
-.acts { list-style: none; margin: 0; padding: 0; border-radius: 8px; background: var(--sheet); box-shadow: var(--shadow); overflow: hidden; }
-.acts button { width: 100%; display: grid; grid-template-columns: 20px minmax(0, 1fr) 16px; gap: 12px; align-items: center; text-align: left; padding: 12px 14px; border: 0; background: none; border-top: 1px solid var(--rule); color: var(--ink); }
-.acts li:first-child button { border-top: 0; }
-.acts button:hover { background: var(--brand-tint); }
-.acts button > svg:first-child { color: var(--brand-ink); }
-.acts button > svg:last-child { width: 16px; height: 16px; color: var(--ink-3); }
-.pend { list-style: none; margin: 0; padding: 0; display: grid; gap: 12px; }
-.pend li { display: grid; gap: 2px; }
-.pend .row { display: flex; justify-content: space-between; gap: 8px; align-items: baseline; }
-.pend b { font-weight: 500; font-size: 13.5px; }
-.pend small { color: var(--ink-3); font-size: 12.5px; line-height: 17px; }
+/* quick actions */
+.acts { list-style: none; margin: 0; padding: 0; display: flex; flex-wrap: wrap; gap: 10px; }
+.acts li { flex: 1 1 170px; }
+.acts button { width: 100%; height: 100%; display: flex; align-items: center; gap: 12px; text-align: left; padding: 14px; border-radius: 14px; border: 1px solid var(--line); background: var(--card); font-weight: 600; font-size: 13.5px; line-height: 1.3; transition: border-color 0.15s, box-shadow 0.15s, transform 0.15s; }
+.acts button:hover { border-color: var(--blue-tint-2); box-shadow: var(--shadow-hi); transform: translateY(-1px); }
+.acts .ai { width: 36px; height: 36px; border-radius: 10px; display: grid; place-items: center; background: var(--blue-tint); color: var(--blue-ink); flex: none; }
 
-.req { list-style: none; margin: 0; padding: 0; }
-.req > li { padding: 14px 0; border-top: 1px solid var(--rule); }
-.req > li:first-child { border-top: 0; }
-.req .row { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 12px; align-items: start; }
-.req b { font-weight: 500; display: block; }
-.req small { color: var(--ink-2); font-size: 13px; display: block; }
-.req .detail { margin-top: 12px; padding: 14px; border-radius: 8px; background: var(--paper); font-size: 13.5px; }
-.req .detail p { margin: 0 0 10px; white-space: pre-wrap; }
-.req .detail ul { margin: 4px 0 10px; padding-left: 18px; color: var(--ink-2); }
-.req .detail input { width: 100%; max-width: 520px; height: 34px; border-radius: 999px; border: 1px solid var(--rule-2); padding: 0 14px; background: var(--sheet); }
-.req .go { display: flex; gap: 8px; }
-.inline-key { display: flex; gap: 8px; margin-top: 10px; }
-.inline-key input { flex: 1; max-width: 320px; height: 32px; border-radius: 999px; border: 1px solid var(--rule-2); padding: 0 14px; background: var(--sheet); }
-.bars { display: grid; gap: 10px; }
-.bar-row { display: grid; grid-template-columns: minmax(130px, 210px) minmax(0, 1fr) 36px; gap: 12px; align-items: center; font-size: 13px; }
-.bar-row .tr { height: 8px; background: var(--bar); border-radius: 4px; overflow: hidden; }
-.bar-row .fl { height: 100%; background: var(--brand); border-radius: 4px; }
-.bar-row .fl.gap { background: var(--warn-dot); }
-.bar-row span:last-child { text-align: right; color: var(--ink-3); font-variant-numeric: tabular-nums; }
-.caption { color: var(--ink-3); font-size: 12px; margin: 14px 0 0; }
+/* ops */
+.bars { display: grid; gap: 12px; }
+.bar-row { display: grid; grid-template-columns: minmax(130px, 220px) minmax(0, 1fr) 40px; gap: 14px; align-items: center; font-size: 13.5px; font-weight: 500; }
+.bar-row .tr { height: 10px; background: var(--soft-2); border-radius: 999px; overflow: hidden; }
+.bar-row .fl { height: 100%; background: var(--blue); border-radius: 999px; }
+.bar-row .fl.gap { background: var(--amber-dot); }
+.bar-row span:last-child { text-align: right; color: var(--ink-2); font-weight: 700; font-variant-numeric: tabular-nums; }
+.caption { color: var(--ink-3); font-size: 12.5px; margin: 16px 0 0; }
 
-.how { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 16px 28px; margin: 0; }
-.how dt { font-weight: 500; margin-bottom: 2px; }
-.how dd { margin: 0; color: var(--ink-2); font-size: 13px; line-height: 18px; }
-.legal { color: var(--ink-3); font-size: 12px; margin: 0; padding-block: 0 32px; }
+/* how it works */
+.how { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 18px 28px; margin: 0; }
+.how dt { font-weight: 700; margin-bottom: 3px; font-size: 14px; }
+.how dd { margin: 0; color: var(--ink-2); font-size: 13px; line-height: 1.5; }
+.legal { color: var(--ink-3); font-size: 12px; margin: 0; }
 
-.panel { position: fixed; top: calc(60px + env(safe-area-inset-top, 0px)); right: 0; bottom: 0; width: var(--panel-w); z-index: 20; background: var(--sheet); border-left: 1px solid var(--rule);
-  display: flex; flex-direction: column; transform: translateX(100%); transition: transform 0.2s; padding-bottom: env(safe-area-inset-bottom, 0px); }
-.panel.open { transform: none; }
-.panel-h { display: flex; align-items: center; gap: 10px; padding: 14px 16px; border-bottom: 1px solid var(--rule); }
-.panel-h b { width: 28px; height: 28px; border-radius: 50%; background: var(--brand); color: #fff; display: grid; place-items: center; font: 700 13px var(--font); flex: none; }
-.panel-h h2 { margin: 0; font: 500 15px/20px var(--font); }
-.panel-h small { display: block; color: var(--ink-3); font-size: 12px; line-height: 16px; }
-.panel-h .ibtn { margin-left: auto; }
-.log { flex: 1; overflow-y: auto; padding: 16px; display: grid; gap: 14px; align-content: start; }
-.msg { max-width: 100%; }
-.msg.me { justify-self: end; width: fit-content; max-width: 85%; overflow-wrap: break-word; background: var(--brand-tint); padding: 8px 12px; border-radius: 12px 12px 2px 12px; }
-.msg.bot .from { font-size: 12px; color: var(--ink-3); margin-bottom: 4px; font-weight: 500; }
+/* ---------- assistant ---------- */
+.panel { position: sticky; top: calc(88px + env(safe-area-inset-top, 0px)); height: calc(100vh - 112px); min-height: 520px; display: flex; flex-direction: column; padding: 0; overflow: hidden; }
+.asst-h { display: flex; align-items: center; gap: 12px; padding: 18px 20px; border-bottom: 1px solid var(--line); }
+.utile { width: 40px; height: 40px; border-radius: 12px; background: linear-gradient(135deg, #0a4fc4, #22a3ec); color: #fff; display: grid; place-items: center; font: 800 17px var(--font); flex: none; }
+.asst-h h2 { margin: 0; font: 700 16px/1.25 var(--font); }
+.asst-h small { display: block; color: var(--ink-3); font-size: 12.5px; }
+.live { margin-left: auto; display: inline-flex; align-items: center; gap: 6px; font-size: 12px; font-weight: 600; color: var(--green); white-space: nowrap; }
+.live::before { content: ""; width: 7px; height: 7px; border-radius: 50%; background: var(--green-dot); }
+.log { flex: 1; overflow-y: auto; padding: 18px 20px; display: grid; gap: 14px; align-content: start; }
+.msg { max-width: 100%; font-size: 13.5px; line-height: 1.55; }
+.msg.bot > div:last-of-type:not(.box) { background: var(--soft); padding: 12px 14px; border-radius: 4px 16px 16px 16px; }
+.msg.me { justify-self: end; width: fit-content; max-width: 85%; overflow-wrap: break-word; background: var(--blue); color: #fff; padding: 10px 14px; border-radius: 16px 16px 4px 16px; }
+.msg.bot .from { font-size: 12px; color: var(--ink-3); margin-bottom: 6px; font-weight: 600; }
 .msg p { margin: 0 0 8px; } .msg p:last-child { margin: 0; }
 .msg ul { margin: 4px 0 8px; padding-left: 18px; } .msg li { margin: 2px 0; }
-.msg code { font: 12.5px var(--mono); }
-.tag { font: 500 11px var(--mono); color: var(--brand-ink); background: var(--brand-tint); padding: 1px 4px; border-radius: 3px; }
-.typing { color: var(--ink-3); font-size: 13px; }
-.box { margin-top: 10px; border: 1px solid var(--rule); border-radius: 8px; overflow: hidden; background: var(--sheet); }
-.box h3 { margin: 0; font: 500 13px/18px var(--font); padding: 10px 12px; background: var(--paper); border-bottom: 1px solid var(--rule); }
-.box dl { margin: 0; padding: 10px 12px; display: grid; grid-template-columns: max-content minmax(0, 1fr); gap: 6px 12px; font-size: 13px; }
+.msg code { font: 12px var(--mono); }
+.tag { font: 500 11px var(--mono); color: var(--blue-ink); background: var(--blue-tint); padding: 1px 5px; border-radius: 4px; }
+.typing { color: var(--ink-3); }
+.box { margin-top: 10px; border: 1px solid var(--line); border-radius: 14px; overflow: hidden; background: var(--card); }
+.box h3 { margin: 0; font: 700 13.5px/1.3 var(--font); padding: 12px 14px; border-bottom: 1px solid var(--line); }
+.box dl { margin: 0; padding: 12px 14px; display: grid; grid-template-columns: max-content minmax(0, 1fr); gap: 6px 12px; font-size: 13px; }
 .box dt { color: var(--ink-3); } .box dd { margin: 0; white-space: pre-wrap; }
-.box details summary { cursor: pointer; padding: 10px 12px; font-size: 13px; color: var(--brand-ink); list-style: none; }
+.box details summary { cursor: pointer; padding: 10px 14px; font-size: 13px; font-weight: 600; color: var(--blue-ink); list-style: none; }
 .box details summary::-webkit-details-marker { display: none; }
-.box details[open] summary { border-bottom: 1px solid var(--rule); }
-.box .bar2 { display: flex; gap: 8px; flex-wrap: wrap; padding: 10px 12px; border-top: 1px solid var(--rule); }
-.box textarea { width: 100%; min-height: 120px; border: 1px solid var(--rule-2); border-radius: 6px; padding: 8px; background: var(--sheet); }
-.guard { margin: 0 12px 10px; font-size: 12.5px; display: flex; align-items: center; gap: 6px; color: var(--ok); }
-.guard::before { content: ""; width: 8px; height: 8px; border-radius: 50%; background: var(--ok-dot); flex: none; }
-.guard.bad { color: var(--bad); } .guard.bad::before { background: var(--bad-dot); }
-.try { padding: 8px 16px 0; display: flex; flex-wrap: wrap; gap: 6px 10px; font-size: 13px; color: var(--ink-3); }
-.try button { border: 0; background: none; padding: 0; color: var(--brand-ink); font-size: 13px; }
-.try button:hover { text-decoration: underline; }
-.composer { display: flex; gap: 8px; padding: 12px 16px; }
-.composer input { flex: 1; min-width: 0; height: 40px; border-radius: 999px; border: 1px solid var(--rule-2); background: var(--sheet); padding: 0 16px; }
-.composer input:focus { outline: none; border-color: var(--brand); }
-.composer .btn { height: 40px; }
-.foot { margin: 0; padding: 0 16px 14px; color: var(--ink-3); font-size: 12px; }
+.box details[open] summary { border-bottom: 1px solid var(--line); }
+.box .bar2 { display: flex; gap: 8px; flex-wrap: wrap; padding: 12px 14px; border-top: 1px solid var(--line); background: var(--soft); }
+.box .btn { height: 34px; padding: 0 14px; font-size: 13px; }
+.box textarea { width: 100%; min-height: 120px; border: 1px solid var(--line-2); border-radius: 10px; padding: 10px; background: var(--card); }
+.box .guard { margin: 0 14px 12px; font-size: 12.5px; }
+.try { padding: 0 20px 10px; display: flex; flex-wrap: wrap; gap: 6px; }
+.try button { border: 1px solid var(--line); background: var(--card); border-radius: 999px; padding: 6px 12px; font-size: 12.5px; font-weight: 600; color: var(--ink-2); }
+.try button:hover { border-color: var(--blue); color: var(--blue-ink); }
+.composer { display: flex; gap: 8px; padding: 14px 20px 18px; border-top: 1px solid var(--line); }
+.composer input { flex: 1; min-width: 0; height: 44px; border-radius: 999px; border: 1px solid var(--line-2); background: var(--soft); padding: 0 18px; }
+.composer input:focus { outline: none; border-color: var(--blue); background: var(--card); }
+.composer .btn { height: 44px; width: 44px; padding: 0; }
 
-@media (max-width: 1100px) {
-  .body { grid-template-columns: minmax(0, 1fr); }
-  .rail { padding-top: 0; grid-template-columns: repeat(2, minmax(0, 1fr)); }
-  .page.with-panel { padding-right: 0; }
-  .panel { width: min(var(--panel-w), 100vw); box-shadow: -8px 0 24px rgba(0, 0, 0, 0.15); }
-  .how { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+@media (max-width: 1180px) {
+  .shell { grid-template-columns: minmax(0, 1fr); }
+  .panel { position: static; height: 620px; min-height: 0; }
+  .search { max-width: 300px; }
 }
-@media (max-width: 700px) {
+@media (max-width: 860px) {
+  .search { display: none; }
+  .askb { display: grid; width: 38px; height: 38px; border-radius: 50%; border: 0; background: var(--nav-2); color: #fff; place-items: center; }
+  .duo, .how { grid-template-columns: minmax(0, 1fr); }
+  .hero-in { grid-template-columns: minmax(0, 1fr); }
+  .glass { display: none; }
+}
+@media (max-width: 640px) {
   .wrap { padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); }
-  .search, .logo small, .ask span, .seg .long, .viewas > span { display: none; }
-  .top .wrap { gap: 8px; }
-  .band h1 { font-size: 24px; line-height: 30px; }
-  .track .tick:not(.first):not(.last) { display: none; }
-  .kpis div { padding-right: 16px; margin-right: 16px; }
-  .kpis b { font-size: 24px; line-height: 30px; }
-  .sec { padding: 20px 16px; }
-  .rail, .how { grid-template-columns: minmax(0, 1fr); }
-  .steps li { grid-template-columns: 28px minmax(0, 1fr); }
-  .steps .who { display: none; }
-  .steps .state { grid-column: 2; justify-content: flex-start; }
-  .need li { grid-template-columns: 40px minmax(0, 1fr); }
-  .need .go { grid-column: 2; justify-content: flex-start; }
-  .bar-row { grid-template-columns: minmax(100px, 130px) minmax(0, 1fr) 30px; }
-  .panel { width: 100vw; }
+  .top .wrap { gap: 10px; }
+  .logo span, .logo small, .roles button span { display: none; }
+  .right { gap: 8px; }
+  .roles button { padding: 7px 10px; }
+  .shell { padding-block: 16px 28px; }
+  .hero { padding: 24px 20px; border-radius: 20px; }
+  .hero h1 { font-size: 30px; }
+  .hero .sub { font-size: 14.5px; }
+  .kpis div { min-width: 0; flex: 1 1 120px; }
+  .kpis b { font-size: 22px; }
+  .card { padding: 20px 16px; border-radius: 18px; }
+  .tile { padding: 16px 16px 16px 20px; }
+  .tile .go { margin-left: 0; }
+  .steps { margin: 0 -8px; }
+  .steps li { grid-template-columns: 32px minmax(0, 1fr); gap: 12px; padding: 12px 8px; }
+  .num { width: 32px; height: 32px; }
+  .steps .end { grid-column: 2; justify-content: flex-start; }
+  .bar-row { grid-template-columns: minmax(96px, 120px) minmax(0, 1fr) 30px; gap: 10px; }
+  .panel { height: 560px; }
 }
 </style>
 </head>
 <body>
 <svg width="0" height="0" style="position:absolute" aria-hidden="true">
   <symbol id="i-search" viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></symbol>
-  <symbol id="i-inbox" viewBox="0 0 24 24"><path d="M4 13h4l2 3h4l2-3h4"/><path d="M5.5 5h13L20 13v6H4v-6z"/></symbol>
   <symbol id="i-chat" viewBox="0 0 24 24"><path d="M5 5h14v10H9l-4 4z"/></symbol>
-  <symbol id="i-x" viewBox="0 0 24 24"><path d="M6 6l12 12M18 6 6 18"/></symbol>
+  <symbol id="i-send" viewBox="0 0 24 24"><path d="M5 12h13M13 6l6 6-6 6"/></symbol>
   <symbol id="i-check" viewBox="0 0 24 24"><path d="m5 12 4.5 4.5L19 7"/></symbol>
   <symbol id="i-clock" viewBox="0 0 24 24"><circle cx="12" cy="12" r="8"/><path d="M12 8v4l3 2"/></symbol>
-  <symbol id="i-list" viewBox="0 0 24 24"><path d="M9 6h11M9 12h11M9 18h11M4 6h.01M4 12h.01M4 18h.01"/></symbol>
   <symbol id="i-hash" viewBox="0 0 24 24"><path d="M5 9h14M5 15h14M10 4 8 20M16 4l-2 16"/></symbol>
   <symbol id="i-cap" viewBox="0 0 24 24"><path d="m3 9 9-4 9 4-9 4z"/><path d="M7 11v4c0 1.5 2.2 3 5 3s5-1.5 5-3v-4"/></symbol>
   <symbol id="i-cal" viewBox="0 0 24 24"><rect x="4" y="5" width="16" height="15" rx="2"/><path d="M4 10h16M9 3v4M15 3v4"/></symbol>
   <symbol id="i-laptop" viewBox="0 0 24 24"><rect x="5" y="5" width="14" height="10" rx="1.5"/><path d="M3 19h18"/></symbol>
   <symbol id="i-lock" viewBox="0 0 24 24"><rect x="5" y="10" width="14" height="10" rx="2"/><path d="M8 10V7a4 4 0 0 1 8 0v3"/></symbol>
-  <symbol id="i-chev" viewBox="0 0 24 24"><path d="m9 6 6 6-6 6"/></symbol>
+  <symbol id="i-file" viewBox="0 0 24 24"><path d="M7 3h7l5 5v13H7z"/><path d="M14 3v5h5"/></symbol>
+  <symbol id="i-x" viewBox="0 0 24 24"><path d="M6 6l12 12M18 6 6 18"/></symbol>
 </svg>
 
 <header class="top">
   <div class="wrap">
-    <a class="logo" href="/"><b>U</b><span>Unblock</span><small>Lumen Labs</small></a>
+    <a class="logo" href="/"><b>U</b><div><span>Unblock</span><small>Lumen Labs</small></div></a>
     <form class="search" id="search" role="search">
       <svg class="i"><use href="#i-search"/></svg>
-      <input id="searchIn" placeholder="Search or ask a question" aria-label="Search or ask a question">
+      <input id="searchIn" placeholder="Search or ask Unblock: &quot;do my checklist&quot;" aria-label="Search or ask Unblock">
     </form>
-    <div class="tools">
-      <button class="ask" id="askBtn" aria-pressed="false"><svg class="i"><use href="#i-chat"/></svg><span>Ask Unblock</span></button>
-      <button class="ibtn" id="inboxBtn" aria-label="Inbox"><svg class="i"><use href="#i-inbox"/></svg><span class="count" id="badge" hidden>0</span></button>
-      <div class="me" id="avatar">MC</div>
+    <div class="right">
+      <div class="roles" role="group" aria-label="View as">
+        <button id="rHire" aria-pressed="true">Maya<span> · new hire</span></button>
+        <button id="rMgr" aria-pressed="false">Jordan<span> · manager</span></button>
+        <button id="rOps" aria-pressed="false">Elena<span> · People Ops</span></button>
+      </div>
+      <button class="askb" id="askBtn" aria-label="Ask Unblock"><svg class="i"><use href="#i-chat"/></svg></button>
+      <button class="mebtn" id="inboxBtn" aria-label="Your inbox"><span id="avatar">MC</span><span class="count" id="badge" hidden>0</span></button>
     </div>
   </div>
 </header>
 
-<div class="page" id="page">
-  <section class="band">
-    <div class="wrap">
-      <div class="band-top">
-        <div><h1 id="hello">Good evening, Maya</h1><p id="heroSub">Data Analyst, Growth Insights</p></div>
-        <div class="viewas"><span>View as</span><div class="seg" role="group" aria-label="View as">
-          <button id="rHire" aria-pressed="true">Maya<span class="long"> · new hire</span></button>
-          <button id="rMgr" aria-pressed="false">Jordan<span class="long"> · manager</span></button>
-          <button id="rOps" aria-pressed="false">Elena<span class="long"> · People Ops</span></button>
-        </div></div>
-      </div>
-      <div class="track" data-role="hire" aria-label="Your first 90 days">
-        <div class="line"><div class="fill" id="trackFill"></div><span class="today" id="trackToday">Today</span></div>
-        <div class="ticks" id="ticks"></div>
+<main class="wrap shell" id="layout">
+  <div class="main">
+    <section class="hero" aria-labelledby="hello">
+      <div class="hero-in">
+        <div>
+          <p class="eyebrow" id="heroDay"></p>
+          <h1 id="hello">Welcome, Maya</h1>
+          <p class="sub" id="heroSub">Data Analyst · Growth Insights · US office</p>
+          <div class="meter" data-hero="hire">
+            <div class="lbl"><span>Onboarding journey</span><span id="meterTxt">0 of 6 done</span></div>
+            <div class="tr"><div class="fl" id="meterFill"></div></div>
+          </div>
+        </div>
+        <div class="glass" data-hero="hire"><dl id="profile"></dl><p id="profSrc"></p></div>
       </div>
       <div class="kpis" id="bandKpis" hidden></div>
-    </div>
-  </section>
+    </section>
 
-  <div class="wrap">
-    <div class="body" data-role="hire">
-      <div class="sheet">
-        <section class="sec">
-          <div class="sec-h"><h2>Needs you</h2><span class="meta" id="inboxMeta"></span></div>
-          <ul class="need" id="hireInbox"></ul>
+    <div class="stack" data-role="hire">
+      <section class="card">
+        <div class="card-h"><h2>Awaiting Your Action</h2><span class="meta">Unblock never acts until you approve</span></div>
+        <ul class="tiles" id="hireInbox"></ul>
+      </section>
+      <section class="card">
+        <div class="card-h"><h2>Onboarding Journey</h2><div class="end"><button class="btn tint" id="autoBtn">Do my checklist</button></div></div>
+        <ul class="steps" id="journey"></ul>
+      </section>
+      <div class="duo">
+        <section class="card">
+          <div class="card-h"><h2>Done for You</h2><span class="meta">Business process history</span></div>
+          <ul class="rows" id="history"><li class="plain"><div class="empty-box"><b>Nothing yet</b>Tasks Unblock completes after your approval show up here.</div></li></ul>
         </section>
-        <section class="sec">
-          <div class="sec-h"><h2>Onboarding checklist</h2><div style="display:flex;align-items:center;gap:14px;flex-wrap:wrap"><span class="meta" id="meterTxt">0 of 6 complete</span><button class="btn" id="autoBtn">Complete with Unblock</button></div></div>
-          <ul class="steps" id="journey"></ul>
-        </section>
-        <section class="sec">
-          <div class="sec-h"><h2>Completed by Unblock</h2><span class="meta">each one approved by you</span></div>
-          <ul class="done-list" id="history"><li class="empty">Nothing yet. Ask Unblock to do a task, or start with the checklist.</li></ul>
+        <section class="card">
+          <div class="card-h"><h2>Waiting on Others</h2></div>
+          <ul class="rows" id="waiting"><li class="plain"><div class="empty-box"><b>Nothing pending</b>Anything Unblock sends for you is tracked here.</div></li></ul>
         </section>
       </div>
-      <aside class="rail">
-        <section>
-          <h3>Your profile</h3>
-          <div class="prof"><div class="av" id="profInit">MC</div><div><b id="profName">Maya Chen</b><span id="profRole">Data Analyst</span></div></div>
-          <dl class="kv" id="profile"></dl>
-          <p class="src" id="profSrc"></p>
-        </section>
-        <section>
-          <h3>Ask Unblock to</h3>
-          <ul class="acts" id="apps">
-            <li><button data-q="Can you join the Slack channels for me?"><svg class="i"><use href="#i-hash"/></svg>Join my team's Slack channels<svg class="i"><use href="#i-chev"/></svg></button></li>
-            <li><button data-q="Sign me up for security awareness training"><svg class="i"><use href="#i-cap"/></svg>Enroll me in required training<svg class="i"><use href="#i-chev"/></svg></button></li>
-            <li><button data-q="Can you schedule my 1:1 with my manager?"><svg class="i"><use href="#i-cal"/></svg>Book my first 1:1<svg class="i"><use href="#i-chev"/></svg></button></li>
-            <li><button data-q="I need access to the analytics dashboard"><svg class="i"><use href="#i-lock"/></svg>Request dashboard access<svg class="i"><use href="#i-chev"/></svg></button></li>
-            <li><button data-q="My laptop screen is cracked"><svg class="i"><use href="#i-laptop"/></svg>Report a laptop problem<svg class="i"><use href="#i-chev"/></svg></button></li>
-          </ul>
-        </section>
-        <section>
-          <h3>Waiting on others</h3>
-          <ul class="pend" id="waiting"><li class="empty">Nothing pending. Anything Unblock sends for you is tracked here.</li></ul>
-        </section>
-      </aside>
+      <section class="card">
+        <div class="card-h"><h2>Ask Unblock To</h2><span class="meta">It shows you exactly what it will do first</span></div>
+        <ul class="acts" id="apps">
+          <li><button data-q="Can you join the Slack channels for me?"><span class="ai"><svg class="i"><use href="#i-hash"/></svg></span>Join my team's Slack channels</button></li>
+          <li><button data-q="Sign me up for security awareness training"><span class="ai"><svg class="i"><use href="#i-cap"/></svg></span>Enroll me in required training</button></li>
+          <li><button data-q="Can you schedule my 1:1 with my manager?"><span class="ai"><svg class="i"><use href="#i-cal"/></svg></span>Book my first 1:1</button></li>
+          <li><button data-q="I need access to the analytics dashboard"><span class="ai"><svg class="i"><use href="#i-lock"/></svg></span>Request dashboard access</button></li>
+          <li><button data-q="My laptop screen is cracked"><span class="ai"><svg class="i"><use href="#i-laptop"/></svg></span>Report a laptop problem</button></li>
+        </ul>
+      </section>
     </div>
 
-    <div class="body" data-role="mgr" hidden>
-      <div class="sheet">
-        <section class="sec">
-          <div class="sec-h"><h2>Approvals</h2><span class="meta">only you can approve access for your team</span></div>
-          <ul class="req" id="mgrInbox"></ul>
-          <div class="inline-key" id="mgrKeyRow" hidden><input id="mgrKey" type="password" placeholder="Manager key" aria-label="Manager key"><button class="btn primary" id="mgrKeyGo">Unlock</button></div>
+    <div class="stack" data-role="mgr" hidden>
+      <section class="card">
+        <div class="card-h"><h2>Awaiting Your Approval</h2><span class="meta">Only you can approve access for your team</span></div>
+        <ul class="tiles" id="mgrInbox"></ul>
+        <div class="inline-key" id="mgrKeyRow" hidden><input id="mgrKey" type="password" placeholder="Manager key" aria-label="Manager key"><button class="btn primary" id="mgrKeyGo">Unlock</button></div>
+      </section>
+      <div class="duo">
+        <section class="card">
+          <div class="card-h"><h2>Recently Decided</h2></div>
+          <ul class="rows" id="mgrHistory"></ul>
         </section>
-        <section class="sec">
-          <div class="sec-h"><h2>Recently decided</h2></div>
-          <ul class="find" id="mgrHistory"><li class="empty">No decisions yet.</li></ul>
+        <section class="card">
+          <div class="card-h"><h2>Your Team</h2></div>
+          <ul class="rows" id="team"></ul>
         </section>
       </div>
-      <aside class="rail"><section><h3>Your team</h3><ul class="pend" id="team"></ul></section></aside>
     </div>
 
-    <div class="body" data-role="ops" hidden>
-      <div class="sheet">
-        <section class="sec">
-          <div class="sec-h"><h2>Where new hires get stuck</h2><span class="meta" id="fmSub">Last 30 days</span></div>
-          <div class="bars" id="fmBars"></div>
-          <p class="caption">Anonymous: topics and doc paths only, groups of 5 or more. Orange marks a gap with a fixable doc.</p>
+    <div class="stack" data-role="ops" hidden>
+      <section class="card">
+        <div class="card-h"><h2>Where New Hires Get Stuck</h2><span class="meta" id="fmSub">Last 30 days</span></div>
+        <div class="bars" id="fmBars"></div>
+        <p class="caption">Anonymous: topics and doc paths only, groups of 5 or more. Orange marks a gap with a fixable doc.</p>
+      </section>
+      <div class="duo">
+        <section class="card">
+          <div class="card-h"><h2>Canary New Hires</h2><div class="end"><a class="btn sm" href="/canary">Walkthrough</a><button class="btn sm primary" id="canaryRun">Run now</button></div></div>
+          <p class="muted" id="canarySub" style="margin-bottom:8px;font-size:13.5px">Synthetic new hires walk the docs before real people start.</p>
+          <ul class="rows" id="walls"></ul>
         </section>
-        <section class="sec">
-          <div class="sec-h"><h2>Canary New Hires</h2><div style="display:flex;gap:8px"><a class="btn" href="/canary">View walkthrough</a><button class="btn primary" id="canaryRun">Run now</button></div></div>
-          <p class="empty" id="canarySub" style="margin-bottom:8px">Synthetic new hires walk the docs before real people start.</p>
-          <ul class="find" id="walls"></ul>
-        </section>
-        <section class="sec">
-          <div class="sec-h"><h2>Doc fixes to review</h2><span class="meta">drafted by the CREAO Doc Steward</span></div>
-          <ul class="find" id="fixes"><li class="empty">Run the canaries to draft fixes.</li></ul>
+        <section class="card">
+          <div class="card-h"><h2>Doc Fixes to Review</h2><span class="meta">Drafted by the CREAO Doc Steward</span></div>
+          <ul class="rows" id="fixes"><li class="plain"><div class="empty-box"><b>No fixes yet</b>Run the canaries to draft fixes. Each one quotes the doc word for word.</div></li></ul>
         </section>
       </div>
-      <aside class="rail"><section><h3>How fixes work</h3><p class="empty" style="font-size:13px;line-height:19px">Unblock checks that every drafted fix quotes the doc word for word. You send it to the doc's owner, who decides whether to publish it.</p></section></aside>
     </div>
 
-    <section class="sec sheet" style="margin-bottom:20px">
-      <div class="sec-h"><h2>How Unblock works</h2><a class="meta" href="/activity" target="_blank" rel="noopener">View agent activity</a></div>
+    <section class="card">
+      <div class="card-h"><h2>How Unblock Works</h2><a class="meta" href="/activity" target="_blank" rel="noopener">View live agent activity →</a></div>
       <dl class="how">
         <div><dt>What it's doing</dt><dd>Every step by every agent is logged live on Agent Activity, including what each check stopped.</dd></div>
         <div><dt>Why it says what it says</dt><dd>Each statement quotes an approved doc word for word, with the doc's date and owner. Anything it can't quote is removed.</dd></div>
@@ -415,18 +420,16 @@ dl.kv dt { color: var(--ink-3); } dl.kv dd { margin: 0; }
         <div><dt>How to correct it</dt><dd>Say "this looks wrong" to ask the doc's owner, or "wrong person" and routing learns.</dd></div>
       </dl>
     </section>
-    <p class="legal">Prototype for the Workday "Build the Future of Work with AI" challenge. Lumen Labs and its people are fictional. Colors and type from Workday's open Canvas design tokens; not a Workday product.</p>
+    <p class="legal">Prototype for the Workday "Build the Future of Work with AI" challenge. Lumen Labs and its people are fictional. Not a Workday product.</p>
   </div>
-</div>
 
-<aside class="panel" id="panel" aria-label="Unblock">
-  <div class="panel-h"><b>U</b><div><h2>Unblock</h2><small>Answers from approved docs. Acts only with your approval.</small></div>
-    <button class="ibtn" id="closePanel" aria-label="Close"><svg class="i"><use href="#i-x"/></svg></button></div>
-  <div class="log" id="log" aria-live="polite"></div>
-  <div class="try" id="chips"><span>Try:</span><button>Do my checklist</button><button>How do I deploy to staging?</button><button>How many vacation days do I get?</button></div>
-  <form class="composer" id="composer"><input id="q" autocomplete="off" placeholder="Ask a question or describe a task" aria-label="Message Unblock"><button class="btn primary" type="submit">Send</button></form>
-  <p class="foot">The same agents run in ASI:One.</p>
-</aside>
+  <aside class="panel card" id="panel" aria-label="Unblock Assistant">
+    <div class="asst-h"><span class="utile">U</span><div><h2>Unblock Assistant</h2><small>Answers from approved docs · acts only with your OK</small></div><span class="live">7 agents</span></div>
+    <div class="log" id="log" aria-live="polite"></div>
+    <div class="try" id="chips"><button>Do my checklist</button><button>How do I deploy to staging?</button><button>How many vacation days do I get?</button></div>
+    <form class="composer" id="composer"><input id="q" autocomplete="off" placeholder="Ask a question or describe a task" aria-label="Message Unblock"><button class="btn primary" type="submit" aria-label="Send"><svg class="i"><use href="#i-send"/></svg></button></form>
+  </aside>
+</main>
 
 <script>
 (() => {
@@ -441,32 +444,19 @@ dl.kv dt { color: var(--ink-3); } dl.kv dd { margin: 0; }
   let session = store.get("ub.session", null), after = store.get("ub.wd.after", 0), role = store.get("ub.wd.role", "hire");
   let mgrKey = ""; try { mgrKey = sessionStorage.getItem("ub.mkey") || ""; } catch (e) {}
   let last = null, busy = false;
-  const greet = () => { const hr = new Date().getHours(); return hr < 12 ? "Good morning" : hr < 18 ? "Good afternoon" : "Good evening"; };
   const ago = t => { if (!t) return ""; const s = Math.max(0, Date.now() / 1000 - t); return s < 60 ? "just now" : s < 3600 ? `${Math.round(s / 60)} min ago` : `${Math.round(s / 3600)} h ago`; };
   const cap = s => String(s || "").replace(/^./, c => c.toUpperCase());
   const day = iso => new Date(iso + "T12:00:00");
+  const plus = (d, n) => { const x = new Date(d); x.setDate(x.getDate() + n); return x; };
   const fmtDay = d => d.toLocaleDateString([], { month: "short", day: "numeric" });
+  const longDay = d => d.toLocaleDateString([], { weekday: "long", month: "short", day: "numeric" });
+  const andList = xs => xs.length < 2 ? xs.join("") : xs.length === 2 ? xs.join(" and ") : xs.slice(0, -1).join(", ") + ", and " + xs[xs.length - 1];
+  const todayStr = () => longDay(last && last.profile.today ? day(last.profile.today) : new Date());
 
   function setPanel(open) {
-    $("panel").classList.toggle("open", open); $("page").classList.toggle("with-panel", open && innerWidth > 1100);
-    $("askBtn").setAttribute("aria-pressed", String(open)); store.set("ub.wd.panel", open);
+    if (open && innerWidth <= 1180) $("panel").scrollIntoView({ behavior: "smooth", block: "start" });
   }
-  $("askBtn").onclick = () => { const o = !$("panel").classList.contains("open"); setPanel(o); if (o) $("q").focus({ preventScroll: true }); };
-  $("closePanel").onclick = () => setPanel(false);
-  addEventListener("resize", () => $("page").classList.toggle("with-panel", $("panel").classList.contains("open") && innerWidth > 1100));
-
-  function renderTrack(p) {
-    if (!p.start_date || !p.today) return;
-    const start = day(p.start_date), n = Math.max(1, Math.round((day(p.today) - start) / 864e5) + 1);
-    const pos = d => Math.min(100, Math.max(0, (d - 1) / 89 * 100));
-    $("trackFill").style.width = pos(n) + "%";
-    $("trackToday").style.left = pos(n) + "%"; $("trackToday").textContent = `Today · day ${n}`;
-    const at = d => { const x = new Date(start); x.setDate(x.getDate() + d - 1); return fmtDay(x); };
-    const ticks = [[1, "Start", "first"], [15, "Training due", "due"], [30, "Day 30", ""], [60, "Day 60", ""], [90, "Day 90", "last"]];
-    $("ticks").replaceChildren(...ticks.map(([d, label, cls]) => {
-      const t = h("div", "tick " + cls); t.style.left = pos(d) + "%"; t.append(h("b", "", label), document.createTextNode(at(d))); return t;
-    }));
-  }
+  $("askBtn").onclick = () => { setPanel(true); $("q").focus({ preventScroll: true }); };
 
   function md(text) {
     const lines = esc(text).split("\n"); let out = "", inList = false;
@@ -509,7 +499,7 @@ dl.kv dt { color: var(--ink-3); } dl.kv dd { margin: 0; }
     const dl = h("dl"); dl.append(h("dt", "", "To"), h("dd", "", d.to_name + (d.to_role ? ", " + d.to_role : "")), h("dt", "", "Subject"), h("dd", "", d.subject));
     const body = h("dd", "", d.body); dl.append(h("dt", "", "Message"), body); c.appendChild(dl);
     const bad = d.guardian && d.guardian.length;
-    c.appendChild(h("div", "guard" + (bad ? " bad" : ""), bad ? "Blocked: " + d.guardian.join("; ") + ". Edit it to remove that." : "Checked: no passwords, IDs, pay, performance or health details."));
+    c.appendChild(h("div", "guard" + (bad ? " bad" : ""), bad ? "Blocked: " + d.guardian.join("; ") + ". Edit it to remove that." : "Guardian checked: no passwords, IDs, pay, performance or health details."));
     if (live) {
       const a = h("div", "bar2");
       const ok = h("button", "btn primary", "Approve and send"); ok.disabled = !!bad;
@@ -560,7 +550,7 @@ dl.kv dt { color: var(--ink-3); } dl.kv dd { margin: 0; }
     const c = h("div", "box"); c.appendChild(h("h3", "", "Review before sending · Reminder"));
     const dl = h("dl"); dl.append(h("dt", "", "To"), h("dd", "", r.draft.to_name), h("dt", "", "Subject"), h("dd", "", r.draft.subject), h("dt", "", "Message"), h("dd", "", r.draft.body)); c.appendChild(dl);
     const bad = r.draft.guardian && r.draft.guardian.length;
-    c.appendChild(h("div", "guard" + (bad ? " bad" : ""), bad ? "Blocked: " + r.draft.guardian.join("; ") : "Checked: nothing sensitive."));
+    c.appendChild(h("div", "guard" + (bad ? " bad" : ""), bad ? "Blocked: " + r.draft.guardian.join("; ") : "Guardian checked: nothing sensitive."));
     const a = h("div", "bar2"); const ok = h("button", "btn primary", "Approve and send"); ok.disabled = !!bad; const no = h("button", "btn", "Not now");
     ok.onclick = () => { disable(c); bubble("me", "Approve"); remind(itemId, true); }; no.onclick = () => disable(c);
     a.append(ok, no); c.appendChild(a); bubble("bot", md(r.text), c);
@@ -572,85 +562,118 @@ dl.kv dt { color: var(--ink-3); } dl.kv dd { margin: 0; }
   $("autoBtn").onclick = () => send("Do my checklist");
 
   function btn(label, cls, fn) { const b = h("button", "btn" + (cls ? " " + cls : ""), label); b.onclick = fn; return b; }
-  function needItem(ic, calm, title, sub, buttons) {
-    const li = h("li", calm ? "calm" : ""); const i = h("div", "ico"); i.innerHTML = icon(ic); li.appendChild(i);
-    const t = h("div"); t.append(h("b", "", title), h("small", "", sub)); li.appendChild(t);
-    const a = h("div", "go"); for (const b of buttons) a.appendChild(b); li.appendChild(a); return li;
+  function tile({ eyebrow, title, sub, guard, bad, calm, buttons, detail }) {
+    const li = h("li", "tile" + (calm ? " calm" : ""));
+    li.append(h("div", "ey", eyebrow), h("h3", "", title));
+    if (sub) li.appendChild(h("p", "sub", sub));
+    const foot = h("div", "foot");
+    if (guard) foot.appendChild(h("span", "guard" + (bad ? " bad" : ""), guard));
+    const go = h("div", "go"); for (const b of buttons || []) go.appendChild(b); foot.appendChild(go);
+    li.appendChild(foot); if (detail) li.appendChild(detail); return li;
   }
+  function emptyBox(title, text) { const li = h("li", "plain"); const d = h("div", "empty-box"); d.append(h("b", "", title), document.createTextNode(text)); li.appendChild(d); return li; }
+  function row(ic, icCls, title, right, sub, code) {
+    const li = h("li"); const i = h("span", "ic" + (icCls ? " " + icCls : "")); i.innerHTML = icon(ic); li.appendChild(i);
+    li.appendChild(h("b", "", title)); const r = h("div", "r"); for (const x of right) r.appendChild(x); li.appendChild(r);
+    if (sub) li.appendChild(h("small", "", sub)); if (code) li.appendChild(h("code", "", code)); return li;
+  }
+  const pill = (cls, text) => h("span", "pill " + cls, text);
+
+  const SHORT = [[/training/i, "Training"], [/slack/i, "Slack channels"], [/analytics/i, "analytics request"], [/1:1/, "your first 1:1"], [/laptop/i, "laptop setup"], [/multi-factor/i, "MFA"]];
+  const short = step => (SHORT.find(([re]) => re.test(step)) || [0, step.replace(/\.$/, "")])[1];
+  function stepSub(step, p) {
+    const start = p.start_date ? day(p.start_date) : null;
+    if (/laptop/i.test(step)) return "With IT, in person, on your first day";
+    if (/multi-factor/i.test(step)) return "Only you can do this · Unblock never touches passwords or MFA";
+    if (/training/i.test(step)) return "Within 14 days of start" + (start ? ` · due ${fmtDay(plus(start, 14))}` : "");
+    if (/slack/i.test(step)) {
+      const ch = ["#announcements", "#ask-people-ops", "#" + (p.team || "team").toLowerCase().replace(/[^a-z0-9]+/g, "-")];
+      if (/analyst|data/i.test(p.role)) ch.push("#data-help");
+      if (/engineer|developer/i.test(p.role)) ch.push("#platform-help", "#deploys");
+      return ch.join(", ");
+    }
+    if (/analytics/i.test(step)) return "Needs manager sign-off";
+    if (/1:1/.test(step)) return `With ${p.manager || "your manager"} in your first week`;
+    return "";
+  }
+
   function renderHire(s) {
     last = s;
     const p = s.profile, first = p.name.split(" ")[0];
-    $("hello").textContent = `${greet()}, ${first}`;
-    $("heroSub").textContent = [p.role, p.team].filter(Boolean).join(", ") + (p.start_date ? ` · started ${fmtDay(day(p.start_date))}` : "");
-    renderTrack(p);
+    const n = p.start_date && p.today ? Math.max(1, Math.round((day(p.today) - day(p.start_date)) / 864e5) + 1) : null;
+    $("heroDay").textContent = (n ? `Day ${n} · ` : "") + todayStr();
+    $("hello").textContent = `Welcome, ${first}`;
+    $("heroSub").textContent = [p.role, p.team, p.office ? p.office + " office" : ""].filter(Boolean).join(" · ");
     const done = s.checklist_done || [], waiting = s.checklist_waiting || [], doable = s.checklist_doable || [];
-    $("meterTxt").textContent = `${done.length} of ${s.checklist.length} complete`;
+    $("meterTxt").textContent = `${done.length} of ${s.checklist.length} done`;
+    $("meterFill").style.width = (100 * done.length / Math.max(1, s.checklist.length)) + "%";
 
     const inbox = $("hireInbox"); inbox.replaceChildren(); let count = 0;
     if (s.awaiting_you) {
       const a = s.awaiting_you; count++;
-      const what = { system_action: "Approve a task", system_batch: "Approve your onboarding plan", access_request: "Review a request to your manager",
-                     message_helper: "Review a message", book_1_1: "Review a 1:1 invite", doc_owner_note: "Review a note to a doc owner", workday_action: "Approve a Workday task" }[a.type] || "Review";
-      inbox.appendChild(needItem("check", false, what, (a.title || "") + (a.to ? " · " + a.to : "") + (a.blocked ? " · remove the sensitive detail first" : ""),
-        [btn("Review", "", () => setPanel(true)), Object.assign(btn("Approve", "primary", () => send("", { action: "ub_approve" }, "Approve")), { disabled: a.blocked })]));
+      const eyebrow = { system_action: "A task Unblock can do", system_batch: "Onboarding steps Unblock can do", access_request: "Request to your manager",
+                        message_helper: "Message ready to send", book_1_1: "1:1 invite", doc_owner_note: "Note to a doc owner", workday_action: "Workday task" }[a.type] || "Ready for review";
+      const isMsg = ["access_request", "message_helper", "book_1_1", "doc_owner_note"].includes(a.type);
+      const ok = btn(isMsg ? "Approve and send" : "Approve and do it", "primary", () => send("", { action: "ub_approve" }, "Approve")); ok.disabled = a.blocked;
+      const steps = doable.filter(i => !waiting.includes(i)).map(i => short(s.checklist[i]));
+      const title = a.type === "system_batch" && steps.length ? cap(andList(steps)) : (a.title || "Review in the assistant") + (isMsg && a.to ? ` → ${a.to}` : "");
+      inbox.appendChild(tile({ eyebrow, title,
+        guard: a.blocked ? "Guardian found a sensitive detail. Edit it in the assistant first." : "Guardian checked: no passwords, IDs, pay or health details",
+        bad: a.blocked, buttons: [btn("Review", "link", () => setPanel(true)), btn("Reject", "", () => send("", { action: "ub_reject" }, "Reject")), ok] }));
     }
     for (const f of s.followups.filter(f => f.nudged && f.status === "waiting")) {
       count++;
-      inbox.appendChild(needItem("clock", true, `No reply from ${f.to}`, `${cap(f.kind.replace(/^your /, ""))} · sent ${f.age} ago`, [btn("Send a reminder", "", () => remind(f.id, false))]));
+      inbox.appendChild(tile({ eyebrow: "No reply yet", title: `${cap(f.kind.replace(/^your /, ""))} to ${f.to}`, sub: `Sent ${f.age} ago`, calm: true,
+        buttons: [btn("Send a reminder", "", () => remind(f.id, false))] }));
     }
-    const nextIdx = doable.find(i => !waiting.includes(i));
-    if (nextIdx != null && !s.awaiting_you) {
+    const open = doable.filter(i => !waiting.includes(i));
+    if (open.length && !s.awaiting_you) {
       count++;
-      inbox.appendChild(needItem("list", false, `Unblock can finish ${doable.length} onboarding task${doable.length > 1 ? "s" : ""} for you`,
-        s.checklist[nextIdx].replace(/\.$/, "") + (doable.length > 1 ? `, and ${doable.length - 1} more` : ""), [btn("Review the plan", "primary", () => send("Do my checklist"))]));
+      inbox.appendChild(tile({ eyebrow: "Onboarding steps Unblock can do", title: cap(andList(open.map(i => short(s.checklist[i])))),
+        sub: "You'll see each system and the exact fields before anything runs.",
+        guard: "Guardian checks every step before it runs", buttons: [btn("Review the plan", "primary", () => send("Do my checklist"))] }));
     }
-    if (!inbox.children.length) inbox.appendChild(h("li", "done", "Nothing needs you right now."));
-    $("inboxMeta").textContent = count ? `${count} item${count > 1 ? "s" : ""}` : "";
+    if (!inbox.children.length) inbox.appendChild(emptyBox("You're all caught up", "Nothing needs your approval right now."));
     const badge = $("badge"); badge.hidden = !count; badge.textContent = count;
 
     $("journey").replaceChildren(...s.checklist.map((step, i) => {
       const st = done.includes(i) ? "done" : waiting.includes(i) ? "wait" : doable.includes(i) ? "todo" : "you";
-      const mfa = /multi-factor/i.test(step);
       const li = h("li", st === "done" ? "isdone" : "");
-      const mark = h("div", "mark " + { done: "ok", wait: "wait", todo: "todo", you: "" }[st]);
-      if (st === "done") mark.innerHTML = icon("check"); else if (st === "wait") mark.innerHTML = icon("clock"); else mark.textContent = i + 1;
-      const tx = h("div", "txt"); tx.appendChild(h("b", "", step.replace(/\.$/, "")));
-      tx.appendChild(h("small", "", { done: "Done by Unblock", wait: "Waiting for Jordan Lee to approve", todo: "Unblock can do this for you",
-                                     you: mfa ? "Yours: Unblock never handles passwords or MFA" : "Done with IT in person" }[st]));
-      const code = { done: "UB", wait: "JL", todo: "UB", you: mfa ? "MC" : "IT" }[st];
-      const who = h("div", "who" + (code === "UB" ? " ub" : ""), code); who.title = { UB: "Unblock", JL: "Jordan Lee", MC: "You", IT: "IT" }[code];
-      const state = h("div", "state");
-      state.appendChild(h("span", "st " + { done: "ok", wait: "warn", todo: "info", you: "" }[st], { done: "Complete", wait: "Pending", todo: "Ready", you: "Not started" }[st]));
-      if (st === "you") state.appendChild(btn("How to", "link", () => send("How do I " + step.charAt(0).toLowerCase() + step.slice(1).replace(/\.$/, "") + "?")));
-      li.append(mark, tx, who, state); return li;
+      const num = h("span", "num " + { done: "ok", wait: "wait", todo: "todo", you: "" }[st]);
+      if (st === "done") num.innerHTML = icon("check"); else if (st === "wait") num.innerHTML = icon("clock"); else num.textContent = i + 1;
+      const tx = h("div", "txt"); tx.append(h("b", "", step.replace(/\.$/, "")), h("small", "", st === "wait" ? `Waiting for ${p.manager || "your manager"} to approve` : stepSub(step, p)));
+      const end = h("div", "end");
+      if (st === "you") end.appendChild(btn("How to", "link", () => send("How do I " + step.charAt(0).toLowerCase() + step.slice(1).replace(/\.$/, "") + "?")));
+      end.appendChild({ done: pill("green", "Done by Unblock"), wait: pill("amber", `Waiting on ${(p.manager || "manager").split(" ")[0]}`),
+                        todo: pill("blue", "Unblock can do this"), you: pill("", "Yours") }[st]);
+      li.append(num, tx, end); return li;
     }));
 
     if ((s.done_for_you || []).length) $("history").replaceChildren(...s.done_for_you.map(r => {
-      const li = h("li"); li.appendChild(h("b", "", r.title));
-      li.appendChild(h("span", "st " + (r.status === "done" ? "ok" : "warn"), { done: "Complete", processing: "In progress", open: "Open", submitted: "Submitted" }[r.status] || r.status));
-      li.appendChild(h("small", "", r.detail)); li.appendChild(h("code", "", `${r.id} · ${r.system}`)); return li;
+      const ok = r.status === "done";
+      return row(ok ? "check" : "clock", ok ? "" : "amber", r.title,
+        [pill(ok ? "green" : "amber", { done: "Complete", processing: "In progress", open: "Open", submitted: "Submitted" }[r.status] || r.status)], r.detail, `${r.id} · ${r.system}`);
     }));
 
     const items = [];
-    for (const r of s.requests) items.push([`${cap(r.category)} request`, `${r.request_id} · with your manager`, r.status === "pending" ? ["warn", "Pending"] : r.status === "approved" ? ["ok", "Approved"] : ["bad", "Denied"]]);
-    for (const f of s.followups) if (!f.id.startsWith("AR-")) items.push([`${cap(f.kind.replace(/^your /, ""))} to ${f.to}`, `"${f.summary}" · ${f.age} ago`, f.status === "waiting" ? ["warn", f.nudged ? "Reminder offered" : "Waiting"] : ["ok", "Answered"]]);
-    if (items.length) $("waiting").replaceChildren(...items.map(([t, sub, [cls, label]]) => {
-      const li = h("li"); const row = h("div", "row"); row.append(h("b", "", t), h("span", "st " + cls, label)); li.append(row, h("small", "", sub)); return li;
-    }));
+    for (const r of s.requests) items.push([cap(r.category) + " request", `${r.request_id} · with your manager`,
+      r.status === "pending" ? ["amber", "Pending"] : r.status === "approved" ? ["green", "Approved"] : ["red", "Denied"]]);
+    for (const f of s.followups) if (!f.id.startsWith("AR-")) items.push([`${cap(f.kind.replace(/^your /, ""))} to ${f.to}`, `"${f.summary}" · ${f.age} ago`,
+      f.status === "waiting" ? ["amber", f.nudged ? "Reminder offered" : "Waiting"] : ["green", "Answered"]]);
+    if (items.length) $("waiting").replaceChildren(...items.map(([t, sub, [cls, label]]) =>
+      row(cls === "green" ? "check" : cls === "red" ? "x" : "clock", cls === "green" ? "" : cls, t, [pill(cls, label)], sub)));
 
-    const init = p.name.split(" ").map(x => x[0]).join("").slice(0, 2);
-    $("profInit").textContent = init; $("avatar").textContent = init;
-    $("profName").textContent = p.name; $("profRole").textContent = p.role;
-    $("profile").replaceChildren(...[["Team", p.team], ["Manager", p.manager], ["Location", p.office ? p.office + " office" : ""],
-      ["Start date", p.start_date ? day(p.start_date).toLocaleDateString([], { month: "long", day: "numeric", year: "numeric" }) : ""]]
+    $("avatar").textContent = p.name.split(" ").map(x => x[0]).join("").slice(0, 2);
+    $("profile").replaceChildren(...[["Manager", p.manager], ["Started", p.start_date ? day(p.start_date).toLocaleDateString([], { month: "long", day: "numeric" }) : ""],
+      ["Training due", p.start_date ? fmtDay(plus(day(p.start_date), 14)) : ""], ["Day 30 check-in", p.start_date ? fmtDay(plus(day(p.start_date), 29)) : ""]]
       .filter(([, v]) => v).flatMap(([k, v]) => [h("dt", "", k), h("dd", "", v)]));
-    $("profSrc").textContent = `Source: ${p.source === "Workday" ? "Workday" : "sample profile"} · Workday tools ${p.workday_mcp && /^connected/.test(p.workday_mcp) ? "connected" : "not connected"}`;
+    $("profSrc").textContent = `Profile: ${p.source === "Workday" ? "Workday" : "sample data"} · Workday tools ${p.workday_mcp && /^connected/.test(p.workday_mcp) ? "connected" : "not connected"}`;
 
     for (const m of s.inbox || []) {
       after = Math.max(after, m.id);
       bubble("bot", md((m.from === "manager" ? "**Update from your manager's approval:** " : m.from === "tracker" ? "**Follow-up:** " : "") + m.text));
     }
-    store.set("ub.wd.after", after);
+    s.inbox = []; store.set("ub.wd.after", after);
   }
 
   function setBandKpis(rows) {
@@ -661,42 +684,39 @@ dl.kv dt { color: var(--ink-3); } dl.kv dd { margin: 0; }
     try { res = await fetch("/api/portal/manager", { headers: { "X-Manager-Key": mgrKey } }); } catch (e) { return; }
     $("mgrKeyRow").hidden = res.status !== 403;
     const inbox = $("mgrInbox"); inbox.replaceChildren();
-    if (res.status === 403) { inbox.appendChild(h("li", "empty", "Enter the manager key to see your team's requests.")); setBandKpis([]); return; }
+    if (res.status === 403) { inbox.appendChild(emptyBox("Locked", "Enter the manager key to see your team's requests.")); setBandKpis([]); $("mgrHistory").replaceChildren(emptyBox("Locked", "Unlock to see what you decided.")); $("team").replaceChildren(emptyBox("Locked", "Unlock to see your team's onboarding.")); return; }
     const list = await res.json();
     const pending = list.filter(r => r.status === "pending"), decided = list.filter(r => r.status !== "pending");
     $("badge").hidden = !pending.length; $("badge").textContent = pending.length;
     setBandKpis([[pending.length, "Waiting for you"], [decided.filter(r => r.status === "approved").length, "Approved"],
                  [last ? `${(last.checklist_done || []).length} of ${last.checklist.length}` : "–", "Maya's onboarding"]]);
-    if (!pending.length) inbox.appendChild(h("li", "empty", "Nothing is waiting for you."));
+    if (!pending.length) inbox.appendChild(emptyBox("You're all caught up", "Nothing from your team is waiting for you."));
     for (const r of pending) {
-      const li = h("li"); const row = h("div", "row"); const t = h("div");
-      t.append(h("b", "", `${cap(r.category)} for ${r.requester ? r.requester.name : "a new hire"}`), h("small", "", `${r.request_id} · received ${ago(r.created)}`));
       const detail = h("div", "detail"); detail.hidden = true;
-      const tg = btn("Details", "link", () => { detail.hidden = !detail.hidden; }); tg.style.marginTop = "4px"; t.appendChild(tg);
       detail.appendChild(h("p", "", r.body || ""));
       if ((r.evidence || []).length) { detail.appendChild(h("small", "", "From the approved docs:")); const ul = h("ul"); for (const e of r.evidence) ul.appendChild(h("li", "", e)); detail.appendChild(ul); }
       const note = h("input"); note.placeholder = "Comment (optional)"; note.setAttribute("aria-label", "Comment"); detail.appendChild(note);
-      const go = h("div", "go");
-      for (const [label, decision, cls] of [["Approve", "approved", "primary"], ["Deny", "rejected", "danger"]]) {
-        go.appendChild(btn(label, cls, async () => {
-          go.querySelectorAll("button").forEach(x => x.disabled = true);
+      const acts = [btn("Details", "link", () => { detail.hidden = !detail.hidden; })];
+      for (const [label, decision, cls] of [["Deny", "rejected", "danger"], ["Approve", "approved", "primary"]]) {
+        acts.push(btn(label, cls, async ev => {
+          ev.target.closest(".go").querySelectorAll("button").forEach(x => x.disabled = true);
           await fetch("/api/portal/decide", { method: "POST", headers: { "Content-Type": "application/json", "X-Manager-Key": mgrKey },
             body: JSON.stringify({ request_id: r.request_id, decision, note: note.value.trim() }) });
           renderMgr();
         }));
       }
-      row.append(t, go); li.append(row, detail); inbox.appendChild(li);
+      inbox.appendChild(tile({ eyebrow: `${r.category} · ${r.request_id}`, title: `${cap(r.category)} for ${r.requester ? r.requester.name : "a new hire"}`,
+        sub: `Received ${ago(r.created)}. Unblock files the form only after you approve.`, guard: "Guardian checked the request", buttons: acts, detail }));
     }
     $("mgrHistory").replaceChildren(...(decided.length ? decided.slice(0, 6).map(r => {
-      const li = h("li"); li.appendChild(h("b", "", `${cap(r.category)} · ${r.requester ? r.requester.name : ""}`));
-      const rr = h("div", "r"); rr.appendChild(h("span", "st " + (r.status === "approved" ? "ok" : "bad"), r.status === "approved" ? "Approved" : "Denied")); li.appendChild(rr);
-      li.appendChild(h("small", "", r.request_id + (r.status === "approved" && /analytics/.test(r.category) ? " · form filed by Unblock after your approval" : "")));
-      return li;
-    }) : [h("li", "empty", "No decisions yet.")]));
+      const ok = r.status === "approved";
+      return row(ok ? "check" : "x", ok ? "" : "red", `${cap(r.category)} · ${r.requester ? r.requester.name : ""}`, [pill(ok ? "green" : "red", ok ? "Approved" : "Denied")],
+        r.request_id + (ok && /analytics/.test(r.category) ? " · form filed by Unblock after your approval" : ""));
+    }) : [emptyBox("No decisions yet", "Requests you approve or deny appear here.")]));
     if (last) {
-      const done = (last.checklist_done || []).length, li = h("li"), row = h("div", "row");
-      row.append(h("b", "", last.profile.name), h("span", "st " + (done === last.checklist.length ? "ok" : "info"), `${done} of ${last.checklist.length}`));
-      li.append(row, h("small", "", `${last.profile.role} · ${(last.done_for_you || []).length} tasks done by Unblock`)); $("team").replaceChildren(li);
+      const done = (last.checklist_done || []).length;
+      $("team").replaceChildren(row("check", done === last.checklist.length ? "" : "blue", last.profile.name,
+        [pill(done === last.checklist.length ? "green" : "blue", `${done} of ${last.checklist.length}`)], `${last.profile.role} · ${(last.done_for_you || []).length} tasks done by Unblock`));
     }
   }
   $("mgrKeyGo").onclick = () => { mgrKey = $("mgrKey").value; try { sessionStorage.setItem("ub.mkey", mgrKey); } catch (e) {} renderMgr(); };
@@ -704,34 +724,32 @@ dl.kv dt { color: var(--ink-3); } dl.kv dd { margin: 0; }
   async function renderOps() {
     try {
       const fm = await (await fetch("/api/friction")).json();
-      $("fmSub").textContent = `Last ${fm.window_days} days · ${/Tiger/.test(fm.storage) ? "Tiger Data" : "local data"}`;
+      $("fmSub").textContent = `Last ${fm.window_days} days · ${/Tiger/.test(fm.storage) && !/not reachable|unreachable/.test(fm.storage) ? "Tiger Data" : "local data"}`;
       setBandKpis([[fm.total_blockers, "Blockers in 30 days"], [Math.round(fm.resolved_without_ticket_share * 100) + "%", "Solved without a ticket"], [fm.process_gaps, "Process gaps found"]]);
       const max = Math.max(1, ...fm.clusters.map(c => c.count));
       $("fmBars").replaceChildren(...fm.clusters.slice(0, 7).map(c => {
-        const row = h("div", "bar-row"); row.title = c.pattern || "";
+        const r = h("div", "bar-row"); r.title = c.pattern || "";
         const tr = h("div", "tr"); const f = h("div", "fl" + (c.fixable ? " gap" : "")); f.style.width = (100 * c.count / max) + "%"; tr.appendChild(f);
-        row.append(h("span", "", cap(c.topic)), tr, h("span", "", c.count)); return row;
+        r.append(h("span", "", cap(c.topic)), tr, h("span", "", c.count)); return r;
       }));
       const run = await (await fetch("/api/canary/latest")).json();
       if (run.status === "none") { $("canarySub").textContent = "No run yet. Synthetic new hires walk the docs before real people start."; return; }
       const sm = run.summary || {};
       $("canarySub").textContent = run.status === "running" ? "Running now…"
-        : `Last run ${run.run_id}: ${sm.walls} findings from 3 synthetic new hires. Estimated time saved for a 3-person cohort: ${(sm.minutes_saved_per_cohort / 60).toFixed(1)} hours.`;
-      $("walls").replaceChildren(...(run.walls || []).map(w => {
-        const li = h("li"); li.appendChild(h("b", "", w.headline));
-        const rr = h("div", "r"); rr.append(h("span", "st " + (w.predicted ? "warn" : "info"), w.predicted ? "Not reported yet" : `${w.humans_hit} reported`), h("span", "chip", w.label));
-        li.appendChild(rr); li.appendChild(h("small", "", "Found by " + w.canaries.join(", "))); return li;
-      }));
+        : `Last run ${run.run_id}: ${sm.walls} findings from 3 synthetic new hires · about ${(sm.minutes_saved_per_cohort / 60).toFixed(1)} hours saved per 3-person cohort.`;
+      $("walls").replaceChildren(...(run.walls || []).map(w =>
+        row("file", w.predicted ? "amber" : "blue", w.headline, [pill(w.predicted ? "amber" : "blue", w.predicted ? "Not reported yet" : `${w.humans_hit} reported`)],
+          `${w.label} · found by ${w.canaries.join(", ")}`)));
       if ((run.fixes || []).length) $("fixes").replaceChildren(...run.fixes.map(f => {
-        const li = h("li"); li.appendChild(h("b", "", `${{ edit: "Edit", archive: "Archive note", write: "Writing request" }[f.kind]}${f.doc_title ? " · " + f.doc_title : ""} → ${f.to.name}`));
-        const rr = h("div", "r"); rr.appendChild(h("span", "st " + (f.status === "sent" ? "ok" : f.status === "ready" ? "info" : "warn"), { sent: "Sent", ready: "Ready", drafting: "Drafting", blocked: "Blocked" }[f.status] || f.status));
-        if (f.status === "ready") rr.appendChild(btn("Send", "primary", async ev => {
+        const right = [pill(f.status === "sent" ? "green" : f.status === "ready" ? "blue" : "amber", { sent: "Sent", ready: "Ready", drafting: "Drafting", blocked: "Blocked" }[f.status] || f.status)];
+        if (f.status === "ready") right.push(btn("Send", "sm primary", async ev => {
           ev.target.disabled = true;
           const r = await fetch("/api/canary/approve", { method: "POST", headers: { "Content-Type": "application/json", "X-Manager-Key": mgrKey }, body: JSON.stringify({ run_id: run.run_id, fix_id: f.id }) });
           if (r.status === 403) { $("canarySub").textContent = "Enter the manager key in Jordan's view first, then send fixes."; ev.target.disabled = false; return; }
           renderOps();
         }));
-        li.appendChild(rr); if (f.after) li.appendChild(h("small", "", f.after)); return li;
+        return row(f.status === "sent" ? "check" : "file", f.status === "sent" ? "" : "blue",
+          `${{ edit: "Edit", archive: "Archive note", write: "Writing request" }[f.kind]}${f.doc_title ? " · " + f.doc_title : ""} → ${f.to.name}`, right, f.after || "");
       }));
       if (run.status === "running") setTimeout(renderOps, 1500);
     } catch (e) {}
@@ -748,11 +766,14 @@ dl.kv dt { color: var(--ink-3); } dl.kv dd { margin: 0; }
     role = r; store.set("ub.wd.role", r);
     for (const [k, [id]] of Object.entries(ROLES)) $(id).setAttribute("aria-pressed", String(k === r));
     document.querySelectorAll("[data-role]").forEach(el => el.hidden = el.dataset.role !== r);
+    document.querySelectorAll("[data-hero]").forEach(el => el.hidden = el.dataset.hero !== r);
     $("bandKpis").hidden = r === "hire";
-    $("avatar").textContent = ROLES[r][1];
-    if (r === "mgr") { $("hello").textContent = `${greet()}, Jordan`; $("heroSub").textContent = "Analytics Manager, Growth Insights"; renderMgr(); }
-    if (r === "ops") { $("hello").textContent = `${greet()}, Elena`; $("heroSub").textContent = "People Operations Partner · onboarding across Lumen Labs"; renderOps(); }
-    if (r === "hire") poll();
+    $("panel").hidden = r !== "hire"; $("layout").classList.toggle("solo", r !== "hire");
+    $("avatar").textContent = ROLES[r][1]; $("badge").hidden = true;
+    if (r !== "hire") $("heroDay").textContent = todayStr();
+    if (r === "mgr") { $("hello").textContent = "Welcome, Jordan"; $("heroSub").textContent = "Analytics Manager · Growth Insights · US office"; renderMgr(); }
+    if (r === "ops") { $("hello").textContent = "Welcome, Elena"; $("heroSub").textContent = "People Operations Partner · onboarding across Lumen Labs"; renderOps(); }
+    if (r === "hire") { if (last) renderHire(last); poll(); }
   }
   $("rHire").onclick = () => setRole("hire"); $("rMgr").onclick = () => setRole("mgr"); $("rOps").onclick = () => setRole("ops");
   $("inboxBtn").onclick = () => window.scrollTo({ top: 0, behavior: "smooth" });
@@ -765,8 +786,8 @@ dl.kv dt { color: var(--ink-3); } dl.kv dd { margin: 0; }
     } catch (e) {}
   }
 
-  bubble("bot", md("Hi, I'm Unblock. I answer from Lumen Labs' approved docs and show where each answer comes from. I can also complete onboarding tasks for you, like joining your Slack channels or booking your first 1:1. I'll show you what I'm about to do first."));
-  setPanel(store.get("ub.wd.panel", false));
+  bubble("bot", md("Hi, I'm Unblock. I answer from Lumen Labs' approved docs and show where each answer comes from. I can also finish onboarding tasks for you, like joining your Slack channels or booking your first 1:1. I'll show you exactly what I'm about to do first."));
+  $("heroDay").textContent = todayStr();
   setRole(role);
   setInterval(() => { if (role === "hire") poll(); else if (role === "mgr") renderMgr(); }, 4000);
 })();
