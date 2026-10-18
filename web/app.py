@@ -138,6 +138,12 @@ async def voice_ask(body: Ask, request: Request, x_unblock_secret: str = Header(
             "sources": [c["title"] for c in result["citations"]], "blocked_claims": len(result["blocked"])}
 
 
+@app.get("/api/voice/config")
+def voice_config():
+    # The agent id is public (the widget puts it in the page); the tool secret never leaves the server.
+    return {"agent_id": env("ELEVENLABS_AGENT_ID") or None}
+
+
 _fmap: dict = {"at": 0.0, "value": None, "busy": False}
 FRICTION_CACHE_SECONDS = 60
 

@@ -97,6 +97,10 @@ button:disabled { opacity: 0.5; cursor: not-allowed; }
 .inrow { display: flex; gap: 8px; }
 .inrow input { flex: 1; min-width: 0; font: inherit; padding: 11px 13px; border: 1px solid var(--line); border-radius: 10px; background: var(--paper); color: var(--ink); }
 .hint { font-size: 12.5px; color: var(--muted); margin: 0; }
+.mic { flex: none; width: 46px; padding: 0; display: grid; place-items: center; color: var(--pine); }
+.mic svg { width: 20px; height: 20px; }
+.mic.on { background: var(--brick); border-color: var(--brick); color: #fff; animation: pulse 1.2s infinite; }
+@keyframes pulse { 50% { box-shadow: 0 0 0 6px var(--brick-soft); } }
 
 /* side */
 .side { display: grid; gap: 16px; }
@@ -173,6 +177,7 @@ button:disabled { opacity: 0.5; cursor: not-allowed; }
         </div>
         <div class="inrow">
           <input id="q" autocomplete="off" placeholder="What's blocking you? Ask in your own words" aria-label="Your question">
+          <button type="button" class="mic" id="mic" hidden aria-label="Ask by voice" title="Ask by voice"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="9" y="3" width="6" height="11" rx="3"/><path d="M5 11a7 7 0 0 0 14 0M12 18v3"/></svg></button>
           <button class="primary" type="submit" id="send">Ask</button>
         </div>
         <p class="hint">Answers come only from approved Lumen Labs docs. Nothing is sent to anyone until you press Approve.</p>
@@ -376,7 +381,7 @@ button:disabled { opacity: 0.5; cursor: not-allowed; }
       const r = await res.json();
       t.remove();
       if (!res.ok) { bubble("bot", md(r.detail ? String(r.detail.msg || r.detail) : "Something went wrong. Nothing was sent.")); }
-      else { renderBot(r, true); remember({ who: "bot", r }); }
+      else { renderBot(r, true); remember({ who: "bot", r }); if (spoken) say(r.text); }
     } catch (e) { t.remove(); bubble("bot", md("I couldn't reach the server. Nothing was sent. Try again in a moment.")); }
     busy = false; $("send").disabled = false; refresh();
   }
@@ -391,6 +396,30 @@ button:disabled { opacity: 0.5; cursor: not-allowed; }
   }
 
   $("composer").onsubmit = ev => { ev.preventDefault(); const q = $("q").value.trim(); if (!q) return; $("q").value = ""; send(q); };
+
+  // ---------- voice: speak a question, hear the verified answer read back ----------
+  let spoken = false;
+  function say(text) {
+    if (!("speechSynthesis" in window) || !text) return;
+    const plain = String(text).replace(/\[([^\]]+)\]\([^)]+\)/g, "$1").replace(/\[D\d+\]/g, "").replace(/[*_`#>]/g, "").replace(/\n+/g, ". ").slice(0, 700);
+    speechSynthesis.cancel(); speechSynthesis.speak(new SpeechSynthesisUtterance(plain));
+  }
+  const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+  if (SR) {
+    const mic = $("mic"), rec = new SR();
+    rec.lang = "en-US"; rec.interimResults = true;
+    let listening = false;
+    rec.onstart = () => { listening = true; mic.classList.add("on"); $("q").placeholder = "Listening…"; };
+    rec.onend = () => {
+      listening = false; mic.classList.remove("on"); $("q").placeholder = "What's blocking you? Ask in your own words";
+      const q = $("q").value.trim(); if (!q) return;
+      $("q").value = ""; spoken = true; send(q).finally(() => { spoken = false; });
+    };
+    rec.onresult = e => { $("q").value = Array.from(e.results).map(x => x[0].transcript).join(""); };
+    rec.onerror = e => { if (e.error === "not-allowed") $("q").placeholder = "Microphone blocked. Allow it in the address bar."; };
+    mic.onclick = () => { if (busy) return; if (listening) rec.stop(); else { speechSynthesis.cancel(); $("q").value = ""; rec.start(); } };
+    mic.hidden = false;
+  }
   $("chips").querySelectorAll("button").forEach(b => b.onclick = () => send(b.textContent));
 
   // ---------- side panel ----------
@@ -513,6 +542,17 @@ button:disabled { opacity: 0.5; cursor: not-allowed; }
     }
     setInterval(() => { if (!$("hireView").hidden) refresh(); else loadQueue(); }, 4000);
   })();
+
+  // ---------- voice: the ElevenLabs widget, only when ELEVENLABS_AGENT_ID is set ----------
+  fetch("/api/voice/config").then(r => r.ok ? r.json() : {}).then(({ agent_id }) => {
+    if (!agent_id) return;
+    const w = document.createElement("elevenlabs-convai");
+    w.setAttribute("agent-id", agent_id);
+    document.body.appendChild(w);
+    const s = document.createElement("script");
+    s.src = "https://unpkg.com/@elevenlabs/convai-widget-embed"; s.async = true;
+    document.body.appendChild(s);
+  }).catch(() => {});
 })();
 </script>
 </body>

@@ -30,6 +30,13 @@ def test_voice_tool_speaks_and_checks_secret(monkeypatch):
     assert ok.status_code == 200
 
 
+def test_voice_config(monkeypatch):
+    monkeypatch.delenv("ELEVENLABS_AGENT_ID", raising=False)
+    assert client.get("/api/voice/config").json() == {"agent_id": None}
+    monkeypatch.setenv("ELEVENLABS_AGENT_ID", "agent_abc")
+    assert client.get("/api/voice/config").json() == {"agent_id": "agent_abc"}
+
+
 def test_voice_never_guesses():
     r = client.post("/api/voice/ask", json={"question": "Is there free lunch on Fridays?"}).json()
     assert r["kind"] == "route" and "won't guess" in r["answer"]
