@@ -5,7 +5,7 @@
 
 **An onboarding agent network that does the work for new hires, can't make things up, and tests your docs with Canary New Hires: synthetic new hires who hit the walls before your people do.**
 
-**Demo video:** VIDEO-LINK · **Live:** LIVE-LINK · **Devpost:** DEVPOST-LINK
+**Code:** https://github.com/SreenijaPavuluri/teamready · **Demo video:** VIDEO-LINK · **Live:** LIVE-LINK · **Devpost:** DEVPOST-LINK
 Built for LA Hacks AI Hackathon 2026: Workday "Build the Future of Work with AI", the Fetch.ai ASI:One Agent Challenge, and CREAO Best Team Empowerment.
 
 A new hire describes a blocker in ASI:One. TeamReady answers only from approved company docs, verifies every claim word for word, finds the right person to ask when the docs fall short, drafts the message, and sends it only after the new hire approves. Access requests go to a human manager. Pay, performance and harassment questions go straight to a person. People Ops gets an anonymous Friction Map of what keeps blocking new hires, and pays for the full report through the Fetch.ai Payment Protocol.

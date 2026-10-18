@@ -12,7 +12,7 @@ Requirements from the hackathon page, what's ready, and what's left for a person
 
 ## Steps for a person
 
-1. **Push the repo public** from the terminal (repo `SreenijaPavuluri/unblock`). Check on GitHub
+1. **Repo is public:** https://github.com/SreenijaPavuluri/teamready. Check on GitHub
    afterwards that `.env` is not in the file list.
 2. **Upload the video** (`demo/teamready_demo.mp4`) to YouTube (Unlisted is fine) or Vimeo and copy the link.
 3. **Fill in Devpost**, section by section, from `docs/devpost.md`:

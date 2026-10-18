@@ -5,7 +5,7 @@ with synthetic new hires before real people start.
 
 **Tracks:** Workday "Build the Future of Work with AI" · Fetch.ai ASI:One Agent Challenge · CREAO Best Team Empowerment
 
-**Links:** GitHub https://github.com/SreenijaPavuluri/unblock · Demo video VIDEO-LINK · Live site LIVE-LINK (`/workday`,
+**Links:** GitHub https://github.com/SreenijaPavuluri/teamready · Demo video VIDEO-LINK · Live site LIVE-LINK (`/workday`,
 `/canary`, `/activity`) · CREAO run https://agent.creao.ai/share/0773babf9c5d456f0fc0446a58d6da2f · ASI:One: message
 `teamready-orchestrator` (addresses in the README)
 
