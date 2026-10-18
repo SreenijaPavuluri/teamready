@@ -1,4 +1,4 @@
-# Unblock eval results
+# TeamReady eval results
 
 Mode: **anthropic** (Sonnet)
 

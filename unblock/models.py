@@ -1,4 +1,4 @@
-"""Messages the Unblock agents send each other over uAgents."""
+"""Messages the TeamReady agents send each other over uAgents."""
 from uagents import Model
 
 

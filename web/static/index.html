@@ -3,8 +3,9 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Unblock</title>
-<meta name="description" content="Unblock answers new-hire questions only from approved docs, proves every claim, and finds the right person when the docs fall short.">
+<title>TeamReady</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns=%27http://www.w3.org/2000/svg%27 viewBox=%270 0 24 24%27%3E%3Crect width=%2724%27 height=%2724%27 rx=%276%27 fill=%27%231f66ff%27/%3E%3Cpath d=%27M5.5 12.5l4 4L18.5 7.5%27 fill=%27none%27 stroke=%27white%27 stroke-width=%273%27 stroke-linecap=%27round%27 stroke-linejoin=%27round%27/%3E%3C/svg%3E">
+<meta name="description" content="TeamReady answers new-hire questions only from approved docs, proves every claim, and finds the right person when the docs fall short.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wdth,wght@12..96,75..100,400..800&family=Source+Sans+3:ital,wght@0,400;0,600;1,400&display=swap" rel="stylesheet">
@@ -103,7 +104,7 @@ footer { padding: 40px 0 60px; color: var(--muted); font-size: 15px; border-top:
 <body>
 <div class="wrap">
   <header class="site">
-    <a class="mark" href="/">unblock</a>
+    <a class="mark" style="font-weight:800;letter-spacing:-0.02em;text-transform:none" href="/"><span style="color:#1f66ff">Team</span>Ready<svg viewBox="0 0 24 24" width="0.9em" height="0.9em" style="margin-left:2px;vertical-align:-0.05em;fill:none;stroke:#2f72ff;stroke-width:3.4;stroke-linecap:round;stroke-linejoin:round" aria-hidden="true"><path d="M3 13.5l5.5 5L21 5"/></svg></a>
     <nav><a href="/app"><strong>Open the portal</strong></a><a href="/workday"><strong>Workday view</strong></a><a href="/canary">Canary new hires</a><a href="/activity">Agent activity</a><a href="#friction">Friction Map</a><a href="#honest">How it stays honest</a></nav>
   </header>
 
@@ -111,7 +112,7 @@ footer { padding: 40px 0 60px; color: var(--muted); font-size: 15px; border-top:
     <section class="hero">
       <div>
         <h1>Stuck in your first weeks? Ask. It won't make things up.</h1>
-        <p class="lede">Unblock answers new-hire questions only from approved company docs, proves every claim, and finds the right person when the docs fall short.</p>
+        <p class="lede">TeamReady answers new-hire questions only from approved company docs, proves every claim, and finds the right person when the docs fall short.</p>
         <ul class="facts">
           <li>Every claim is checked word for word against its source before you see it.</li>
           <li>Nothing is sent for you until you approve it. Access goes to your manager.</li>
@@ -149,7 +150,7 @@ footer { padding: 40px 0 60px; color: var(--muted); font-size: 15px; border-top:
       <div>
         <h2>Use it</h2>
         <p class="sub">The full assistant lives in ASI:One. Search for <b>unblock-orchestrator</b>, or message its address. There it drafts messages, 1:1 invites and access requests, and sends them only after you approve.</p>
-        <p class="sub">Prefer talking? The Unblock voice agent answers out loud through the same verifier, so a spoken answer is held to the same proof as a written one.</p>
+        <p class="sub">Prefer talking? The TeamReady voice agent answers out loud through the same verifier, so a spoken answer is held to the same proof as a written one.</p>
       </div>
       <div>
         <h2>The agents</h2>
@@ -168,7 +169,7 @@ footer { padding: 40px 0 60px; color: var(--muted); font-size: 15px; border-top:
         <li>The quote isn't cut out of a sentence that says "not".</li>
         <li>Most of the claim's words appear in the quote.</li>
         <li>Every number in the claim is in the quote.</li>
-        <li>If nothing survives, Unblock asks a person instead of guessing.</li>
+        <li>If nothing survives, TeamReady asks a person instead of guessing.</li>
       </ol>
     </section>
   </main>
@@ -205,7 +206,7 @@ function render(r) {
     html += `<div class="conf">${Object.keys(f).map((k) => `<div><b>${f[k].points}/${f[k].max}</b>${k}</div>`).join("")}</div>`;
     html += `<p class="why" style="margin-top:8px">Confidence: ${esc(r.confidence.label)} (${r.confidence.score}/100)</p>`;
   }
-  if (r.trace && r.trace.length) html += `<details class="trace"><summary>What Unblock did</summary><ol>${r.trace.map((t) => `<li>${esc(t)}</li>`).join("")}</ol></details>`;
+  if (r.trace && r.trace.length) html += `<details class="trace"><summary>What TeamReady did</summary><ol>${r.trace.map((t) => `<li>${esc(t)}</li>`).join("")}</ol></details>`;
   if (r.llm === "extractive") html += `<p class="why">Running without an AI model: answers are direct quotes.</p>`;
   $("#result").innerHTML = html;
 }

@@ -2,7 +2,7 @@
 
 Each canary (data/canaries.json) is a fictional new hire with a role and an
 office. It walks its onboarding checklist step by step, plus a few tasks for its
-role, and asks Unblock how to do each one, through the same risk gate and
+role, and asks TeamReady how to do each one, through the same risk gate and
 verified-answer pipeline a real new hire gets. Then it judges whether a person
 could actually do the step from what the docs say:
 
@@ -52,8 +52,8 @@ STATUS = {
     "loop": ("Circular", 120, "The only source is the checklist itself. No approved doc says how."),
     "trap": ("Stale-doc trap", 90, "An out-of-date doc still ranks for this and gives different instructions."),
     "dead_end": ("Dead end", 240, "No approved doc covers this for this office, so it waits on a person."),
-    "approval": ("Needs manager", 0, "Gated on purpose: Unblock prepares the request and the manager approves."),
-    "person": ("Person only", 0, "High-impact: Unblock hands it to a person by design."),
+    "approval": ("Needs manager", 0, "Gated on purpose: TeamReady prepares the request and the manager approves."),
+    "person": ("Person only", 0, "High-impact: TeamReady hands it to a person by design."),
 }
 WALLS = ("trap", "dead_end", "loop", "detour")
 MINUTES_NOTE = ("Estimated minutes a real new hire would lose at each wall: detour 30, stale-doc trap 90, "
@@ -104,7 +104,7 @@ def _overlap(task: str, title: str) -> float:
 
 
 def classify(task: str, start_doc: str, risk, answer: dict) -> tuple[str, dict]:
-    """(status, details) for one step, from the risk gate and Unblock's verified answer."""
+    """(status, details) for one step, from the risk gate and TeamReady's verified answer."""
     docs = load_docs()
     stale = next((c for c in answer.get("conflicts", []) if c.get("type") == "stale doc"), None)
     cited = [c["id"] for c in answer.get("citations", [])]
@@ -140,7 +140,7 @@ def classify(task: str, start_doc: str, risk, answer: dict) -> tuple[str, dict]:
 
 
 async def walk(c: dict, ask, on_step=None) -> list[dict]:
-    """One canary's walk. ask(question, user) -> Unblock's answer dict. Calls on_step(record) after each step."""
+    """One canary's walk. ask(question, user) -> TeamReady's answer dict. Calls on_step(record) after each step."""
     user = canary_user(c)
     docs = load_docs()
     out = []
@@ -321,15 +321,15 @@ def propose(w: dict, claims: list[str]) -> dict:
             except Exception as exc:  # CREAO down or misconfigured: draft here instead
                 activity.log("canary", f"CREAO unavailable ({type(exc).__name__}); drafting the fix here", kind="block")
         llm = get_llm_or_unavailable()
-        drafted, drafter = None, "Unblock (from the source doc's own words)"
+        drafted, drafter = None, "TeamReady (from the source doc's own words)"
         if llm.mode not in ("extractive", "unavailable"):
             try:
-                drafted, drafter = llm.propose_fix(_cluster(w), doc.body, doc.title, source.body), f"Unblock ({llm.mode})"
+                drafted, drafter = llm.propose_fix(_cluster(w), doc.body, doc.title, source.body), f"TeamReady ({llm.mode})"
             except LLMError:
                 drafted = None
         checked = _check_fix(drafted, doc) if drafted else {"error": "no model draft"}
         if "error" in checked:
-            checked, drafter = _check_fix(_local_fix(w, claims), doc), "Unblock (from the source doc's own words)"
+            checked, drafter = _check_fix(_local_fix(w, claims), doc), "TeamReady (from the source doc's own words)"
         fix.update(drafter=drafter, **checked)
         if "error" in checked:
             fix["status"] = "blocked"
@@ -341,12 +341,12 @@ def propose(w: dict, claims: list[str]) -> dict:
         fix.update(kind="archive", to=w["owner"], doc_id=doc.id, doc_title=doc.title, before=first,
                    after="OUT OF DATE: don't use this runbook." + (f" Follow '{current.title}' instead." if current else ""),
                    rationale=f"It was last updated {doc.updated_at.isoformat()} and new hires still find it.",
-                   drafter="Unblock (archive note)")
+                   drafter="TeamReady (archive note)")
     else:
         to = w.get("writer") or {"id": "p05", "name": load_people()["p05"]["name"], "role": load_people()["p05"]["role"]}
         fix.update(kind="write", to=to, doc_id=w.get("doc_id", ""), doc_title=w.get("doc_title", ""),
                    before="", after=f"A short how-to for \"{w['task']}\" ({', '.join(w['offices'])} offices).",
-                   rationale=w["why"], drafter="Unblock (writing request)")
+                   rationale=w["why"], drafter="TeamReady (writing request)")
     return fix
 
 
@@ -381,7 +381,7 @@ def refresh(run: dict) -> bool:
         if "error" in checked:
             activity.log("canary", f"CREAO run unusable ({checked['error']}); drafting the fix here", kind="block")
             checked = _check_fix(_local_fix(w, []), docs[fix["doc_id"]])
-            fix["drafter"] = "Unblock (CREAO run unusable, drafted from the source doc)"
+            fix["drafter"] = "TeamReady (CREAO run unusable, drafted from the source doc)"
         else:
             activity.log("creao", "Drafted a one-line fix to the doc", to="canary", kind="message")
             activity.log("canary", "Exact-quote check passed: the fix quotes the doc word for word", kind="check")
@@ -531,12 +531,12 @@ def approve(run_id: str, fix_id: str) -> dict:
             subject = "Onboarding docs: a missing how-to new hires will need"
             body = (f"Hi {fix['to']['name'].split()[0]},\n\nUnblock's canary new hires (synthetic, no real people) tried to onboard "
                     f"with our docs and couldn't find how to do this: {fix['after']}\n\n{fix['rationale']}\n\n"
-                    "Could you write a few lines for it, or tell People Ops who should?\n\nThanks,\nPeople Ops (via Unblock)")
+                    "Could you write a few lines for it, or tell People Ops who should?\n\nThanks,\nPeople Ops (via TeamReady)")
         else:
             subject = f"Proposed fix for '{fix['doc_title']}'"
             body = (f"Hi {fix['to']['name'].split()[0]},\n\nUnblock's canary new hires (synthetic, no real people) got stuck on "
                     f"'{fix['doc_title']}'. Proposed change:\n\nBefore: {fix['before']}\nAfter: {fix['after']}\n\n"
-                    f"Why: {fix['rationale']}\n\nNothing changes until you approve it.\n\nThanks,\nPeople Ops (via Unblock)")
+                    f"Why: {fix['rationale']}\n\nNothing changes until you approve it.\n\nThanks,\nPeople Ops (via TeamReady)")
         result = send_email(to.get("email", ""), subject, body, "people-ops@lumen.example")
         if result["status"] != "failed":
             fix["status"] = "sent"

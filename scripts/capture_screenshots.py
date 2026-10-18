@@ -1,4 +1,4 @@
-"""Walk through Unblock live and save presentation screenshots to docs/screenshots.
+"""Walk through TeamReady live and save presentation screenshots to docs/screenshots.
 
     pip install playwright   # uses your installed Chrome (channel="chrome")
     python scripts/capture_screenshots.py <PORTAL_MANAGER_KEY>   # with the web app on localhost:8081
@@ -139,7 +139,7 @@ with sync_playwright() as p:
     say(page, "Can the AI decide whether I deserve a promotion?")
     chat_shot(page, "13_high_impact_stopped_person_named")
 
-    trust = page.locator("section.card", has_text="How Unblock Works")
+    trust = page.locator("section.card", has_text="How TeamReady Works")
     trust.scroll_into_view_if_needed()
     shot(trust, "14_trust_card")
 

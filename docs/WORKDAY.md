@@ -1,7 +1,7 @@
-# Connect Unblock to a Workday development tenant
+# Connect TeamReady to a Workday development tenant
 
 Workday Build gives developers a free, non-production Workday tenant with sample
-workers. Unblock can read the new hire's profile from it: name, business title,
+workers. TeamReady can read the new hire's profile from it: name, business title,
 supervisory organization and work email. It never requests anything else.
 
 ## 1. Get a tenant (about 5 minutes)
@@ -24,7 +24,7 @@ Exact task names and scope labels can differ by tenant version. If a step doesn'
 "Get Started on the Workday Developer Platform" and "Steps: Set Up ISU Authentication for Apps" docs
 on developer.workday.com cover it.
 
-## 3. Configure Unblock
+## 3. Configure TeamReady
 ```
 WORKDAY_HOST=your-host.workday.com
 WORKDAY_TENANT=your_tenant
@@ -36,17 +36,17 @@ WORKDAY_WORKER_SEARCH=mcneil
 Restart. `GET /api/health` should show `"new_hire_profile": "Workday worker Logan McNeil"`, and each answer's
 trust trace starts with "Read your name, title and organization from Workday (nothing else)".
 
-If Workday is unreachable, Unblock keeps working on the local profile and `/api/health` says why.
+If Workday is unreachable, TeamReady keeps working on the local profile and `/api/health` says why.
 
 ## How to pitch it
-"Unblock reads the new hire's identity from Workday itself, the system of record, and only the four fields it
+"TeamReady reads the new hire's identity from Workday itself, the system of record, and only the four fields it
 needs. Company docs and the people directory stay synthetic for the demo."
 
 
-## 4. Let Unblock act in Workday: Agent-Ready MCP tools
+## 4. Let TeamReady act in Workday: Agent-Ready MCP tools
 
 Workday exposes 400+ **Agent-Ready MCP tools** (absence, onboarding, journeys, learning, expenses, talent) at one
-endpoint. With them Unblock answers "how many vacation days do I have left?" from Workday itself (the docs can't),
+endpoint. With them TeamReady answers "how many vacation days do I have left?" from Workday itself (the docs can't),
 and does Workday tasks such as **Create Worker Time Off Request**, always after the new hire approves. Workday's own
 approvals (the manager for time off) still apply, and in delegate mode the agent can never do more than the person.
 
@@ -56,7 +56,7 @@ Lookups (find / list / get) run straight away; anything that changes Workday sho
 **Setup in the tenant** (Workday docs: Agents → External Agents → *Connect an External Agent with Workday MCP*; it
 needs an Extend-enabled tenant, so confirm your Build tenant has Agent System of Record):
 1. **Set Up Agent System of Record** (ASOR) in the tenant.
-2. **Register External Agents**: register "Unblock".
+2. **Register External Agents**: register "TeamReady".
 3. **Configure External Agents**: add the skills/tools it may use. Start with *Find Absence Balances*, *Find Eligible
    Absence Types*, *Find Worker Valid Time Off Dates*, *Create Worker Time Off Request*, *List Onboarding Business
    Process Tasks*, *Find Journey Statuses*, *Update Journey Steps*, and the *Learning* lookups.
@@ -67,6 +67,6 @@ needs an Extend-enabled tenant, so confirm your Build tenant has Agent System of
    `grant_type=authorization_code&code=…&client_id=…&client_secret=…`.
 6. In `.env`: `WORKDAY_MCP_URL=https://us.agent.workday.com/<tenant>/mcp` and `WORKDAY_MCP_TOKEN=<access_token>`
    (it lasts 60 minutes; for longer, also set `WORKDAY_MCP_TOKEN_URL`, `WORKDAY_MCP_CLIENT_ID`,
-   `WORKDAY_MCP_CLIENT_SECRET`, `WORKDAY_MCP_REFRESH_TOKEN` and Unblock refreshes it).
+   `WORKDAY_MCP_CLIENT_SECRET`, `WORKDAY_MCP_REFRESH_TOKEN` and TeamReady refreshes it).
 7. Check: `/api/health` shows `"workday_mcp": "connected: N Agent-Ready tools"`, and the Workday view's profile card
    shows "Workday MCP: connected". Then ask "How many vacation days do I have left?".

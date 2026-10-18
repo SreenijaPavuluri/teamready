@@ -3,8 +3,9 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>Unblock Agent Activity</title>
-<meta name="description" content="Watch Unblock's agents work: every message between them, every check, every stop.">
+<title>TeamReady Agent Activity</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns=%27http://www.w3.org/2000/svg%27 viewBox=%270 0 24 24%27%3E%3Crect width=%2724%27 height=%2724%27 rx=%276%27 fill=%27%231f66ff%27/%3E%3Cpath d=%27M5.5 12.5l4 4L18.5 7.5%27 fill=%27none%27 stroke=%27white%27 stroke-width=%273%27 stroke-linecap=%27round%27 stroke-linejoin=%27round%27/%3E%3C/svg%3E">
+<meta name="description" content="Watch TeamReady's agents work: every message between them, every check, every stop.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wdth,wght@12..96,75..100,400..800&family=Source+Sans+3:wght@400;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
@@ -111,7 +112,7 @@ li.step .msg { color: var(--muted); }
 <body>
 <div class="wrap">
   <header>
-    <div class="brand"><a href="/" id="home">Unblock</a><h1>Agent Activity</h1><span id="mode" class="mode"><i></i><span id="modeText">Connecting</span></span></div>
+    <div class="brand"><a href="/" id="home"><span style="color:#1f66ff">Team</span>Ready<svg viewBox="0 0 24 24" width="0.9em" height="0.9em" style="margin-left:2px;vertical-align:-0.05em;fill:none;stroke:#2f72ff;stroke-width:3.4;stroke-linecap:round;stroke-linejoin:round" aria-hidden="true"><path d="M3 13.5l5.5 5L21 5"/></svg></a><h1>Agent Activity</h1><span id="mode" class="mode"><i></i><span id="modeText">Connecting</span></span></div>
     <div class="controls">
       <button id="play" class="primary">Pause</button>
       <button id="speed" aria-label="Replay speed">1×</button>
@@ -119,12 +120,12 @@ li.step .msg { color: var(--muted); }
       <button id="toggle">Watch recorded demo</button>
     </div>
   </header>
-  <p class="note" id="note">Every message between Unblock's agents, every check and every stop, as it happens. People's messages are shown only when they hold nothing sensitive; drafted emails are never shown.</p>
+  <p class="note" id="note">Every message between TeamReady's agents, every check and every stop, as it happens. People's messages are shown only when they hold nothing sensitive; drafted emails are never shown.</p>
 
   <div class="grid">
     <section class="panel" aria-label="Agent map">
       <h2>Who's talking to whom</h2>
-      <svg id="map" viewBox="0 0 980 440" role="img" aria-label="Map of the seven Unblock agents, the people they work with, and CREAO"></svg>
+      <svg id="map" viewBox="0 0 980 440" role="img" aria-label="Map of the seven TeamReady agents, the people they work with, and CREAO"></svg>
       <div class="strip" id="strip"></div>
       <div class="legend">
         <span><b style="background:var(--pine)"></b>Message or passed check</span>
@@ -141,7 +142,7 @@ li.step .msg { color: var(--muted); }
 
     <section class="panel" aria-label="Activity feed">
       <h2>What's happening</h2>
-      <ul id="feed" aria-live="polite"><li class="empty" id="empty">Waiting for the agents. Ask a question below, or message Unblock in ASI:One.</li></ul>
+      <ul id="feed" aria-live="polite"><li class="empty" id="empty">Waiting for the agents. Ask a question below, or message TeamReady in ASI:One.</li></ul>
       <form class="ask" id="ask">
         <input id="q" placeholder="Ask as the new hire, e.g. How do I deploy to staging?" aria-label="Question">
         <button class="primary" type="submit">Ask</button>
@@ -284,7 +285,7 @@ li.step .msg { color: var(--muted); }
         + "In this recording the CREAO run used a test stand-in; the live version calls the real Doc Steward. People's messages are shown only when they hold nothing sensitive.";
       idx = 0; playing = true; playBtn.textContent = "Pause"; tick();
     } else {
-      note.textContent = "Every message between Unblock's agents, every check and every stop, as it happens. People's messages are shown only when they hold nothing sensitive; drafted emails are never shown.";
+      note.textContent = "Every message between TeamReady's agents, every check and every stop, as it happens. People's messages are shown only when they hold nothing sensitive; drafted emails are never shown.";
       after = 0; poll(true);
     }
   }

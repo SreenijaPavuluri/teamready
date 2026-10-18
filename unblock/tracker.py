@@ -70,7 +70,7 @@ def plan_text(items: dict, user: str, now: float | None = None) -> str:
     now = time.time() if now is None else now
     mine = [i for i in items.values() if i["user"] == user]
     if not mine:
-        return "Nothing to track yet. When Unblock sends a message or request for you, I'll follow its progress here."
+        return "Nothing to track yet. When TeamReady sends a message or request for you, I'll follow its progress here."
     lines = ["**Your onboarding follow-ups**"]
     for i in sorted(mine, key=lambda x: x["created"]):
         state = "waiting" if i["status"] == "open" else i["status"]

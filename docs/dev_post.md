@@ -5,7 +5,7 @@ tags: ai, agents, python, hackathon
 
 New hires get stuck on questions nobody has answered for them yet: how to deploy, who owns the dashboard, how to request access. An AI assistant over internal docs sounds like the fix, until it confidently invents a deploy command. A new hire can't tell a real answer from a made-up one.
 
-At LA Hacks AI Hackathon 2026 we built **Unblock**, a team of five agents on Fetch.ai's Agentverse that answers only what it can prove.
+At LA Hacks AI Hackathon 2026 we built **TeamReady**, a team of five agents on Fetch.ai's Agentverse that answers only what it can prove.
 
 ## The rule: no quote, no claim
 
@@ -16,7 +16,7 @@ The model (Anthropic's Sonnet, or Gemini, or Snowflake Cortex: they're interchan
 - most of the claim's words are in the quote, and
 - every number in the claim is in the quote.
 
-If nothing survives, Unblock doesn't guess. It finds the right person and drafts the message.
+If nothing survives, TeamReady doesn't guess. It finds the right person and drafts the message.
 
 <!-- Add one real blocked claim from your demo here. -->
 

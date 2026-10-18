@@ -1,9 +1,9 @@
-# Unblock: onboarding buddy for new hires
+# TeamReady: onboarding buddy for new hires
 
 ![tag:innovationlab](https://img.shields.io/badge/innovationlab-3D8BD3)
 ![tag:hackathon](https://img.shields.io/badge/hackathon-5F43F1)
 
-Ask what's blocking you at work, in your own words. Unblock answers only from approved company docs and shows its sources, or finds the right person to ask and drafts the message for you. Nothing is sent without your approval.
+Ask what's blocking you at work, in your own words. TeamReady answers only from approved company docs and shows its sources, or finds the right person to ask and drafts the message for you. Nothing is sent without your approval.
 
 **What it does**
 - Runs a risk gate first: pay, performance, benefits eligibility and harassment questions go straight to a person, with no search and no draft.

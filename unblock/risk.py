@@ -2,7 +2,7 @@
 
 stop      -> high-impact topic (pay, performance, benefits eligibility, employment,
              harassment). No search, no draft. Route to a named human channel.
-approval  -> elevated or gated access. Unblock may prepare a request, but only the
+approval  -> elevated or gated access. TeamReady may prepare a request, but only the
              manager agent (a human) can approve it.
 routine   -> normal onboarding question.
 """

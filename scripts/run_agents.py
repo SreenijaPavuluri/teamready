@@ -1,4 +1,4 @@
-"""Start all seven Unblock agents with ONE command, the way Agentverse mailboxes work.
+"""Start all seven TeamReady agents with ONE command, the way Agentverse mailboxes work.
 
     python scripts/run_agents.py          # start all seven, connect mailboxes, keep running
     python scripts/run_agents.py --stop   # stop a copy started earlier (uses logs/pids)

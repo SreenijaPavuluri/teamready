@@ -1,4 +1,4 @@
-"""Run all seven Unblock agents in one process.
+"""Run all seven TeamReady agents in one process.
 
     python agents/main.py
 

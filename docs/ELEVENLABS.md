@@ -1,6 +1,6 @@
 # Voice onboarding buddy with ElevenLabs
 
-The voice agent talks; Unblock decides what is true. Every spoken fact comes from
+The voice agent talks; TeamReady decides what is true. Every spoken fact comes from
 `POST /api/voice/ask`, which runs the same risk gate and verifier as the chat agents.
 
 ## Before you start
@@ -8,11 +8,11 @@ The voice agent talks; Unblock decides what is true. Every spoken fact comes fro
 - Pick a long random value for `VOICE_TOOL_SECRET` in `.env` and restart the web app.
 
 ## Create the agent (ElevenLabs dashboard)
-1. Agents → Create agent → Blank template. Name it **Unblock Voice**.
-2. **First message:** "Hi, I'm Unblock, your onboarding buddy at Lumen Labs. What's blocking you?"
+1. Agents → Create agent → Blank template. Name it **TeamReady Voice**.
+2. **First message:** "Hi, I'm TeamReady, your onboarding buddy at Lumen Labs. What's blocking you?"
 3. **System prompt:**
    ```
-   You are Unblock, a friendly onboarding buddy for new employees at Lumen Labs, a fictional company.
+   You are TeamReady, a friendly onboarding buddy for new employees at Lumen Labs, a fictional company.
    For ANY question about how things work at Lumen Labs, call the ask_unblock tool with the employee's
    question, then say the tool's "answer" field in a natural voice. Do not add facts, numbers, names,
    links or commands that are not in the tool's answer. If the tool says a person should handle it,

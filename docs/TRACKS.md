@@ -1,11 +1,11 @@
-# Tracks: what each one asks for, where Unblock meets it, and what you must do by hand
+# Tracks: what each one asks for, where TeamReady meets it, and what you must do by hand
 
 Status key: **Built and tested** means code plus automated tests in this repo. **Needs your account** means the code is ready but only your keys or clicks can switch it on. Nothing here could be tested against the real sponsor service from the build environment, so test each one live once.
 
 ## Main targets (recruiters on site)
 
 ### Workday: Build the Future of Work with AI
-| What they score | Where Unblock meets it |
+| What they score | Where TeamReady meets it |
 | --- | --- |
 | Agentic logic and AI innovation (30%) | Intent classification, risk gate, verified retrieval, helper routing, drafted actions, manager approval, feedback learning (`unblock/flow.py`) |
 | New hire relevance (20%) | Built around a new hire's first 90 days (Maya, data analyst) |
@@ -14,7 +14,7 @@ Status key: **Built and tested** means code plus automated tests in this repo. *
 | UX and inclusivity (10%) | Plain-language onboarding-buddy tone, web demo, voice option, works without cards |
 | Pitch (5%) | 3-minute script in README |
 
-**Built on Workday's own platform:** with a free Workday Build development tenant, Unblock reads the new hire's name, title, organization and work email from Workday (the system of record), and nothing else. Setup: [`docs/WORKDAY.md`](WORKDAY.md), about 15 minutes. Code: `unblock/workday.py`, tested against a fake tenant; **test it live**.
+**Built on Workday's own platform:** with a free Workday Build development tenant, TeamReady reads the new hire's name, title, organization and work email from Workday (the system of record), and nothing else. Setup: [`docs/WORKDAY.md`](WORKDAY.md), about 15 minutes. Code: `unblock/workday.py`, tested against a fake tenant; **test it live**.
 
 **You must:** create the dev tenant and API client; present it; say exactly which parts each teammate built (their recruiters asked for this).
 
@@ -76,7 +76,7 @@ Status key: **Built and tested** means code plus automated tests in this repo. *
 - **Where:** `docs/dev_post.md` is a draft article. Publish it after the event and add your own numbers.
 
 ### MLH Commit Fellowship
-- **You must:** opt in on the submission form and fill out the separate fellowship form, if you'd continue Unblock as a startup.
+- **You must:** opt in on the submission form and fill out the separate fellowship form, if you'd continue TeamReady as a startup.
 
 ## Order to do the manual steps (with about 22 hours left)
 1. Anthropic + Agentverse keys, connect mailboxes, test the full flow in ASI:One (Fetch is the hiring prize).

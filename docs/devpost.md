@@ -1,4 +1,4 @@
-# Unblock: Devpost submission
+# TeamReady: Devpost submission
 
 **Tagline:** An onboarding agent network that does the work for new hires, can't make things up, and tests your docs
 with synthetic new hires before real people start.
@@ -11,7 +11,7 @@ with synthetic new hires before real people start.
 
 ## Project description (short)
 
-Unblock is a network of seven Fetch.ai agents that onboards new hires. It answers only from approved company docs and
+TeamReady is a network of seven Fetch.ai agents that onboards new hires. It answers only from approved company docs and
 checks every claim word for word, so it can't make things up. It also does the onboarding work: it joins Slack channels,
 enrolls the new hire in training, books the first 1:1 and files the access request once the manager approves. Every
 action runs only after a person approves it. For People Ops, **Canary New Hires** send synthetic new hires through the
@@ -37,9 +37,9 @@ to-do list, and (3) stops the same walls from hitting the next person.
 
 **For the new hire (in ASI:One, or the web portal):**
 - **Verified answers.** Every claim is checked word for word against an approved company doc before the new hire sees
-  it. Stale docs are flagged and left out. If the docs don't answer, Unblock doesn't guess: it finds the right person,
+  it. Stale docs are flagged and left out. If the docs don't answer, TeamReady doesn't guess: it finds the right person,
   with a visible, fair score, and drafts the message.
-- **It does the work.** "Do my checklist" makes Unblock plan the whole onboarding checklist. It joins the right Slack
+- **It does the work.** "Do my checklist" makes TeamReady plan the whole onboarding checklist. It joins the right Slack
   channels, enrolls the new hire in required training, books the first 1:1 with the manager (with a calendar invite)
   and opens IT tickets. For analytics access it drafts the request to the manager and **files the access form the
   moment the manager approves**. It says plainly what it won't do: MFA and passwords, and in-person IT setup. Every
@@ -57,7 +57,7 @@ to-do list, and (3) stops the same walls from hitting the next person.
   walls (a checklist step with no how-to, a stale runbook that still comes up, a missing doc for one office) and check
   each one against the Friction Map: confirmed by real new hires, or predicted. On our synthetic company they rediscover
   the two walls real hires hit most (13 and 10 blockers) and predict two that nobody has reported yet.
-- **Doc fixes, drafted by CREAO.** For each wall, the CREAO Doc Steward drafts a one-line fix. Unblock checks that it
+- **Doc fixes, drafted by CREAO.** For each wall, the CREAO Doc Steward drafts a one-line fix. TeamReady checks that it
   quotes the doc word for word, and the doc owner (a person) decides.
 
 ## How we built it
@@ -127,8 +127,8 @@ claim cited and verified, approve-before-act on every action, a human manager fo
 to a person. It has a Workday REST connector (four profile fields only) and a client for Workday's Agent-Ready MCP
 tools; the demo uses a local fallback profile because our sandbox tenant was unavailable. For People Ops, the Friction
 Map and Canary New Hires turn individual blockers into fixable patterns, and doc owners stay in control. The `/workday`
-view puts all of it in a Workday-style worker home: Awaiting Your Action, an Onboarding Journey that Unblock completes,
-Done for You (process history), the manager's approval inbox, People Ops onboarding health, and a "How Unblock Works"
+view puts all of it in a Workday-style worker home: Awaiting Your Action, an Onboarding Journey that TeamReady completes,
+Done for You (process history), the manager's approval inbox, People Ops onboarding health, and a "How TeamReady Works"
 card that answers each "Design for Trust" question.
 
 **CREAO: Best Team Empowerment.** The CREAO Doc Steward (agent ID `b450ed0d-985d-4079-917f-d9f9ee75e812`) does the core

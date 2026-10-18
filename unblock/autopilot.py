@@ -1,8 +1,8 @@
-"""Autopilot: Unblock does onboarding tasks for the new hire, not just explains them.
+"""Autopilot: TeamReady does onboarding tasks for the new hire, not just explains them.
 
 Each action is backed by an approved doc that says how the task is done, and by
 the system that does it (Slack, Learning Hub, Calendar, IT Help, Access Hub).
-Unblock fills the form from what it already knows (profile, the doc, the
+TeamReady fills the form from what it already knows (profile, the doc, the
 question), shows exactly what it will do, and acts only after the new hire
 approves. Gated actions (analytics access) still go to the manager first; the
 form is filed the moment the manager approves.
@@ -42,10 +42,10 @@ ACTIONS = {
     "analytics_access": {"title": "Request Analytics Workspace access", "system": "Access Hub (go/analytics-access)",
                          "doc": "D01", "gate": "manager", "step": "Request analytics tools"},
 }
-# Checklist steps Unblock must not do, and why.
+# Checklist steps TeamReady must not do, and why.
 CANT = {
     "Finish laptop and account setup": "IT does this with you in person on your first day.",
-    "Turn on multi-factor authentication": "Unblock never touches passwords or MFA. You turn it on yourself.",
+    "Turn on multi-factor authentication": "TeamReady never touches passwords or MFA. You turn it on yourself.",
 }
 
 _DO = re.compile(r"\b(for me|do it|sign me up|enrol+ me|add me|book|schedule|set up my 1:1|open a ticket|file a ticket|"
@@ -67,8 +67,8 @@ _NEVER = re.compile(r"\b(mfa|2fa|password|multi-factor|authenticator)\b", re.I)
 
 
 def detect(text: str) -> str:
-    """The action the new hire is asking Unblock to do, or ''. A question gets an answer, not an action,
-    unless it asks Unblock to do it ("can you...", "for me"). Anything about passwords or MFA is never an action."""
+    """The action the new hire is asking TeamReady to do, or ''. A question gets an answer, not an action,
+    unless it asks TeamReady to do it ("can you...", "for me"). Anything about passwords or MFA is never an action."""
     t = text.strip()
     if _NEVER.search(t) or (_QUESTION.search(t) and not _ASKS_ME.search(t)):
         return ""
@@ -83,7 +83,7 @@ def detect(text: str) -> str:
 
 
 def offer_for(answer: dict) -> str:
-    """An action Unblock can do after a verified answer that cites the doc for it."""
+    """An action TeamReady can do after a verified answer that cites the doc for it."""
     cited = {c["id"] for c in answer.get("citations", [])}
     for action, spec in ACTIONS.items():
         if spec["gate"] == "you" and action != "it_ticket" and spec["doc"] in cited:
@@ -130,7 +130,7 @@ def build(action: str, user: dict, text: str = "") -> dict:
 
 
 def describe(action: str, form: dict) -> str:
-    """One line: exactly what Unblock will do."""
+    """One line: exactly what TeamReady will do."""
     if action == "slack_channels":
         return f"Add you to {', '.join(form['channels'])} in Slack."
     if action == "security_training":
@@ -145,7 +145,7 @@ def describe(action: str, form: dict) -> str:
 
 
 def done_text(action: str, form: dict) -> str:
-    """One line: what Unblock did."""
+    """One line: what TeamReady did."""
     if action == "slack_channels":
         return f"Added you to {', '.join(form['channels'])} in Slack."
     if action == "security_training":
@@ -214,7 +214,7 @@ def execute(action: str, form: dict, user: dict, owner: str, approved_by: str = 
 
 
 def log_record(action: str, title: str, system: str, status: str, detail: str, owner: str, form: dict) -> dict:
-    """Record something Unblock did in another system (e.g. Workday), so it shows in Done for You."""
+    """Record something TeamReady did in another system (e.g. Workday), so it shows in Done for You."""
     record = {"id": f"WD-{uuid.uuid4().hex[:5].upper()}", "action": action, "title": title, "system": system, "status": status,
               "detail": detail, "form": form, "owner": owner, "created": time.time(), "approved_by": "you"}
     with _lock:
@@ -237,7 +237,7 @@ def done_actions(owner: str) -> set[str]:
 # ---------- autopilot over the checklist ----------
 
 def plan_checklist(steps: list[str], user: dict, owner: str, waiting: bool = False) -> list[dict]:
-    """For each checklist step: what Unblock will do, what it can't (and why), and what's already done.
+    """For each checklist step: what TeamReady will do, what it can't (and why), and what's already done.
     waiting: an access request is already with the manager, so it isn't asked for again."""
     done = done_actions(owner)
     plan = []
@@ -254,7 +254,7 @@ def plan_checklist(steps: list[str], user: dict, owner: str, waiting: bool = Fal
             plan.append({"step": step, "status": "manager" if ACTIONS[action]["gate"] == "manager" else "will_do",
                          "action": action, "form": form, "does": describe(action, form)})
         else:
-            plan.append({"step": step, "status": "person", "why": cant or "Not something Unblock can do; ask People Ops."})
+            plan.append({"step": step, "status": "person", "why": cant or "Not something TeamReady can do; ask People Ops."})
     return plan
 
 

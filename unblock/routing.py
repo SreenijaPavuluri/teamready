@@ -2,7 +2,7 @@
 
 score = 50% skill match + 30% team/process match + 20% availability - feedback penalty
 
-Fairness rotation: among everyone within 10% of the top score, Unblock picks the
+Fairness rotation: among everyone within 10% of the top score, TeamReady picks the
 person with the lightest recent question load, so the same senior engineer isn't
 always the default. Protected characteristics are never inputs.
 

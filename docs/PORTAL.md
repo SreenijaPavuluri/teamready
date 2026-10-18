@@ -1,6 +1,6 @@
 # New Hire Portal (`/app`)
 
-The portal is the web version of the Unblock chat in ASI:One. It's a page the new hire can use from day one,
+The portal is the web version of the TeamReady chat in ASI:One. It's a page the new hire can use from day one,
 with a manager view on the same page.
 
 ## What the new hire can do
@@ -8,12 +8,12 @@ with a manager view on the same page.
 | What | How it works |
 | --- | --- |
 | Ask anything in their own words | Same pipeline as ASI:One: risk gate → knowledge (verified, cited answers) → confidence. The "Why you can trust this" panel shows sources, confidence factors and data used. |
-| Get sent to the right person | When the docs don't answer, Routing picks a person (skills, team, availability, fair rotation) and Unblock drafts the message |
+| Get sent to the right person | When the docs don't answer, Routing picks a person (skills, team, availability, fair rotation) and TeamReady drafts the message |
 | Approve, edit or reject every draft | The draft card shows exactly what will be sent. **Edit** in place; the Guardian re-checks it and disables **Approve** if it finds a password, ID number, card number, health or pay details |
 | Say "wrong person" | Ranking learns; the next best person gets a new draft |
 | Request access | Access requests go to the manager's queue (Manager tab). Only the manager can approve. The decision appears in the new hire's chat |
 | Get follow-ups | "Waiting on others" lists every message and request. If nobody replies in time, the Tracker offers a reminder, shown before it's sent |
-| Work through the first two weeks | The checklist comes from the approved "New Hire Systems Checklist" doc. **Ask** on any item asks Unblock about it. Ticks are saved in the browser |
+| Work through the first two weeks | The checklist comes from the approved "New Hire Systems Checklist" doc. **Ask** on any item asks TeamReady about it. Ticks are saved in the browser |
 | See their profile | Name, role, team and manager. From Workday when the tenant is connected; the badge says which |
 
 The manager tab (Jordan) shows each request with the doc evidence behind it, a note field, Approve and Reject.

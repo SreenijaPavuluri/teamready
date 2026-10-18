@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Run each Unblock agent as its own process (recommended for Agentverse mailbox mode).
+# Run each TeamReady agent as its own process (recommended for Agentverse mailbox mode).
 # Logs go to logs/<agent>.log. Stop everything with: kill $(cat logs/pids)
 cd "$(dirname "$0")/.." || exit 1
 mkdir -p logs

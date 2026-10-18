@@ -1,4 +1,4 @@
-# Unblock
+# TeamReady
 
 ![tag:innovationlab](https://img.shields.io/badge/innovationlab-3D8BD3)
 ![tag:hackathon](https://img.shields.io/badge/hackathon-5F43F1)
@@ -8,22 +8,22 @@
 **Demo video:** VIDEO-LINK · **Live:** LIVE-LINK · **Devpost:** DEVPOST-LINK
 Built for LA Hacks AI Hackathon 2026: Workday "Build the Future of Work with AI", the Fetch.ai ASI:One Agent Challenge, and CREAO Best Team Empowerment.
 
-A new hire describes a blocker in ASI:One. Unblock answers only from approved company docs, verifies every claim word for word, finds the right person to ask when the docs fall short, drafts the message, and sends it only after the new hire approves. Access requests go to a human manager. Pay, performance and harassment questions go straight to a person. People Ops gets an anonymous Friction Map of what keeps blocking new hires, and pays for the full report through the Fetch.ai Payment Protocol.
+A new hire describes a blocker in ASI:One. TeamReady answers only from approved company docs, verifies every claim word for word, finds the right person to ask when the docs fall short, drafts the message, and sends it only after the new hire approves. Access requests go to a human manager. Pay, performance and harassment questions go straight to a person. People Ops gets an anonymous Friction Map of what keeps blocking new hires, and pays for the full report through the Fetch.ai Payment Protocol.
 
 ## Try it
 
 - **ASI:One** (asi1.ai): message **unblock-orchestrator** with "do my checklist", "What's our deploy process for
   staging?" or "my laptop screen is cracked". Message **unblock-canary** with "run". Addresses are in the agent table below.
-- **Web:** **`/workday`** (Unblock in a Workday-style worker home: Awaiting Your Action, Onboarding Journey, Done for
-  You and the Unblock Assistant for Maya; Jordan's approval inbox; Elena's onboarding health), `/app` (New Hire Portal),
+- **Web:** **`/workday`** (TeamReady in a Workday-style worker home: Awaiting Your Action, Onboarding Journey, Done for
+  You and the TeamReady Assistant for Maya; Jordan's approval inbox; Elena's onboarding health), `/app` (New Hire Portal),
   `/canary` (Canary New Hires), `/activity` (the agents talking, live).
 - **No keys at all:** `UNBLOCK_LLM=extractive python scripts/local_demo.py` and `scripts/local_canary_demo.py`.
 
-## Unblock does the work, not just answers
+## TeamReady does the work, not just answers
 
-A chatbot tells a new hire what to do. Unblock does it for them, after they approve:
+A chatbot tells a new hire what to do. TeamReady does it for them, after they approve:
 
-| Say | Unblock does (in the Lumen system) | Who approves |
+| Say | TeamReady does (in the Lumen system) | Who approves |
 | --- | --- | --- |
 | "Do my checklist" | Plans every onboarding step: does the ones it can, sends the gated one to the manager, says plainly which it can't (MFA, in-person IT setup) | You, then the manager for access |
 | "Which Slack channels should I join?" → **Do it** | Joins #announcements, #ask-people-ops, the team channel and the role's channels (Slack) | You |
@@ -32,7 +32,7 @@ A chatbot tells a new hire what to do. Unblock does it for them, after they appr
 | "My laptop screen is cracked" | Opens an IT ticket through go/it-help with the description; the Tracker follows up (IT Help) | You |
 | "I need access to the analytics dashboard" | Drafts the request to the manager, and **files the go/analytics-access form the moment the manager approves** (Access Hub) | You, then the manager |
 
-Every action is backed by the approved doc that describes it (shown on the card), fills its form from what Unblock
+Every action is backed by the approved doc that describes it (shown on the card), fills its form from what TeamReady
 already knows, passes free text through the Guardian, and runs only after approval. Each one leaves a record with an id
 ("Done for you" in the portal, `what have you done` in ASI:One). It never touches passwords or MFA, pay, performance or
 benefits. Lumen's systems are fictional like the company, so each is a small adapter (`unblock/autopilot.py`); a real
@@ -40,11 +40,11 @@ deployment swaps in the Slack, LMS, calendar, ServiceNow or access-request API b
 
 ## Canary New Hires: your docs get a CI pipeline
 
-Every onboarding tool waits for a real new hire to get stuck, then helps. Unblock's **canaries** get stuck first.
+Every onboarding tool waits for a real new hire to get stuck, then helps. TeamReady's **canaries** get stuck first.
 
 Three synthetic new hires (a Data Analyst, a Backend Engineer, a Product Designer in the EU office) go through
 onboarding with nothing but the company docs. They walk the New Hire Systems Checklist step by step, then their role's
-tasks, and ask Unblock how to do each one, through the same risk gate and verifier a real new hire gets. Where a canary
+tasks, and ask TeamReady how to do each one, through the same risk gate and verifier a real new hire gets. Where a canary
 couldn't do a step from what the docs say, that's a **wall**:
 
 | Wall | What the canary found |
@@ -105,7 +105,7 @@ Every agent gets only the tools its job needs. The **Guardian** is not a separat
 
 Full checklist with what each sponsor asks for and the manual steps: [`docs/TRACKS.md`](docs/TRACKS.md).
 
-| Track | How Unblock uses it |
+| Track | How TeamReady uses it |
 | --- | --- |
 | Workday | The product: a new-hire agent with visible responsible-AI controls and a People Ops Friction Map, shown in a Workday-style worker home (`/workday`). Reads the new hire's profile from a Workday Build tenant, and **acts in Workday through its Agent-Ready MCP tools**: time off balances and requests, onboarding tasks, journeys, learning, with approval before any change ([setup](docs/WORKDAY.md)) |
 | Fetch.ai | Seven uAgents on Agentverse (one of them sends synthetic new hires through the others), Chat Protocol, ASI:One, Interactive Cards, Payment Protocol (FET) |
@@ -122,7 +122,7 @@ Full checklist with what each sponsor asks for and the manual steps: [`docs/TRAC
 
 `uvicorn web.app:app --port 8080` serves a landing page where anyone can ask a question and see verified claims, blocked claims, sources and confidence; the live Friction Map; the agent addresses; and `POST /api/voice/ask` for the voice agent. It is read-only: actions only happen in ASI:One after approval.
 
-**New Hire Portal (`/app`)** is the web version of the Unblock chat: ask, see verified answers with sources,
+**New Hire Portal (`/app`)** is the web version of the TeamReady chat: ask, see verified answers with sources,
 approve/edit/reject every draft (Guardian checks each version), "wrong person", access requests the manager approves on
 the Manager tab, Tracker reminders, a first-two-weeks checklist from the approved docs, and the profile from Workday
 when connected. Details: [`docs/PORTAL.md`](docs/PORTAL.md).
@@ -173,23 +173,23 @@ Sonnet must return every fact as a claim with a supporting quote and a doc id. P
 5. most of the claim's words appear in the quote, so the claim can't say more than its source, and
 6. every number in the claim also appears in the quote ("100 USD" can't hide behind a quote that says "75 USD").
 
-Only verified claims are shown. The model's free text never is. If nothing verifies, Unblock routes the question to a person instead of guessing.
+Only verified claims are shown. The model's free text never is. If nothing verifies, TeamReady routes the question to a person instead of guessing.
 
 ### Confidence
 
-Computed in code from four visible factors, with no fixed base points: retrieval strength (30), agreement between sources (25), doc freshness (15), and the share of claims verified (30). Below 60, or when docs disagree, Unblock routes to a person.
+Computed in code from four visible factors, with no fixed base points: retrieval strength (30), agreement between sources (25), doc freshness (15), and the share of claims verified (30). Below 60, or when docs disagree, TeamReady routes to a person.
 
 ## Trust panel
 
-Every answer and every proposed action shows: what Unblock did, sources with dates and owners, confidence and its factors, claims blocked, why this person, the data used and not used, and Approve / Edit / Reject.
+Every answer and every proposed action shows: what TeamReady did, sources with dates and owners, confidence and its factors, claims blocked, why this person, the data used and not used, and Approve / Edit / Reject.
 
 **Guardian:** every draft (messages, 1:1 invites, access requests, follow-ups) is checked before it can be sent. Drafts that mention pay, performance, benefits or harassment, health details, an ID or card number, a password or an API key are stopped until edited.
 
-**Unblock will never:** send or file anything without approval · grant access or approve its own requests · read private DMs, performance reviews or pay data · present an answer as fact without a source.
+**TeamReady will never:** send or file anything without approval · grant access or approve its own requests · read private DMs, performance reviews or pay data · present an answer as fact without a source.
 
 ## Responsible AI (Workday's five principles)
 
-| Principle | How Unblock meets it |
+| Principle | How TeamReady meets it |
 | --- | --- |
 | Transparent | Every claim cites its source line; the trust panel shows steps, sources, confidence factors and reasons. |
 | Fair | Helper ranking uses only job-relevant factors, shown on screen. Fairness rotation spreads questions across qualified people. Protected characteristics are never inputs. |
@@ -250,7 +250,7 @@ UNBLOCK_LLM=extractive python scripts/local_demo.py
 
 This runs the real agents plus a test new hire and a test manager, and prints the whole conversation: verified answer, stale-doc flag, routing to a person, "wrong person", an access request approved by the manager agent, and the high-impact stop.
 
-**Real email (optional):** set the SMTP values in `.env` (a Gmail app password works) and `DEMO_RECIPIENT_OVERRIDE` to an inbox you control. Without SMTP, approved emails are saved to `outbox/` and the reply says "Simulated". Unblock never claims a send that didn't happen.
+**Real email (optional):** set the SMTP values in `.env` (a Gmail app password works) and `DEMO_RECIPIENT_OVERRIDE` to an inbox you control. Without SMTP, approved emails are saved to `outbox/` and the reply says "Simulated". TeamReady never claims a send that didn't happen.
 
 **Payments:** the insights agent checks that each `CommitPayment` matches its open request (reference, FET, amount, its own wallet, not expired) and cancels on any mismatch or if the report fails. Confirming the transaction hash on the Fetch ledger is left to the ASI:One wallet in this build.
 
@@ -262,11 +262,11 @@ This runs the real agents plus a test new hire and a test manager, and prints th
 
 1. **Hook:** "It's Maya's third week. She's stuck, and she doesn't know who to ask. What if someone had hit that wall before her?"
 2. "How do I set up my dev environment?" Verified, cited answer and the trust panel.
-3. "What's our deploy process for staging?" The legacy runbook is flagged as two years stale and left out; Unblock offers to tell its owner.
-4. "How many vacation days do I get?" The docs don't say. Unblock doesn't guess: it routes to People Ops and drafts the message. Click "wrong person"; the ranking updates live.
-5. **"Do my checklist."** Unblock lays out all six steps: it does three (Slack channels, security training, the 1:1 with
+3. "What's our deploy process for staging?" The legacy runbook is flagged as two years stale and left out; TeamReady offers to tell its owner.
+4. "How many vacation days do I get?" The docs don't say. TeamReady doesn't guess: it routes to People Ops and drafts the message. Click "wrong person"; the ranking updates live.
+5. **"Do my checklist."** TeamReady lays out all six steps: it does three (Slack channels, security training, the 1:1 with
    an invite), sends analytics access to the manager, and says it won't touch MFA. Approve. The manager approves in their
-   own chat, and Unblock files the go/analytics-access form by itself. "It doesn't tell Maya what to do. It does it."
+   own chat, and TeamReady files the go/analytics-access form by itself. "It doesn't tell Maya what to do. It does it."
 6. "Can the AI decide whether I deserve a promotion?" Stopped before any search, with the right person named.
 7. Switch to People Ops: "friction map", then "full report", pay 0.1 FET, get the drafted fix for the onboarding checklist, send it to the doc owner.
 8. **Canary New Hires:** open `/canary`, press Run. Three synthetic new hires walk the docs; they hit the same analytics

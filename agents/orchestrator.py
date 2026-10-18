@@ -39,7 +39,7 @@ ROUTING_TIMEOUT = 15  # routing is pure code
 
 agent = create_agent(
     "orchestrator", "unblock-orchestrator",
-    "Unblock: an onboarding buddy for new hires. Ask 'who do I ask?' or 'how do I...?' and get an answer "
+    "TeamReady: an onboarding buddy for new hires. Ask 'who do I ask?' or 'how do I...?' and get an answer "
     "verified against approved docs, the right person to ask, and a drafted message that is only sent "
     "after you approve. High-impact requests go to your manager; pay and performance go to a person.",
     ["orchestrator", "asi-one", "chat"],

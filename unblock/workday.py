@@ -10,7 +10,7 @@ WORKDAY_CLIENT_SECRET
 WORKDAY_REFRESH_TOKEN  from "Manage Refresh Tokens for Integrations"
 WORKDAY_WORKER_SEARCH  who the demo new hire is, e.g. "mcneil" (the sample persona)
 
-If anything fails, Unblock falls back to data/user.json and says so in /api/health.
+If anything fails, TeamReady falls back to data/user.json and says so in /api/health.
 """
 import threading
 import time

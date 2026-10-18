@@ -1,4 +1,4 @@
-"""Evaluate Unblock on 40 labeled questions.
+"""Evaluate TeamReady on 40 labeled questions.
 
     python eval/run_eval.py                 # Anthropic (needs ANTHROPIC_API_KEY, LLM_MODEL)
     python eval/run_eval.py --llm extractive  # no-model baseline
@@ -89,7 +89,7 @@ def main() -> None:
     out = {"summary": summary, "rows": rows}
     tag = llm.mode + ("_hybrid" if args.embeddings else "")
     (ROOT / "eval" / f"results_{tag}.json").write_text(json.dumps(out, indent=1))
-    md = ["# Unblock eval results", "", f"Mode: **{llm.mode}** {summary['model']}", "",
+    md = ["# TeamReady eval results", "", f"Mode: **{llm.mode}** {summary['model']}", "",
           "| Metric | Result |", "| --- | --- |"]
     md += [f"| {k.replace('_', ' ')} | {v} |" for k, v in summary.items() if k not in ("llm", "model")]
     md += ["", "Unsupported claims shown to the user is 0 by construction: the verifier removes any claim it can't find word for word.",

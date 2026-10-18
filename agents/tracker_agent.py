@@ -25,7 +25,7 @@ CHECK_SECONDS = float(env("TRACKER_CHECK_SECONDS", "300"))
 
 agent = create_agent(
     "tracker", "unblock-tracker",
-    "Follows up for new hires: watches messages and access requests Unblock sent, and when one gets no answer, "
+    "Follows up for new hires: watches messages and access requests TeamReady sent, and when one gets no answer, "
     "drafts a friendly reminder that is sent only after the new hire approves. Say 'my plan' to see what's pending.",
     ["follow-up", "reminders"],
 )

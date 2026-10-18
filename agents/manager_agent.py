@@ -22,7 +22,7 @@ from unblock.models import ApprovalDecision, ApprovalRequest
 agent = create_agent(
     "manager", "unblock-manager",
     "Human approval gate for new-hire access requests. Managers review the request, the evidence and the "
-    "business reason, then approve or reject. Unblock never grants access by itself.",
+    "business reason, then approve or reject. TeamReady never grants access by itself.",
     ["approval", "human-in-the-loop"],
 )
 
@@ -49,7 +49,7 @@ def _card(req: dict):
         f"**Approval request {req['request_id']}**: {req['category']}",
         f"From: {req['requester']['name']}, {req['requester']['role']} ({req['requester']['team']})",
         f"Subject: {req['subject']}", "", req["body"], "",
-        "Evidence Unblock verified in approved docs:", *[f"- {e}" for e in req["evidence"] or ["none"]], "",
+        "Evidence TeamReady verified in approved docs:", *[f"- {e}" for e in req["evidence"] or ["none"]], "",
         f"Reply **approve {req['request_id']}** or **reject {req['request_id']} <reason>**.",
     ])
     payload = {
@@ -59,7 +59,7 @@ def _card(req: dict):
             {"label": "Request", "value": req["subject"]},
             {"label": "Business reason", "value": req["body"][:500]},
             {"label": "Evidence", "value": "; ".join(req["evidence"])[:500] or "none"},
-            {"label": "Note", "value": "Unblock prepared this. Only you can approve it."},
+            {"label": "Note", "value": "TeamReady prepared this. Only you can approve it."},
         ],
         "approve_cta": {"label": "Approve", "primary": True, "selection": {"action": "ub_approve", "request_id": req["request_id"]}},
         "reject_cta": {"label": "Reject", "selection": {"action": "ub_reject", "request_id": req["request_id"]}},

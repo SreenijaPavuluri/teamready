@@ -28,7 +28,7 @@ REJECT = {"reject", "no", "cancel", "don't send", "dont send", "stop"}
 GREETINGS = {"hi", "hello", "hey", "help", "start", "what can you do", "what can you do?"}
 
 INTRO = (
-    "Hi, I'm **Unblock**, your onboarding buddy at Lumen Labs. No question is too basic.\n\n"
+    "Hi, I'm **TeamReady**, your onboarding buddy at Lumen Labs. No question is too basic.\n\n"
     "Tell me what's blocking you, in your own words. I'll answer only from approved company docs and show "
     "my sources, or find the right person to ask and draft the message for you. Nothing is sent without your OK.\n\n"
     "Try: \"How do I set up my dev environment?\", \"I need access to the analytics dashboard\", "
@@ -150,7 +150,7 @@ class Orchestrator:
             return Reply(INTRO)
         if cmd == "friction_map":
             fmap = await self.s.friction_map()
-            return Reply(render.friction_text(fmap) + "\n\nPeople Ops can buy the full report with fix proposals from the Unblock Insights agent.")
+            return Reply(render.friction_text(fmap) + "\n\nPeople Ops can buy the full report with fix proposals from the TeamReady Insights agent.")
         if cmd == "autopilot" or autopilot.AUTOPILOT.match(text.strip().rstrip(".!")):
             return self._autopilot(sender, state)
         if cmd == "my_actions":
@@ -242,11 +242,11 @@ class Orchestrator:
         return self._review(state)
 
     def _autopilot(self, sender: str, state: dict) -> Reply:
-        """Plan the whole onboarding checklist: what Unblock will do now, what needs the manager, what it can't do."""
+        """Plan the whole onboarding checklist: what TeamReady will do now, what needs the manager, what it can't do."""
         from .portal import checklist
         plan = autopilot.plan_checklist(checklist(), self._user(), sender, waiting=bool(state.get("awaiting")))
         todo = [x for x in plan if x["status"] in ("will_do", "manager")]
-        activity.log("orchestrator", f"Autopilot: {len(todo)} of {len(plan)} checklist steps Unblock can do", kind="step")
+        activity.log("orchestrator", f"Autopilot: {len(todo)} of {len(plan)} checklist steps TeamReady can do", kind="step")
         if not todo:
             return Reply("Nothing left on your checklist that I can do. " + autopilot.plan_text(plan).split("\n\n")[0])
         p = {"type": "system_batch", "plan": plan, "to_name": "your checklist", "to_role": "Lumen systems",
@@ -264,7 +264,7 @@ class Orchestrator:
         try:
             candidates = await asyncio.to_thread(workday_mcp.shortlist, words)
             if not candidates:
-                raise LLMError("no matching Workday tool is registered for Unblock")
+                raise LLMError("no matching Workday tool is registered for TeamReady")
             plan = await asyncio.to_thread(workday_mcp.plan, goal, text, user, candidates, self.llm_factory())
         except Exception as exc:
             activity.log("systems", f"Workday unavailable ({str(exc)[:80]}); answering from the docs instead", kind="block")
@@ -462,7 +462,7 @@ class Orchestrator:
                                    state.get("question") or p["subject"], p["to_name"], p["to_email"])
         label = {"sent": "Sent", "simulated": "Simulated (email not configured)", "failed": "Not sent"}[result["status"]]
         if result["status"] != "failed":
-            result["detail"] += " The Unblock Tracker will check back if there's no reply."
+            result["detail"] += " The TeamReady Tracker will check back if there's no reply."
         follow = " Reply **wrong person** if they can't help, and I'll find someone else." if p["type"] == "message_helper" else ""
         return Reply(f"**{label}.** {result['detail']}{follow}")
 

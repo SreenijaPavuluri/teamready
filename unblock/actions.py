@@ -1,6 +1,6 @@
 """Real actions, run only after the new hire approves.
 
-If SMTP settings are present, Unblock sends the email for real (with a calendar
+If SMTP settings are present, TeamReady sends the email for real (with a calendar
 invite attached for 1:1 requests). If not, it writes the exact email to /outbox
 and says "simulated" out loud. It never claims a send that didn't happen.
 
@@ -21,7 +21,7 @@ def make_ics(summary: str, organizer: str, attendee: str, start: datetime, minut
     fmt = "%Y%m%dT%H%M%SZ"
     end = start + timedelta(minutes=minutes)
     return "\r\n".join([
-        "BEGIN:VCALENDAR", "VERSION:2.0", "PRODID:-//Unblock//LA Hacks//EN", "METHOD:REQUEST", "BEGIN:VEVENT",
+        "BEGIN:VCALENDAR", "VERSION:2.0", "PRODID:-//TeamReady//LA Hacks//EN", "METHOD:REQUEST", "BEGIN:VEVENT",
         f"UID:{uuid.uuid4()}@unblock", f"DTSTAMP:{stamp}",
         f"DTSTART:{start.astimezone(timezone.utc).strftime(fmt)}", f"DTEND:{end.astimezone(timezone.utc).strftime(fmt)}",
         f"SUMMARY:{summary}", f"ORGANIZER:mailto:{organizer}", f"ATTENDEE;RSVP=TRUE:mailto:{attendee}",
@@ -65,7 +65,7 @@ def send_email(to: str, subject: str, body: str, sender: str, ics: str | None = 
     msg["To"] = actual_to
     msg["Reply-To"] = sender
     msg["Subject"] = subject
-    note = f"\n\n(Sent by Unblock for {sender}. Intended recipient: {to}.)" if override else "\n\n(Sent by Unblock after the sender approved it.)"
+    note = f"\n\n(Sent by TeamReady for {sender}. Intended recipient: {to}.)" if override else "\n\n(Sent by TeamReady after the sender approved it.)"
     msg.set_content(body + note)
     if ics:
         msg.add_attachment(ics.encode(), maintype="text", subtype="calendar", filename="invite.ics",

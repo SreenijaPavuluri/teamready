@@ -1,4 +1,4 @@
-"""Unblock web app: landing page with a live verified-answer demo, the live Friction
+"""TeamReady web app: landing page with a live verified-answer demo, the live Friction
 Map, and the voice tool endpoint for an ElevenLabs voice agent.
 
     uvicorn web.app:app --host 0.0.0.0 --port 8080
@@ -31,7 +31,7 @@ from unblock.llm import get_llm_or_unavailable  # noqa: E402
 from unblock.risk import assess  # noqa: E402
 from unblock.routing import rank  # noqa: E402
 
-app = FastAPI(title="Unblock", docs_url="/api/docs")
+app = FastAPI(title="TeamReady", docs_url="/api/docs")
 STATIC = Path(__file__).resolve().parent / "static"
 RATE = int(env("WEB_RATE_PER_MIN", "20"))
 _hits: dict[str, deque] = defaultdict(deque)
@@ -66,7 +66,7 @@ def _speech(result: dict) -> str:
     source = result["citations"][0]["title"] if result["citations"] else "the approved docs"
     text = "Here's what the docs say. " + ". ".join(facts) + f". That's from {source}."
     if kind == "approval":
-        text += f" {result['reason']} You can ask Unblock in ASI:One to prepare the request."
+        text += f" {result['reason']} You can ask TeamReady in ASI:One to prepare the request."
     return text
 
 
@@ -287,7 +287,7 @@ def canary_approve(body: CanaryFix, request: Request, x_manager_key: str = Heade
 
 @app.get("/workday")
 def workday_page():
-    """Unblock in a Workday-style worker home (Canvas design tokens), with every feature in one place."""
+    """TeamReady in a Workday-style worker home (Canvas design tokens), with every feature in one place."""
     return FileResponse(STATIC / "workday.html")
 
 

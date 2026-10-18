@@ -44,10 +44,10 @@ async def chat(ctx: Context, sender: str, text: str):
         return render.stop_text(risk.__dict__, load_people()[risk.human_id])
     result = await run(text, load_user())
     if risk.level == "approval":
-        return (render.answer_text(result) + f"\n\n{risk.reason} Ask the Unblock orchestrator to prepare the request for your manager.")
+        return (render.answer_text(result) + f"\n\n{risk.reason} Ask the TeamReady orchestrator to prepare the request for your manager.")
     if result["decision"] == "answer":
         return render.answer_text(result)
-    return render.answer_text(result) + f"\n\n{result['route_reason']} Ask the Unblock orchestrator to find the right person."
+    return render.answer_text(result) + f"\n\n{result['route_reason']} Ask the TeamReady orchestrator to find the right person."
 
 
 agent.include(create_chat_protocol("unblock-knowledge", chat), publish_manifest=PUBLISH)

@@ -84,10 +84,10 @@ def action_text(pending: dict, answer: dict | None, helper: dict | None, rotatio
 
 def action_card(pending: dict, answer: dict | None, helper: dict | None) -> dict:
     what_happens = {
-        "message_helper": "Unblock emails this message from you. Nothing else is shared.",
-        "book_1_1": "Unblock emails this message with a 30-minute calendar invite.",
-        "access_request": f"Unblock sends this to {pending['to_name']}'s approval agent. Only your manager can approve it.",
-        "doc_owner_note": "Unblock emails the doc owner. They decide whether to update the doc.",
+        "message_helper": "TeamReady emails this message from you. Nothing else is shared.",
+        "book_1_1": "TeamReady emails this message with a 30-minute calendar invite.",
+        "access_request": f"TeamReady sends this to {pending['to_name']}'s approval agent. Only your manager can approve it.",
+        "doc_owner_note": "TeamReady emails the doc owner. They decide whether to update the doc.",
     }[pending["type"]]
     rows = [{"label": "To", "value": f"{pending['to_name']} ({pending['to_role']})"},
             {"label": "Subject", "value": pending["subject"]},
@@ -140,7 +140,7 @@ def stop_text(risk: dict, human: dict) -> str:
         "I stopped before searching, choosing anyone, or drafting a message.",
         f"The right person: **{human['name']}**, {human['role']} ({risk['channel']}).",
         "",
-        "Unblock will never: " + "; ".join(NEVER_DO) + ".",
+        "TeamReady will never: " + "; ".join(NEVER_DO) + ".",
     ])
 
 
@@ -171,4 +171,4 @@ def doc_title(doc_id: str) -> str:
 
 def guardian_text(issues: list[str]) -> str:
     return ("**Guardian stopped this draft:** it " + "; it ".join(issues) +
-            ". Unblock won't send it. Remove that part with **edit: <new message>**, or **reject** it.")
+            ". TeamReady won't send it. Remove that part with **edit: <new message>**, or **reject** it.")

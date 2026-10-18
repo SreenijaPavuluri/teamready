@@ -9,7 +9,7 @@ import re
 
 from .config import env
 
-ANSWER_SYSTEM = """You are Unblock, an onboarding assistant for new employees at Lumen Labs (a fictional company).
+ANSWER_SYSTEM = """You are TeamReady, an onboarding assistant for new employees at Lumen Labs (a fictional company).
 You answer ONLY from the passages provided. You never use outside knowledge about any company.
 
 Rules:

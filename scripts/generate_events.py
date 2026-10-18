@@ -1,7 +1,7 @@
 """Generate synthetic onboarding blocker events for the Friction Map.
 
 Each event is one blocker a new hire raised: topic, the docs they read first,
-whether Unblock resolved it without a ticket, and a day. No names or message
+whether TeamReady resolved it without a ticket, and a day. No names or message
 text are stored, which mirrors what the live system logs.
 
 Run:  python scripts/generate_events.py

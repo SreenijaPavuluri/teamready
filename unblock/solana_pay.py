@@ -47,7 +47,7 @@ def new_reference() -> str:
     return b58encode(os.urandom(32))
 
 
-def payment_url(reference: str, label: str = "Unblock", message: str = "Friction Map full report") -> str:
+def payment_url(reference: str, label: str = "TeamReady", message: str = "Friction Map full report") -> str:
     s = settings()
     return (f"solana:{s['recipient']}?amount={s['price']}&spl-token={s['mint']}&reference={reference}"
             f"&label={quote(label)}&message={quote(message)}")

@@ -71,7 +71,7 @@ async def _request_payment(ctx: Context, sender: str) -> None:
     await ctx.send(sender, RequestPayment(
         accepted_funds=[Funds(amount=PRICE, currency="FET", payment_method="fet_direct")],
         recipient=_wallet(), deadline_seconds=300, reference=reference,
-        description="Unblock Friction Map full report with doc-fix proposal",
+        description="TeamReady Friction Map full report with doc-fix proposal",
         metadata={"agent": "unblock-insights", "service": "friction_map_report",
                   "fet_network": "stable-testnet" if testnet else "mainnet", "mainnet": "false" if testnet else "true",
                   "provider_agent_wallet": _wallet(),
@@ -284,7 +284,7 @@ async def chat(ctx: Context, sender: str, text: str):
         owner = load_people()[p["owner_id"]]
         body = (f"Hi {owner['name'].split()[0]},\n\nUnblock's Friction Map shows {p['cluster']['count']} new-hire blockers about "
                 f"{p['cluster']['topic']} in the last 30 days. {p['cluster']['pattern']}.\n\nProposed change to '{p['doc_title']}':\n"
-                f"Before: {p['before']}\nAfter: {p['after']}\n\nYou decide whether to publish it.\n\nPeople Ops, via Unblock")
+                f"Before: {p['before']}\nAfter: {p['after']}\n\nYou decide whether to publish it.\n\nPeople Ops, via TeamReady")
         result = await asyncio.to_thread(send_email, owner["email"], f"Suggested fix for '{p['doc_title']}'", body, "people-ops@lumen.example")
         activity.log("insights", f"Fix sent to {owner['name']}, the doc owner, who decides whether to publish ({result['status']})", to="people", kind="done")
         return f"**{result['status'].capitalize()}.** {result['detail']} {owner['name']} decides whether to publish it."

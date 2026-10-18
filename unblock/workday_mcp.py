@@ -1,4 +1,4 @@
-"""Workday Agent-Ready MCP tools: Unblock reads Workday data and does Workday tasks.
+"""Workday Agent-Ready MCP tools: TeamReady reads Workday data and does Workday tasks.
 
 Workday exposes 400+ Agent-Ready MCP tools (absence, onboarding, journeys, learning,
 expenses, talent...) at one endpoint, called with MCP's JSON-RPC 2.0 and an Agent
@@ -6,7 +6,7 @@ System User (ASU) OAuth token from Workday's Agent System of Record (ASOR). In
 delegate mode the agent can never do more than the person it acts for.
 Docs: developer.workday.com → Agents → Agent-Ready MCP Tools.
 
-Unblock's part:
+TeamReady's part:
   - discover the tools the tenant registered for this agent (tools/list),
   - for a goal ("how many vacation days do I have?", "request Nov 3-4 off"), shortlist the
     matching tools and let the model pick one and fill its arguments from the tool's own schema

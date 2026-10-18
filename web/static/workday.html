@@ -3,8 +3,9 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>Unblock for Workday</title>
-<meta name="description" content="A new hire's onboarding home: Unblock does the onboarding work, and a person approves every action.">
+<title>TeamReady for Workday</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns=%27http://www.w3.org/2000/svg%27 viewBox=%270 0 24 24%27%3E%3Crect width=%2724%27 height=%2724%27 rx=%276%27 fill=%27%231f66ff%27/%3E%3Cpath d=%27M5.5 12.5l4 4L18.5 7.5%27 fill=%27none%27 stroke=%27white%27 stroke-width=%273%27 stroke-linecap=%27round%27 stroke-linejoin=%27round%27/%3E%3C/svg%3E">
+<meta name="description" content="A new hire's onboarding home: TeamReady does the onboarding work, and a person approves every action.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
@@ -61,9 +62,12 @@ svg.i { width: 18px; height: 18px; flex: none; stroke: currentColor; fill: none;
 .top .wrap { height: 64px; display: flex; align-items: center; gap: 20px; }
 .logo { display: flex; align-items: center; gap: 10px; color: #fff; flex: none; }
 .logo:hover { text-decoration: none; }
-.logo b { width: 34px; height: 34px; border-radius: 10px; background: var(--logo); color: var(--logo-ink); display: grid; place-items: center; font: 800 17px var(--font); }
-.logo span { font: 700 17px/1 var(--font); letter-spacing: -0.01em; }
-.logo small { display: block; font: 500 12px/1 var(--font); color: var(--nav-mute); margin-top: 4px; }
+.logo b { display: none; width: 36px; height: 36px; border-radius: 10px; background: #1f66ff; place-items: center; }
+.logo b svg { width: 20px; height: 20px; fill: none; stroke: #fff; stroke-width: 3.2; stroke-linecap: round; stroke-linejoin: round; }
+.wm { display: inline-flex; align-items: center; font: 800 21px/1 var(--font); letter-spacing: -0.03em; color: #fff; }
+.wm .t { color: #4d8bff; }
+.wm svg { width: 19px; height: 19px; margin-left: 3px; fill: none; stroke: #4d8bff; stroke-width: 3.4; stroke-linecap: round; stroke-linejoin: round; }
+.logo small { display: block; font: 500 12px/1 var(--font); color: var(--nav-mute); margin-top: 5px; }
 .search { flex: 1; max-width: 460px; position: relative; }
 .search svg { position: absolute; left: 14px; top: 11px; color: var(--nav-mute); }
 .search input { width: 100%; height: 40px; border: 1px solid transparent; border-radius: 12px; background: var(--nav-2); color: #fff; padding: 0 14px 0 42px; }
@@ -215,7 +219,7 @@ svg.i { width: 18px; height: 18px; flex: none; stroke: currentColor; fill: none;
 /* ---------- assistant ---------- */
 .panel { position: sticky; top: calc(88px + env(safe-area-inset-top, 0px)); height: calc(100vh - 112px); min-height: 520px; display: flex; flex-direction: column; padding: 0; overflow: hidden; }
 .asst-h { display: flex; align-items: center; gap: 12px; padding: 18px 20px; border-bottom: 1px solid var(--line); }
-.utile { width: 40px; height: 40px; border-radius: 12px; background: linear-gradient(135deg, #0a4fc4, #22a3ec); color: #fff; display: grid; place-items: center; font: 800 17px var(--font); flex: none; }
+.utile { width: 40px; height: 40px; border-radius: 12px; background: #1f66ff; color: #fff; display: grid; place-items: center; font: 800 17px var(--font); flex: none; }
 .asst-h h2 { margin: 0; font: 700 16px/1.25 var(--font); }
 .asst-h small { display: block; color: var(--ink-3); font-size: 12.5px; }
 .live { margin-left: auto; display: inline-flex; align-items: center; gap: 6px; font-size: 12px; font-weight: 600; color: var(--green); white-space: nowrap; }
@@ -264,7 +268,8 @@ svg.i { width: 18px; height: 18px; flex: none; stroke: currentColor; fill: none;
 @media (max-width: 640px) {
   .wrap { padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); }
   .top .wrap { gap: 10px; }
-  .logo span, .logo small, .roles button span { display: none; }
+  .logo .wm, .logo small, .roles button span { display: none; }
+  .logo b { display: grid; }
   .right { gap: 8px; }
   .roles button { padding: 7px 10px; }
   .shell { padding-block: 16px 28px; }
@@ -303,10 +308,10 @@ svg.i { width: 18px; height: 18px; flex: none; stroke: currentColor; fill: none;
 
 <header class="top">
   <div class="wrap">
-    <a class="logo" href="/"><b>U</b><div><span>Unblock</span><small>Lumen Labs</small></div></a>
+    <a class="logo" href="/" aria-label="TeamReady home"><b><svg viewBox="0 0 24 24"><path d="M4.5 12.5l4.5 4.5L19.5 6.5"/></svg></b><div><span class="wm"><span class="t">Team</span>Ready<svg viewBox="0 0 24 24"><path d="M3 13.5l5.5 5L21 5"/></svg></span><small>Lumen Labs</small></div></a>
     <form class="search" id="search" role="search">
       <svg class="i"><use href="#i-search"/></svg>
-      <input id="searchIn" placeholder="Search or ask Unblock: &quot;do my checklist&quot;" aria-label="Search or ask Unblock">
+      <input id="searchIn" placeholder="Search or ask TeamReady: &quot;do my checklist&quot;" aria-label="Search or ask TeamReady">
     </form>
     <div class="right">
       <div class="roles" role="group" aria-label="View as">
@@ -314,7 +319,7 @@ svg.i { width: 18px; height: 18px; flex: none; stroke: currentColor; fill: none;
         <button id="rMgr" aria-pressed="false">Jordan<span> · manager</span></button>
         <button id="rOps" aria-pressed="false">Elena<span> · People Ops</span></button>
       </div>
-      <button class="askb" id="askBtn" aria-label="Ask Unblock"><svg class="i"><use href="#i-chat"/></svg></button>
+      <button class="askb" id="askBtn" aria-label="Ask TeamReady"><svg class="i"><use href="#i-chat"/></svg></button>
       <button class="mebtn" id="inboxBtn" aria-label="Your inbox"><span id="avatar">MC</span><span class="count" id="badge" hidden>0</span></button>
     </div>
   </div>
@@ -340,7 +345,7 @@ svg.i { width: 18px; height: 18px; flex: none; stroke: currentColor; fill: none;
 
     <div class="stack" data-role="hire">
       <section class="card">
-        <div class="card-h"><h2>Awaiting Your Action</h2><span class="meta">Unblock never acts until you approve</span></div>
+        <div class="card-h"><h2>Awaiting Your Action</h2><span class="meta">TeamReady never acts until you approve</span></div>
         <ul class="tiles" id="hireInbox"></ul>
       </section>
       <section class="card">
@@ -350,15 +355,15 @@ svg.i { width: 18px; height: 18px; flex: none; stroke: currentColor; fill: none;
       <div class="duo">
         <section class="card">
           <div class="card-h"><h2>Done for You</h2><span class="meta">Business process history</span></div>
-          <ul class="rows" id="history"><li class="plain"><div class="empty-box"><b>Nothing yet</b>Tasks Unblock completes after your approval show up here.</div></li></ul>
+          <ul class="rows" id="history"><li class="plain"><div class="empty-box"><b>Nothing yet</b>Tasks TeamReady completes after your approval show up here.</div></li></ul>
         </section>
         <section class="card">
           <div class="card-h"><h2>Waiting on Others</h2></div>
-          <ul class="rows" id="waiting"><li class="plain"><div class="empty-box"><b>Nothing pending</b>Anything Unblock sends for you is tracked here.</div></li></ul>
+          <ul class="rows" id="waiting"><li class="plain"><div class="empty-box"><b>Nothing pending</b>Anything TeamReady sends for you is tracked here.</div></li></ul>
         </section>
       </div>
       <section class="card">
-        <div class="card-h"><h2>Ask Unblock To</h2><span class="meta">It shows you exactly what it will do first</span></div>
+        <div class="card-h"><h2>Ask TeamReady To</h2><span class="meta">It shows you exactly what it will do first</span></div>
         <ul class="acts" id="apps">
           <li><button data-q="Can you join the Slack channels for me?"><span class="ai"><svg class="i"><use href="#i-hash"/></svg></span>Join my team's Slack channels</button></li>
           <li><button data-q="Sign me up for security awareness training"><span class="ai"><svg class="i"><use href="#i-cap"/></svg></span>Enroll me in required training</button></li>
@@ -407,7 +412,7 @@ svg.i { width: 18px; height: 18px; flex: none; stroke: currentColor; fill: none;
     </div>
 
     <section class="card">
-      <div class="card-h"><h2>How Unblock Works</h2><a class="meta" href="/activity" target="_blank" rel="noopener">View live agent activity →</a></div>
+      <div class="card-h"><h2>How TeamReady Works</h2><a class="meta" href="/activity" target="_blank" rel="noopener">View live agent activity →</a></div>
       <dl class="how">
         <div><dt>What it's doing</dt><dd>Every step by every agent is logged live on Agent Activity, including what each check stopped.</dd></div>
         <div><dt>Why it says what it says</dt><dd>Each statement quotes an approved doc word for word, with the doc's date and owner. Anything it can't quote is removed.</dd></div>
@@ -423,11 +428,11 @@ svg.i { width: 18px; height: 18px; flex: none; stroke: currentColor; fill: none;
     <p class="legal">Prototype for the Workday "Build the Future of Work with AI" challenge. Lumen Labs and its people are fictional. Not a Workday product.</p>
   </div>
 
-  <aside class="panel card" id="panel" aria-label="Unblock Assistant">
-    <div class="asst-h"><span class="utile">U</span><div><h2>Unblock Assistant</h2><small>Answers from approved docs · acts only with your OK</small></div><span class="live">7 agents</span></div>
+  <aside class="panel card" id="panel" aria-label="TeamReady Assistant">
+    <div class="asst-h"><span class="utile"><svg viewBox="0 0 24 24" style="width:22px;height:22px;fill:none;stroke:#fff;stroke-width:3.2;stroke-linecap:round;stroke-linejoin:round"><path d="M4.5 12.5l4.5 4.5L19.5 6.5"/></svg></span><div><h2>TeamReady Assistant</h2><small>Answers from approved docs · acts only with your OK</small></div><span class="live">7 agents</span></div>
     <div class="log" id="log" aria-live="polite"></div>
     <div class="try" id="chips"><button>Do my checklist</button><button>How do I deploy to staging?</button><button>How many vacation days do I get?</button></div>
-    <form class="composer" id="composer"><input id="q" autocomplete="off" placeholder="Ask a question or describe a task" aria-label="Message Unblock"><button class="btn primary" type="submit" aria-label="Send"><svg class="i"><use href="#i-send"/></svg></button></form>
+    <form class="composer" id="composer"><input id="q" autocomplete="off" placeholder="Ask a question or describe a task" aria-label="Message TeamReady"><button class="btn primary" type="submit" aria-label="Send"><svg class="i"><use href="#i-send"/></svg></button></form>
   </aside>
 </main>
 
@@ -471,7 +476,7 @@ svg.i { width: 18px; height: 18px; flex: none; stroke: currentColor; fill: none;
   const log = $("log");
   function bubble(who, html, extra) {
     const m = h("div", "msg " + who);
-    if (who === "bot") m.appendChild(h("div", "from", "Unblock"));
+    if (who === "bot") m.appendChild(h("div", "from", "TeamReady"));
     const b = h("div"); if (html) b.innerHTML = html; m.appendChild(b);
     if (extra) m.appendChild(extra);
     log.appendChild(m); log.scrollTop = log.scrollHeight; return m;
@@ -539,7 +544,7 @@ svg.i { width: 18px; height: 18px; flex: none; stroke: currentColor; fill: none;
       t.remove();
       if (!res.ok) { const e = await res.json().catch(() => ({})); bubble("bot", md(e.detail || "Something went wrong. Nothing was sent.")); }
       else renderBot(await res.json());
-    } catch (e) { t.remove(); bubble("bot", md("Unblock isn't reachable right now. Nothing was sent.")); }
+    } catch (e) { t.remove(); bubble("bot", md("TeamReady isn't reachable right now. Nothing was sent.")); }
     busy = false; poll();
   }
   async function remind(itemId, doSend) {
@@ -584,7 +589,7 @@ svg.i { width: 18px; height: 18px; flex: none; stroke: currentColor; fill: none;
   function stepSub(step, p) {
     const start = p.start_date ? day(p.start_date) : null;
     if (/laptop/i.test(step)) return "With IT, in person, on your first day";
-    if (/multi-factor/i.test(step)) return "Only you can do this · Unblock never touches passwords or MFA";
+    if (/multi-factor/i.test(step)) return "Only you can do this · TeamReady never touches passwords or MFA";
     if (/training/i.test(step)) return "Within 14 days of start" + (start ? ` · due ${fmtDay(plus(start, 14))}` : "");
     if (/slack/i.test(step)) {
       const ch = ["#announcements", "#ask-people-ops", "#" + (p.team || "team").toLowerCase().replace(/[^a-z0-9]+/g, "-")];
@@ -611,7 +616,7 @@ svg.i { width: 18px; height: 18px; flex: none; stroke: currentColor; fill: none;
     const inbox = $("hireInbox"); inbox.replaceChildren(); let count = 0;
     if (s.awaiting_you) {
       const a = s.awaiting_you; count++;
-      const eyebrow = { system_action: "A task Unblock can do", system_batch: "Onboarding steps Unblock can do", access_request: "Request to your manager",
+      const eyebrow = { system_action: "A task TeamReady can do", system_batch: "Onboarding steps TeamReady can do", access_request: "Request to your manager",
                         message_helper: "Message ready to send", book_1_1: "1:1 invite", doc_owner_note: "Note to a doc owner", workday_action: "Workday task" }[a.type] || "Ready for review";
       const isMsg = ["access_request", "message_helper", "book_1_1", "doc_owner_note"].includes(a.type);
       const ok = btn(isMsg ? "Approve and send" : "Approve and do it", "primary", () => send("", { action: "ub_approve" }, "Approve")); ok.disabled = a.blocked;
@@ -629,7 +634,7 @@ svg.i { width: 18px; height: 18px; flex: none; stroke: currentColor; fill: none;
     const open = doable.filter(i => !waiting.includes(i));
     if (open.length && !s.awaiting_you) {
       count++;
-      inbox.appendChild(tile({ eyebrow: "Onboarding steps Unblock can do", title: cap(andList(open.map(i => short(s.checklist[i])))),
+      inbox.appendChild(tile({ eyebrow: "Onboarding steps TeamReady can do", title: cap(andList(open.map(i => short(s.checklist[i])))),
         sub: "You'll see each system and the exact fields before anything runs.",
         guard: "Guardian checks every step before it runs", buttons: [btn("Review the plan", "primary", () => send("Do my checklist"))] }));
     }
@@ -644,8 +649,8 @@ svg.i { width: 18px; height: 18px; flex: none; stroke: currentColor; fill: none;
       const tx = h("div", "txt"); tx.append(h("b", "", step.replace(/\.$/, "")), h("small", "", st === "wait" ? `Waiting for ${p.manager || "your manager"} to approve` : stepSub(step, p)));
       const end = h("div", "end");
       if (st === "you") end.appendChild(btn("How to", "link", () => send("How do I " + step.charAt(0).toLowerCase() + step.slice(1).replace(/\.$/, "") + "?")));
-      end.appendChild({ done: pill("green", "Done by Unblock"), wait: pill("amber", `Waiting on ${(p.manager || "manager").split(" ")[0]}`),
-                        todo: pill("blue", "Unblock can do this"), you: pill("", "Yours") }[st]);
+      end.appendChild({ done: pill("green", "Done by TeamReady"), wait: pill("amber", `Waiting on ${(p.manager || "manager").split(" ")[0]}`),
+                        todo: pill("blue", "TeamReady can do this"), you: pill("", "Yours") }[st]);
       li.append(num, tx, end); return li;
     }));
 
@@ -706,17 +711,17 @@ svg.i { width: 18px; height: 18px; flex: none; stroke: currentColor; fill: none;
         }));
       }
       inbox.appendChild(tile({ eyebrow: `${r.category} · ${r.request_id}`, title: `${cap(r.category)} for ${r.requester ? r.requester.name : "a new hire"}`,
-        sub: `Received ${ago(r.created)}. Unblock files the form only after you approve.`, guard: "Guardian checked the request", buttons: acts, detail }));
+        sub: `Received ${ago(r.created)}. TeamReady files the form only after you approve.`, guard: "Guardian checked the request", buttons: acts, detail }));
     }
     $("mgrHistory").replaceChildren(...(decided.length ? decided.slice(0, 6).map(r => {
       const ok = r.status === "approved";
       return row(ok ? "check" : "x", ok ? "" : "red", `${cap(r.category)} · ${r.requester ? r.requester.name : ""}`, [pill(ok ? "green" : "red", ok ? "Approved" : "Denied")],
-        r.request_id + (ok && /analytics/.test(r.category) ? " · form filed by Unblock after your approval" : ""));
+        r.request_id + (ok && /analytics/.test(r.category) ? " · form filed by TeamReady after your approval" : ""));
     }) : [emptyBox("No decisions yet", "Requests you approve or deny appear here.")]));
     if (last) {
       const done = (last.checklist_done || []).length;
       $("team").replaceChildren(row("check", done === last.checklist.length ? "" : "blue", last.profile.name,
-        [pill(done === last.checklist.length ? "green" : "blue", `${done} of ${last.checklist.length}`)], `${last.profile.role} · ${(last.done_for_you || []).length} tasks done by Unblock`));
+        [pill(done === last.checklist.length ? "green" : "blue", `${done} of ${last.checklist.length}`)], `${last.profile.role} · ${(last.done_for_you || []).length} tasks done by TeamReady`));
     }
   }
   $("mgrKeyGo").onclick = () => { mgrKey = $("mgrKey").value; try { sessionStorage.setItem("ub.mkey", mgrKey); } catch (e) {} renderMgr(); };
@@ -786,7 +791,7 @@ svg.i { width: 18px; height: 18px; flex: none; stroke: currentColor; fill: none;
     } catch (e) {}
   }
 
-  bubble("bot", md("Hi, I'm Unblock. I answer from Lumen Labs' approved docs and show where each answer comes from. I can also finish onboarding tasks for you, like joining your Slack channels or booking your first 1:1. I'll show you exactly what I'm about to do first."));
+  bubble("bot", md("Hi, I'm TeamReady. I answer from Lumen Labs' approved docs and show where each answer comes from. I can also finish onboarding tasks for you, like joining your Slack channels or booking your first 1:1. I'll show you exactly what I'm about to do first."));
   $("heroDay").textContent = todayStr();
   setRole(role);
   setInterval(() => { if (role === "hire") poll(); else if (role === "mgr") renderMgr(); }, 4000);

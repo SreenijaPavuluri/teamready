@@ -1,4 +1,4 @@
-"""New Hire Portal: the same Unblock conversation as in ASI:One, in a web page.
+"""New Hire Portal: the same TeamReady conversation as in ASI:One, in a web page.
 
 The portal runs the orchestrator's own conversation logic (unblock/flow.py)
 with the same checks: risk gate, verified answers, fair routing, Guardian,
@@ -211,7 +211,7 @@ def state(session: str, after: int = 0) -> dict:
                     "workday_mcp": _workday_mcp_status(), "start_date": user.get("start_date", ""),
                     "today": today().isoformat()},
         "checklist": checklist(),
-        # Checklist steps Unblock already did for this session (by index), and everything it did.
+        # Checklist steps TeamReady already did for this session (by index), and everything it did.
         "checklist_done": [i for i, step in enumerate(checklist()) for p in autopilot.plan_checklist([step], user, session)
                            if p["status"] == "done"],
         "checklist_doable": [i for i, step in enumerate(checklist()) for p in autopilot.plan_checklist([step], user, session)

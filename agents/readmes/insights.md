@@ -1,4 +1,4 @@
-# Unblock Insights: the Friction Map for People Ops
+# TeamReady Insights: the Friction Map for People Ops
 
 ![tag:innovationlab](https://img.shields.io/badge/innovationlab-3D8BD3)
 ![tag:hackathon](https://img.shields.io/badge/hackathon-5F43F1)

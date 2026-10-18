@@ -64,7 +64,7 @@
       ],
       "human_id": "p06",
       "channel": "HR Business Partner",
-      "reason": "Benefits and eligibility questions are answered by HR. Unblock can only point you to the right place."
+      "reason": "Benefits and eligibility questions are answered by HR. TeamReady can only point you to the right place."
     },
     {
       "category": "employment status",
@@ -129,7 +129,7 @@
         "break glass"
       ],
       "approver": "manager",
-      "reason": "Elevated access always needs your manager's approval. Unblock prepares the request but never files it on its own."
+      "reason": "Elevated access always needs your manager's approval. TeamReady prepares the request but never files it on its own."
     },
     {
       "category": "analytics access",

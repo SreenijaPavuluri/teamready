@@ -3,8 +3,9 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>Unblock New Hire Portal</title>
-<meta name="description" content="Ask Unblock anything about your first weeks: verified answers, the right person to ask, and nothing sent without your OK.">
+<title>TeamReady New Hire Portal</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns=%27http://www.w3.org/2000/svg%27 viewBox=%270 0 24 24%27%3E%3Crect width=%2724%27 height=%2724%27 rx=%276%27 fill=%27%231f66ff%27/%3E%3Cpath d=%27M5.5 12.5l4 4L18.5 7.5%27 fill=%27none%27 stroke=%27white%27 stroke-width=%273%27 stroke-linecap=%27round%27 stroke-linejoin=%27round%27/%3E%3C/svg%3E">
+<meta name="description" content="Ask TeamReady anything about your first weeks: verified answers, the right person to ask, and nothing sent without your OK.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wdth,wght@12..96,75..100,400..800&family=Source+Sans+3:ital,wght@0,400;0,600;1,400&family=JetBrains+Mono:wght@500&display=swap" rel="stylesheet">
@@ -149,7 +150,7 @@ button:disabled { opacity: 0.5; cursor: not-allowed; }
 <body>
 <div class="wrap">
   <header>
-    <div class="brand"><a href="/">Unblock</a><span>New Hire Portal</span></div>
+    <div class="brand"><a href="/"><span style="color:#1f66ff">Team</span>Ready<svg viewBox="0 0 24 24" width="0.9em" height="0.9em" style="margin-left:2px;vertical-align:-0.05em;fill:none;stroke:#2f72ff;stroke-width:3.4;stroke-linecap:round;stroke-linejoin:round" aria-hidden="true"><path d="M3 13.5l5.5 5L21 5"/></svg></a><span>New Hire Portal</span></div>
     <div class="seg" role="tablist" aria-label="View as">
       <button role="tab" id="tabHire" aria-selected="true">Maya · new hire</button>
       <button role="tab" id="tabMgr" aria-selected="false">Jordan · manager</button>
@@ -159,7 +160,7 @@ button:disabled { opacity: 0.5; cursor: not-allowed; }
 
   <!-- New hire view -->
   <div class="layout" id="hireView">
-    <section class="panel chat" aria-label="Chat with Unblock">
+    <section class="panel chat" aria-label="Chat with TeamReady">
       <div id="log" aria-live="polite"></div>
       <form class="composer" id="composer">
         <div class="chips" id="chips">
@@ -193,14 +194,14 @@ button:disabled { opacity: 0.5; cursor: not-allowed; }
       </section>
       <section class="panel" aria-label="Done for you">
         <h2>Done for you</h2>
-        <ul class="items" id="doneList"><li class="none">Nothing yet. Ask Unblock to do something ("join my Slack channels", "my laptop is broken") or press <b>Do my checklist for me</b>. It shows you first and acts only when you approve.</li></ul>
+        <ul class="items" id="doneList"><li class="none">Nothing yet. Ask TeamReady to do something ("join my Slack channels", "my laptop is broken") or press <b>Do my checklist for me</b>. It shows you first and acts only when you approve.</li></ul>
       </section>
       <section class="panel" aria-label="Waiting on others">
         <h2>Waiting on others</h2>
-        <ul class="items" id="follow"><li class="none">Nothing yet. When Unblock sends something for you, it shows up here, and the Tracker follows up if nobody replies.</li></ul>
+        <ul class="items" id="follow"><li class="none">Nothing yet. When TeamReady sends something for you, it shows up here, and the Tracker follows up if nobody replies.</li></ul>
       </section>
-      <section class="panel" aria-label="What Unblock will never do">
-        <h2>Unblock will never</h2>
+      <section class="panel" aria-label="What TeamReady will never do">
+        <h2>TeamReady will never</h2>
         <div class="promise">
           <span>Send anything without your approval.</span>
           <span>Guess when the docs don't say. It finds a person instead.</span>
@@ -215,7 +216,7 @@ button:disabled { opacity: 0.5; cursor: not-allowed; }
   <div class="mgr" id="mgrView" hidden>
     <section class="panel intro">
       <h2>Requests waiting for you</h2>
-      <p class="sub">Jordan Lee, Analytics Manager. Unblock never approves its own requests: only you can. Each request shows the doc it's based on.</p>
+      <p class="sub">Jordan Lee, Analytics Manager. TeamReady never approves its own requests: only you can. Each request shows the doc it's based on.</p>
       <div id="keyRow" hidden style="margin-top:12px" class="inrow"><input id="mkey" type="password" placeholder="Manager key" aria-label="Manager key"><button id="mkeyGo">Unlock</button></div>
     </section>
     <div id="queue" class="mgr"></div>
@@ -413,7 +414,7 @@ button:disabled { opacity: 0.5; cursor: not-allowed; }
       cb.onchange = () => { const d = store.get(doneKey, []).filter(x => x !== i); if (cb.checked) d.push(i); store.set(doneKey, d); renderPanel(s); };
       const sp = document.createElement("span"); sp.textContent = item.replace(/\.$/, "");
       const ask = document.createElement("button"); ask.type = "button";
-      if ((s.checklist_done || []).includes(i)) { ask.textContent = "Done by Unblock"; ask.disabled = true; }
+      if ((s.checklist_done || []).includes(i)) { ask.textContent = "Done by TeamReady"; ask.disabled = true; }
       else if ((s.checklist_waiting || []).includes(i)) { ask.textContent = "With manager"; ask.disabled = true; }
       else if ((s.checklist_doable || []).includes(i)) { ask.textContent = "Do it"; ask.onclick = () => send("Do my checklist for me"); }
       else { ask.textContent = "Ask"; ask.onclick = () => send("How do I " + item.charAt(0).toLowerCase() + item.slice(1).replace(/\.$/, "") + "?"); }

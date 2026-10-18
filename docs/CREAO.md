@@ -2,18 +2,18 @@
 
 **Track question:** do agents act as the connective tissue between people, making a team work better together without replacing anyone?
 
-**Unblock's answer:** two CREAO agents keep onboarding docs from going stale. They don't answer new hires; the Fetch.ai agents do that. They turn the new hires' repeated blockers into fixes that the right human (the doc owner) approves.
+**TeamReady's answer:** two CREAO agents keep onboarding docs from going stale. They don't answer new hires; the Fetch.ai agents do that. They turn the new hires' repeated blockers into fixes that the right human (the doc owner) approves.
 
 | CREAO agent | Trigger | What it does | Without it |
 | --- | --- | --- | --- |
 | **Doc Steward** | API Trigger, called by `unblock-insights` | Reads the worst Friction Map cluster, the doc new hires started from, and the doc that has the missing step. Drafts a one-span edit as JSON. | No doc fixes get drafted; the same blocker keeps coming back |
-| **Weekly Digest** | Scheduled run, Mondays 9am | Reads `https://YOUR-DOMAIN/api/friction` (anonymous aggregates, groups of 5+). Posts each doc owner's top gap to Slack or Notion, with a link to ask Unblock for the fix. | Doc owners never hear that their doc is the problem |
+| **Weekly Digest** | Scheduled run, Mondays 9am | Reads `https://YOUR-DOMAIN/api/friction` (anonymous aggregates, groups of 5+). Posts each doc owner's top gap to Slack or Notion, with a link to ask TeamReady for the fix. | Doc owners never hear that their doc is the problem |
 
 The Doc Steward also drafts the one-line edits for **Canary New Hires** detours (walls the synthetic new hires find
 before real hires do, `unblock/canary.py`): same inputs, same API Trigger, same exact-quote check, and the run link shows
 on `/canary`.
 
-The Doc Steward's output still goes through Unblock's exact-quote check, then a People Ops "approve", then the doc owner decides. A human approves every change.
+The Doc Steward's output still goes through TeamReady's exact-quote check, then a People Ops "approve", then the doc owner decides. A human approves every change.
 
 **Status:** Doc Steward live (agent ID `b450ed0d-985d-4079-917f-d9f9ee75e812`, tested against `data/docs/D02.md`/`D01.md`, matches the expected output exactly; [share link to a run](https://agent.creao.ai/share/0773babf9c5d456f0fc0446a58d6da2f)). Weekly Digest agent built (agent ID `add647c2-ebdf-4f6f-858a-a8d5f303b3d9`), Notion connected, test run posted both notes to the ["Onboarding health"](https://app.notion.com/p/Onboarding-health-3fc5a84da8e0815b82f5c42a8d01605a) page. Slack timed out on the first try, so Notion is the live channel. The weekly schedule is set once the domain is live (it needs the real `/api/friction` URL).
 
@@ -37,7 +37,7 @@ The Doc Steward's output still goes through Unblock's exact-quote check, then a 
 6. Create the **Weekly Digest** agent (instructions below). Connect Slack or Notion under Skills and connectors. Schedule it weekly, and run it once by hand for the demo.
 7. **For Devpost (required):** in the README, add the Doc Steward's agent ID and a **share link to one of its runs**. Show a run in the demo video.
 
-If CREAO is slow or a run fails, Unblock waits up to `CREAO_TIMEOUT_MINUTES` (12), then drafts the fix locally and says so in the chat. The demo can't get stuck.
+If CREAO is slow or a run fails, TeamReady waits up to `CREAO_TIMEOUT_MINUTES` (12), then drafts the fix locally and says so in the chat. The demo can't get stuck.
 
 ## Doc Steward instructions (paste into agent.creao.ai)
 
@@ -71,7 +71,7 @@ Never name individual new hires; the data has none, and don't add any.
 
 ## Rubric check
 
-| Criterion | Weight | How Unblock meets it |
+| Criterion | Weight | How TeamReady meets it |
 | --- | --- | --- |
 | AI as foundation | 30% | The doc-fix loop runs on the Doc Steward's output |
 | Depth on CREAO | 25% | API Trigger from our backend, async polling, our own verifier on its output, a second scheduled agent with a Slack/Notion connector |
