@@ -8,6 +8,13 @@ Built for LA Hacks AI Hackathon 2026: Workday "Build the Future of Work with AI"
 
 A new hire describes a blocker in ASI:One. Unblock answers only from approved company docs, verifies every claim word for word, finds the right person to ask when the docs fall short, drafts the message, and sends it only after the new hire approves. Access requests go to a human manager. Pay, performance and harassment questions go straight to a person. People Ops gets an anonymous Friction Map of what keeps blocking new hires, and pays for the full report through the Fetch.ai Payment Protocol.
 
+## Try it
+
+- **ASI:One** (asi1.ai): message **unblock-orchestrator** with "do my checklist", "What's our deploy process for
+  staging?" or "my laptop screen is cracked". Message **unblock-canary** with "run". Addresses are in the agent table below.
+- **Web:** `/app` (New Hire Portal, with a manager tab), `/canary` (Canary New Hires), `/activity` (the agents talking, live).
+- **No keys at all:** `UNBLOCK_LLM=extractive python scripts/local_demo.py` and `scripts/local_canary_demo.py`.
+
 ## Unblock does the work, not just answers
 
 A chatbot tells a new hire what to do. Unblock does it for them, after they approve:
@@ -63,17 +70,17 @@ New hires get stuck on questions nobody has answered for them. Ownership lives i
 
 ## Agents
 
-Seven agents, each registered on Agentverse with the Chat Protocol and usable on its own from ASI:One. Run `python scripts/addresses.py` to print the addresses for your seeds. **Go live:** [`docs/GO_LIVE.md`](docs/GO_LIVE.md).
+Seven agents, each registered on Agentverse with the Chat Protocol and usable on its own from ASI:One. Each one's address is below (from the team's seeds; `python scripts/addresses.py` prints them). **Go live:** [`docs/GO_LIVE.md`](docs/GO_LIVE.md).
 
 | Agent | What it does | Address |
 | --- | --- | --- |
-| `unblock-orchestrator` | ASI:One front door. Risk gate, coordinates the others, Interactive Cards, does approved tasks in Lumen's systems (Slack, training, calendar, IT tickets, access forms), relays manager decisions. | `agent1q...` |
-| `unblock-knowledge` | Search over approved docs, Sonnet drafts claims with quotes, a plain-code verifier keeps only verified claims, flags stale and conflicting docs, computes confidence. | `agent1q...` |
-| `unblock-routing` | Who to ask: 50% skills, 30% team, 20% availability, fairness rotation, learns from "wrong person". | `agent1q...` |
-| `unblock-manager` | Human approval gate. Only the manager can approve access requests. | `agent1q...` |
-| `unblock-insights` | Friction Map from anonymous events (groups of 5+ only). Full report with an AI-drafted doc fix for 0.1 FET via the Payment Protocol. | `agent1q...` |
-| `unblock-tracker` | Follows up when a message or request gets no answer, with a reminder sent only after approval. | `agent1q...` |
-| `unblock-canary` | Canary New Hires: synthetic new hires walk the onboarding docs through `unblock-knowledge`, find walls before real hires do, and draft fixes for the doc owners. | `agent1q...` |
+| `unblock-orchestrator` | ASI:One front door. Risk gate, coordinates the others, Interactive Cards, does approved tasks in Lumen's systems (Slack, training, calendar, IT tickets, access forms), relays manager decisions. | `agent1qvxgega6yer28glv25lyrkrr2j5r4dhky93twt94gjntrk2lcpswud2vcg7` |
+| `unblock-knowledge` | Search over approved docs, Sonnet drafts claims with quotes, a plain-code verifier keeps only verified claims, flags stale and conflicting docs, computes confidence. | `agent1qwh3qfy6nzlzaz9qw34prd5n0a94ns0kkqfjzcxqeqy7hqta8rfq2ql3jdv` |
+| `unblock-routing` | Who to ask: 50% skills, 30% team, 20% availability, fairness rotation, learns from "wrong person". | `agent1qgwxm40ue8umthyvdqmx32hfzt4xkvw66r7qwfervdl5zdhgdnl7q0c9ndk` |
+| `unblock-manager` | Human approval gate. Only the manager can approve access requests. | `agent1qvff097rt08j5jqgr9zpvhmusaulnrmyc0zrkmqsfe3jqqalpafmkruga7s` |
+| `unblock-insights` | Friction Map from anonymous events (groups of 5+ only). Full report with an AI-drafted doc fix for 0.1 FET via the Payment Protocol. | `agent1qtqytcznnvddv0u0y62u2ufnugsuvc7c8v3mqdxp4yr8jfun775ejn3f4rl` |
+| `unblock-tracker` | Follows up when a message or request gets no answer, with a reminder sent only after approval. | `agent1qds99je8gj9ez2pxwwq0mmy8ytavereqakgfydfr5jauhym2v6j56aeukm7` |
+| `unblock-canary` | Canary New Hires: synthetic new hires walk the onboarding docs through `unblock-knowledge`, find walls before real hires do, and draft fixes for the doc owners. | `agent1qd0h9mhhr3wv3dwanf4qjhexmr8ww82ldmzgmcmwmjpj6ja6tvpm62fptn6` |
 
 ### What each agent may do (and nothing more)
 
@@ -224,8 +231,8 @@ pip install -r requirements.txt
 cp .env.example .env          # fill in the keys and your own agent seeds
 python scripts/generate_events.py
 python -m pytest -q           # 88 tests, no network needed
-./scripts/run_all.sh          # runs the seven agents as separate processes (logs in logs/)
-# or: python agents/main.py   # all seven in one process
+python scripts/run_agents.py  # starts the seven agents as separate processes, checks every mailbox (Ctrl+C stops)
+# or: ./scripts/run_all.sh     # same, from a shell (logs in logs/; stop with kill $(cat logs/pids))
 ```
 
 With `AGENTVERSE_API_KEY` set, each agent starts in mailbox mode and prints an Agent Inspector link. Open each link once and connect the mailbox; the agent then appears in Agentverse with its README and badges. In ASI:One, search for **unblock-orchestrator** (or @-mention its address) and start chatting.
