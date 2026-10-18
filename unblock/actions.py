@@ -38,6 +38,25 @@ def next_slot(hour: int = 10) -> datetime:
     return day.replace(hour=hour, minute=0, second=0, microsecond=0)
 
 
+_reach: dict = {}
+
+
+def _reachable(host: str, port: int) -> bool:
+    """A 3-second check, cached for a minute, so a network that blocks email never makes an approval hang."""
+    import socket
+    import time as _t
+    key = (host, port)
+    if key in _reach and _t.time() - _reach[key][1] < 60:
+        return _reach[key][0]
+    try:
+        socket.create_connection((host, port), timeout=3).close()
+        ok = True
+    except OSError:
+        ok = False
+    _reach[key] = (ok, _t.time())
+    return ok
+
+
 def send_email(to: str, subject: str, body: str, sender: str, ics: str | None = None) -> dict:
     override = env("DEMO_RECIPIENT_OVERRIDE")
     actual_to = override or to
@@ -53,11 +72,14 @@ def send_email(to: str, subject: str, body: str, sender: str, ics: str | None = 
                            params={"method": "REQUEST"})
 
     host = env("SMTP_HOST")
-    if not host:
+    reachable = bool(host) and _reachable(host, int(env("SMTP_PORT", "587")))
+    if not reachable:
         OUTBOX_DIR.mkdir(exist_ok=True)
         path = OUTBOX_DIR / f"{datetime.now().strftime('%Y%m%d-%H%M%S')}-{uuid.uuid4().hex[:6]}.eml"
         path.write_bytes(bytes(msg))
-        return {"status": "simulated", "to": actual_to, "detail": f"Email is not configured, so nothing was sent. Saved to outbox/{path.name}."}
+        why = ("Email is not configured" if not host else
+               "The mail server isn't reachable from this network (some Wi-Fi networks block email)")
+        return {"status": "simulated", "to": actual_to, "detail": f"{why}, so nothing was sent. Saved to outbox/{path.name}."}
     try:
         port = int(env("SMTP_PORT", "587"))
         if port == 465:  # implicit TLS, for networks that block port 587
