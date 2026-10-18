@@ -213,6 +213,18 @@ def execute(action: str, form: dict, user: dict, owner: str, approved_by: str = 
     return record
 
 
+def log_record(action: str, title: str, system: str, status: str, detail: str, owner: str, form: dict) -> dict:
+    """Record something Unblock did in another system (e.g. Workday), so it shows in Done for You."""
+    record = {"id": f"WD-{uuid.uuid4().hex[:5].upper()}", "action": action, "title": title, "system": system, "status": status,
+              "detail": detail, "form": form, "owner": owner, "created": time.time(), "approved_by": "you"}
+    with _lock:
+        db = _load()
+        db["records"].append(record)
+        _save(db)
+    activity.log("systems", f"{record['id']}: {title} {status}", to="orchestrator", kind="done")
+    return record
+
+
 def records(owner: str) -> list[dict]:
     with _lock:
         return [r for r in _load()["records"] if r["owner"] == owner]

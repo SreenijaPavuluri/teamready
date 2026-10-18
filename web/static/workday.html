@@ -254,7 +254,7 @@ a { color: var(--blueberry-500); }
           <div class="body"><ul class="rows" id="waiting"><li class="empty">Nothing waiting. Requests and messages you approve show up here.</li></ul></div>
         </section>
         <section class="card">
-          <header><h2>My Profile</h2><span class="pill you" id="profSrc">Sample profile</span></header>
+          <header><h2>My Profile</h2><span style="display:flex;gap:6px;flex-wrap:wrap"><span class="pill you" id="profSrc">Sample profile</span><span class="pill you" id="mcpSrc" title="Workday Agent-Ready MCP tools">Workday MCP: not connected</span></span></header>
           <div class="body"><dl class="acard" style="border:0;padding:0;margin:0" id="profile"></dl></div>
         </section>
       </div>
@@ -514,6 +514,8 @@ a { color: var(--blueberry-500); }
     for (const [k, v] of [["Name", p.name], ["Job title", p.role], ["Team", p.team], ["Manager", p.manager], ["Office", p.office]]) if (v) prof.append(h("dt", "", k), h("dd", "", v));
     $("profSrc").textContent = p.source === "Workday" ? "From Workday" : "Sample profile";
     $("profSrc").className = "pill " + (p.source === "Workday" ? "done" : "you");
+    const mcp = p.workday_mcp || "not connected";
+    $("mcpSrc").textContent = "Workday MCP: " + mcp; $("mcpSrc").className = "pill " + (/^connected/.test(mcp) ? "done" : "you");
 
     // Messages from the manager or the Tracker arrive in the assistant
     for (const m of s.inbox || []) {

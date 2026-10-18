@@ -9,7 +9,7 @@ import re
 import uuid
 from dataclasses import dataclass
 
-from . import activity, autopilot, render
+from . import activity, autopilot, render, workday_mcp
 from .data import load_people, load_user
 from .llm import ExtractiveLLM, LLMError
 from .risk import assess, check_draft
@@ -38,6 +38,7 @@ INTRO = (
 
 # Card buttons carry distinctive ids ("ub_approve") so a typed sentence can never
 # be mistaken for a click. Typed commands must match a whole short phrase.
+ACTION_TYPES = ("system_action", "system_batch", "workday_action")  # pending items that do something, not messages
 ACTIONS = ("approve", "reject", "wrong_person", "wrong_answer", "ask_helper", "book_1_1", "do_it", "autopilot")
 PHRASES = {
     "wrong_person": {"wrong person", "not the right person", "wrong person, try someone else", "someone else please"},
@@ -112,7 +113,7 @@ class Orchestrator:
 
     def _review(self, state: dict, prefix: str = "") -> Reply:
         p = state["pending"]
-        if p["type"] in ("system_action", "system_batch"):
+        if p["type"] in ACTION_TYPES:
             if p.get("guardian"):
                 prefix = (prefix + "\n\n" if prefix else "") + render.guardian_text(p["guardian"])
             return Reply((prefix + "\n\n" + render.system_text(p)).strip(), "review", render.system_card(p))
@@ -169,17 +170,17 @@ class Orchestrator:
         pending = state.get("pending")
         if cmd == "approve" and pending:
             if pending.get("guardian"):
-                fix = ("Reply **reject**, then ask again without that detail." if pending["type"] in ("system_action", "system_batch")
+                fix = ("Reply **reject**, then ask again without that detail." if pending["type"] in ACTION_TYPES
                        else "Reply **edit: <new message>** or **reject**.")
                 return Reply(render.guardian_text(pending["guardian"]) + f"\n\nNothing was sent. {fix}")
-            if pending["type"] in ("system_action", "system_batch"):
+            if pending["type"] in ACTION_TYPES:
                 return await self._do(sender, state, state.pop("pending"))
             return await self._execute(sender, state)
         if cmd == "reject" and pending:
             state.pop("pending", None)
             self.store.set(sender, state)
             return Reply("Okay, I discarded the draft. Nothing was sent.")
-        if cmd == "edit" and pending and pending["type"] in ("system_action", "system_batch"):
+        if cmd == "edit" and pending and pending["type"] in ACTION_TYPES:
             return Reply("This is an action, not a message, so there's nothing to edit. Reply **approve** or **reject**.")
         if cmd == "edit" and pending:
             new_body = re.sub(r"^\s*edit:\s*", "", text, flags=re.I).strip()
@@ -210,6 +211,12 @@ class Orchestrator:
         if cmd in ("approve", "reject", "edit", "wrong_person", "ask_helper", "book_1_1", "wrong_answer", "do_it"):
             return Reply("There's nothing waiting for that right now. Ask me a question to get started.")
 
+        if workday_mcp.enabled() and assess(text).level != "stop":
+            found = workday_mcp.intent(text)
+            if found:
+                reply = await self._workday(sender, state, text, found)
+                if reply:
+                    return reply
         wanted = autopilot.detect(text)
         if wanted and assess(text).level == "routine":
             return self._propose(sender, state, wanted, text)
@@ -248,9 +255,56 @@ class Orchestrator:
         self.store.set(sender, state)
         return self._review(state)
 
+    async def _workday(self, sender: str, state: dict, text: str, found: tuple) -> Reply | None:
+        """Read from or act in the new hire's Workday tenant through its Agent-Ready MCP tools. None = fall back."""
+        import asyncio
+        name, words, goal = found
+        user = self._user()
+        activity.log("orchestrator", f"Workday: {goal.lower()}", to="systems", kind="message")
+        try:
+            candidates = await asyncio.to_thread(workday_mcp.shortlist, words)
+            if not candidates:
+                raise LLMError("no matching Workday tool is registered for Unblock")
+            plan = await asyncio.to_thread(workday_mcp.plan, goal, text, user, candidates, self.llm_factory())
+        except Exception as exc:
+            activity.log("systems", f"Workday unavailable ({str(exc)[:80]}); answering from the docs instead", kind="block")
+            return None
+        if plan["read"]:
+            try:
+                result = await asyncio.to_thread(workday_mcp.call, plan["tool"], plan["arguments"])
+            except Exception as exc:
+                activity.log("systems", f"Workday {plan['title']} failed: {str(exc)[:80]}", kind="block")
+                return None
+            answer = await asyncio.to_thread(workday_mcp.summarize, result, goal, self.llm_factory())
+            activity.log("systems", f"Workday {plan['title']}: read, nothing changed", to="orchestrator", kind="done")
+            return Reply(f"**From Workday:** {answer}\n\nRead live from your Workday tenant with the *{plan['title']}* tool, "
+                         "as you. Nothing was changed.")
+        import json as _json
+        p = {"type": "workday_action", "tool": plan["tool"], "form": plan["arguments"], "title": plan["title"],
+             "system": "Workday", "does": plan["explain"] or f"Run {plan['title']} in Workday.", "to_name": "Workday",
+             "to_role": "your tenant", "subject": plan["title"], "body": plan["explain"],
+             "guardian": check_draft("", _json.dumps(plan["arguments"]))}
+        p["form"] = {**p["form"], "why": "Workday Agent-Ready MCP tool; Workday's own approvals still apply"}
+        activity.log("orchestrator", f"Can do this in Workday: {plan['title']}. Waiting for your approval", kind="check")
+        state = {**state, "pending": p}
+        self.store.set(sender, state)
+        return self._review(state)
+
     async def _do(self, sender: str, state: dict, p: dict) -> Reply:
         import asyncio
         user = self._user()
+        if p["type"] == "workday_action":
+            args = {k: v for k, v in p["form"].items() if k != "why"}
+            try:
+                result = await asyncio.to_thread(workday_mcp.call, p["tool"], args)
+            except Exception as exc:
+                self.store.set(sender, state)
+                return Reply(f"**Not done.** Workday didn't accept it: {str(exc)[:300]}. Nothing else changed.")
+            answer = await asyncio.to_thread(workday_mcp.summarize, result, p["title"], self.llm_factory())
+            rec = autopilot.log_record("workday", p["title"], "Workday", "submitted", answer, sender, args)
+            self.store.set(sender, state)
+            return Reply(f"**Done in Workday: {rec['id']}.** {answer}\n\nWorkday's own approvals (for example your manager "
+                         "for time off) still apply.")
         if p["type"] == "system_action":
             rec = await asyncio.to_thread(autopilot.execute, p["action"], p["form"], user, sender)
             self.store.set(sender, state)

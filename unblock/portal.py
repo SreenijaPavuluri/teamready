@@ -184,6 +184,11 @@ def _check_overdue(db: dict, session: str) -> None:
                             "Want me to send a short, friendly reminder? I'll show it to you first."})
 
 
+def _workday_mcp_status() -> str:
+    from . import workday_mcp
+    return workday_mcp.status_cached()
+
+
 def state(session: str, after: int = 0) -> dict:
     from . import workday
 
@@ -202,7 +207,8 @@ def state(session: str, after: int = 0) -> dict:
     return {
         "profile": {"name": user["name"], "role": user["role"], "team": user.get("team", ""), "office": user.get("office", ""),
                     "manager": load_people().get(user.get("manager_id", ""), {}).get("name", ""),
-                    "source": user.get("profile_source", "Sample profile"), "workday": workday.status()},
+                    "source": user.get("profile_source", "Sample profile"), "workday": workday.status(),
+                    "workday_mcp": _workday_mcp_status()},
         "checklist": checklist(),
         # Checklist steps Unblock already did for this session (by index), and everything it did.
         "checklist_done": [i for i, step in enumerate(checklist()) for p in autopilot.plan_checklist([step], user, session)

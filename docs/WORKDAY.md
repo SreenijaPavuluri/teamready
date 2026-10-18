@@ -41,3 +41,32 @@ If Workday is unreachable, Unblock keeps working on the local profile and `/api/
 ## How to pitch it
 "Unblock reads the new hire's identity from Workday itself, the system of record, and only the four fields it
 needs. Company docs and the people directory stay synthetic for the demo."
+
+
+## 4. Let Unblock act in Workday: Agent-Ready MCP tools
+
+Workday exposes 400+ **Agent-Ready MCP tools** (absence, onboarding, journeys, learning, expenses, talent) at one
+endpoint. With them Unblock answers "how many vacation days do I have left?" from Workday itself (the docs can't),
+and does Workday tasks such as **Create Worker Time Off Request**, always after the new hire approves. Workday's own
+approvals (the manager for time off) still apply, and in delegate mode the agent can never do more than the person.
+
+Code: `unblock/workday_mcp.py` (JSON-RPC 2.0 client, tool discovery, read vs change), wired into `unblock/flow.py`.
+Lookups (find / list / get) run straight away; anything that changes Workday shows a review card first.
+
+**Setup in the tenant** (Workday docs: Agents → External Agents → *Connect an External Agent with Workday MCP*; it
+needs an Extend-enabled tenant, so confirm your Build tenant has Agent System of Record):
+1. **Set Up Agent System of Record** (ASOR) in the tenant.
+2. **Register External Agents**: register "Unblock".
+3. **Configure External Agents**: add the skills/tools it may use. Start with *Find Absence Balances*, *Find Eligible
+   Absence Types*, *Find Worker Valid Time Off Dates*, *Create Worker Time Off Request*, *List Onboarding Business
+   Process Tasks*, *Find Journey Statuses*, *Update Journey Steps*, and the *Learning* lookups.
+4. **Configure Security Policies for Agent Skills**.
+5. Get an ASU token (the docs use Bruno or Postman):
+   `GET https://us.agent.workday.com/auth/authorize/<tenant>` (client_id, redirect_uri, response_type=code), log in as
+   the demo worker, then `POST https://us.agent.workday.com/auth/oauth2/<tenant>/token` with
+   `grant_type=authorization_code&code=…&client_id=…&client_secret=…`.
+6. In `.env`: `WORKDAY_MCP_URL=https://us.agent.workday.com/<tenant>/mcp` and `WORKDAY_MCP_TOKEN=<access_token>`
+   (it lasts 60 minutes; for longer, also set `WORKDAY_MCP_TOKEN_URL`, `WORKDAY_MCP_CLIENT_ID`,
+   `WORKDAY_MCP_CLIENT_SECRET`, `WORKDAY_MCP_REFRESH_TOKEN` and Unblock refreshes it).
+7. Check: `/api/health` shows `"workday_mcp": "connected: N Agent-Ready tools"`, and the Workday view's profile card
+   shows "Workday MCP: connected". Then ask "How many vacation days do I have left?".
