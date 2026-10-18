@@ -49,7 +49,8 @@ def test_reject_and_edit_do_nothing():
 def test_it_ticket_text_goes_through_the_guardian():
     s = session()
     r = chat(s, "my laptop is broken, my password is hunter22 if IT needs it")
-    assert r["draft"]["guardian"]
+    guard = next(row["value"] for row in r["payload"]["summary_rows"] if row["label"] == "Guardian check")
+    assert guard.startswith("Blocked")
     r = chat(s, "approve")
     assert "Nothing was sent" in r["text"] and autopilot.records(s) == []
 

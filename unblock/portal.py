@@ -16,7 +16,7 @@ import threading
 import time
 import uuid
 
-from . import activity, tracker
+from . import activity, autopilot, tracker
 from . import knowledge as knowledge_lib
 from . import routing as routing_lib
 from .actions import send_email
@@ -141,7 +141,7 @@ def _reply(reply: Reply, session: str) -> dict:
     state = Store().get(session) or {}
     pending = state.get("pending")
     out = {"text": reply.text, "kind": reply.kind, "payload": reply.payload}
-    if reply.kind == "review" and pending:
+    if reply.kind == "review" and pending and pending["type"] not in ("system_action", "system_batch"):
         out["draft"] = {k: pending[k] for k in ("type", "to_name", "to_role", "subject", "body", "guardian")}
     return out
 
@@ -201,6 +201,15 @@ def state(session: str, after: int = 0) -> dict:
                     "manager": load_people().get(user.get("manager_id", ""), {}).get("name", ""),
                     "source": user.get("profile_source", "Sample profile"), "workday": workday.status()},
         "checklist": checklist(),
+        # Checklist steps Unblock already did for this session (by index), and everything it did.
+        "checklist_done": [i for i, step in enumerate(checklist()) for p in autopilot.plan_checklist([step], user, session)
+                           if p["status"] == "done"],
+        "checklist_doable": [i for i, step in enumerate(checklist()) for p in autopilot.plan_checklist([step], user, session)
+                             if p["status"] in ("will_do", "manager")],
+        "checklist_waiting": [i for i, step in enumerate(checklist()) for p in autopilot.plan_checklist([step], user, session)
+                              if p["status"] == "manager" and any(r.get("status") == "pending" and r.get("category") == "analytics access"
+                                                                  for r in db.get("approvals", {}).values() if r.get("session") == session)],
+        "done_for_you": [{k: r[k] for k in ("id", "title", "system", "status", "detail")} for r in autopilot.records(session)][::-1],
         "followups": sorted(({"id": i["id"], "kind": tracker.KIND_LABEL.get(i["kind"], i["kind"]), "to": i["to_name"],
                               "summary": i["summary"], "status": "waiting" if i["status"] == "open" else i["status"],
                               "age": tracker.age_text(time.time() - i["created"]), "nudged": i["nudged"]} for i in items),

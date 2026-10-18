@@ -14,7 +14,8 @@ import time
 from .config import env
 from .risk import check_draft
 
-KIND_LABEL = {"message_helper": "your message", "book_1_1": "your 1:1 invite", "access_request": "your access request"}
+KIND_LABEL = {"message_helper": "your message", "book_1_1": "your 1:1 invite", "access_request": "your access request",
+              "it_ticket": "your IT ticket"}
 
 
 def due_seconds() -> int:

@@ -167,11 +167,12 @@ li.step .msg { color: var(--muted); }
     insights:       { x: 640, y: 405, label: "Insights", sub: "Friction Map · FET" },
     creao:          { x: 880, y: 405, label: "CREAO", sub: "Doc Steward agent", creao: true },
     canary:         { x: 880, y: 50,  label: "Canary", sub: "synthetic new hires" },
+    systems:        { x: 640, y: 215, label: "Lumen systems", sub: "Slack · IT · Learning · Access", person: true },
   };
   const EDGES = [["user","orchestrator"],["orchestrator","knowledge"],["orchestrator","routing"],["orchestrator","tracker"],
     ["orchestrator","manager"],["orchestrator","insights"],["orchestrator","people"],["tracker","user"],["tracker","people"],
     ["manager_person","manager"],["people_ops","insights"],["insights","creao"],["insights","people"],
-    ["canary","knowledge"],["canary","creao"],["canary","people"]];
+    ["canary","knowledge"],["canary","creao"],["canary","people"],["orchestrator","systems"]];
   const NAME = Object.fromEntries(Object.entries(NODES).map(([k, v]) => [k, v.label]));
   const W = 176, H = 56;
   const svg = document.getElementById("map"), ns = "http://www.w3.org/2000/svg";

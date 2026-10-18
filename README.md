@@ -8,6 +8,25 @@ Built for LA Hacks AI Hackathon 2026: Workday "Build the Future of Work with AI"
 
 A new hire describes a blocker in ASI:One. Unblock answers only from approved company docs, verifies every claim word for word, finds the right person to ask when the docs fall short, drafts the message, and sends it only after the new hire approves. Access requests go to a human manager. Pay, performance and harassment questions go straight to a person. People Ops gets an anonymous Friction Map of what keeps blocking new hires, and pays for the full report through the Fetch.ai Payment Protocol.
 
+## Unblock does the work, not just answers
+
+A chatbot tells a new hire what to do. Unblock does it for them, after they approve:
+
+| Say | Unblock does (in the Lumen system) | Who approves |
+| --- | --- | --- |
+| "Do my checklist" | Plans every onboarding step: does the ones it can, sends the gated one to the manager, says plainly which it can't (MFA, in-person IT setup) | You, then the manager for access |
+| "Which Slack channels should I join?" → **Do it** | Joins #announcements, #ask-people-ops, the team channel and the role's channels (Slack) | You |
+| "Sign me up for security training" | Enrolls in Security Awareness Training, due 14 days after the start date (Learning Hub) | You |
+| "Schedule my 1:1 with my manager" | Books a 30-minute 1:1 with the agenda from the docs and sends the calendar invite (Calendar, real .ics email) | You |
+| "My laptop screen is cracked" | Opens an IT ticket through go/it-help with the description; the Tracker follows up (IT Help) | You |
+| "I need access to the analytics dashboard" | Drafts the request to the manager, and **files the go/analytics-access form the moment the manager approves** (Access Hub) | You, then the manager |
+
+Every action is backed by the approved doc that describes it (shown on the card), fills its form from what Unblock
+already knows, passes free text through the Guardian, and runs only after approval. Each one leaves a record with an id
+("Done for you" in the portal, `what have you done` in ASI:One). It never touches passwords or MFA, pay, performance or
+benefits. Lumen's systems are fictional like the company, so each is a small adapter (`unblock/autopilot.py`); a real
+deployment swaps in the Slack, LMS, calendar, ServiceNow or access-request API behind the same call.
+
 ## Canary New Hires: your docs get a CI pipeline
 
 Every onboarding tool waits for a real new hire to get stuck, then helps. Unblock's **canaries** get stuck first.
@@ -48,7 +67,7 @@ Seven agents, each registered on Agentverse with the Chat Protocol and usable on
 
 | Agent | What it does | Address |
 | --- | --- | --- |
-| `unblock-orchestrator` | ASI:One front door. Risk gate, coordinates the others, Interactive Cards, executes approved actions, relays manager decisions. | `agent1q...` |
+| `unblock-orchestrator` | ASI:One front door. Risk gate, coordinates the others, Interactive Cards, does approved tasks in Lumen's systems (Slack, training, calendar, IT tickets, access forms), relays manager decisions. | `agent1q...` |
 | `unblock-knowledge` | Search over approved docs, Sonnet drafts claims with quotes, a plain-code verifier keeps only verified claims, flags stale and conflicting docs, computes confidence. | `agent1q...` |
 | `unblock-routing` | Who to ask: 50% skills, 30% team, 20% availability, fairness rotation, learns from "wrong person". | `agent1q...` |
 | `unblock-manager` | Human approval gate. Only the manager can approve access requests. | `agent1q...` |
@@ -62,7 +81,7 @@ Every agent gets only the tools its job needs. The **Guardian** is not a separat
 
 | Agent | Tools it gets | Data it sees | Can it act? |
 | --- | --- | --- | --- |
-| Orchestrator | Risk gate, Guardian, calls to the other agents, email after approval | The question, the new hire's role, team and office | Only after the new hire approves |
+| Orchestrator | Risk gate, Guardian, calls to the other agents, email after approval, the Lumen system adapters (Slack, Learning Hub, Calendar, IT Help, Access Hub) | The question, the new hire's role, team and office | Only after the new hire approves (access forms also need the manager) |
 | Knowledge | Doc search, the model, the verifier | Approved company docs | Read only |
 | Routing | Helper ranking, feedback | Each person's skills, team, availability and question load | Read only (ranks people) |
 | Manager | Hold requests, send decisions | The request, its business reason and verified evidence | Only a human manager decides |
@@ -233,7 +252,9 @@ This runs the real agents plus a test new hire and a test manager, and prints th
 2. "How do I set up my dev environment?" Verified, cited answer and the trust panel.
 3. "What's our deploy process for staging?" The legacy runbook is flagged as two years stale and left out; Unblock offers to tell its owner.
 4. "How many vacation days do I get?" The docs don't say. Unblock doesn't guess: it routes to People Ops and drafts the message. Click "wrong person"; the ranking updates live.
-5. "I need access to the analytics dashboard." A request goes to the manager agent; the manager approves in their own chat; Maya is notified.
+5. **"Do my checklist."** Unblock lays out all six steps: it does three (Slack channels, security training, the 1:1 with
+   an invite), sends analytics access to the manager, and says it won't touch MFA. Approve. The manager approves in their
+   own chat, and Unblock files the go/analytics-access form by itself. "It doesn't tell Maya what to do. It does it."
 6. "Can the AI decide whether I deserve a promotion?" Stopped before any search, with the right person named.
 7. Switch to People Ops: "friction map", then "full report", pay 0.1 FET, get the drafted fix for the onboarding checklist, send it to the doc owner.
 8. **Canary New Hires:** open `/canary`, press Run. Three synthetic new hires walk the docs; they hit the same analytics

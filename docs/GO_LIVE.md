@@ -64,6 +64,9 @@ Go through the demo script and tick each line:
 - [ ] The new hire's chat gets "Jordan Lee approved…" (if it doesn't appear, type "status": it's shown there)
 - [ ] Wait for the Tracker (for the demo set `TRACKER_DUE_MINUTES=2` in `.env` and restart) → follow-up card → "approve"
 - [ ] "Can the AI decide whether I deserve a promotion?" → stopped, HR named
+- [ ] "do my checklist" → plan card → "approve" → Slack, training and 1:1 done (record ids), access request to the manager;
+      after the manager approves, the new hire gets "I filed it for you: ACC-…"
+- [ ] "my laptop screen is cracked" → IT ticket card → "approve" → ITH-… ; "what have you done" lists everything
 - [ ] Message **unblock-insights**: "friction map", then "full report" → pay 0.1 FET in the ASI:One wallet → report and doc fix
 - [ ] Message **unblock-canary**: "run" → report card with confirmed and predicted walls → "fixes" → "approve F1"
 
